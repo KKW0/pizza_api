@@ -24,5 +24,6 @@ if type(input) == int:
     # print(gan_10[int(year)%10])
     # print(gan_12[int(year)%12])
     # print("해 입니다.")p
-    else:
+
+else:
     print("Warning: 숫자 형태의 연도를 입력하시오.")

@@ -3,7 +3,7 @@
 import os
 import csv
 
-path = '/home/rapa/Justin/project'
+path = '/home/rapa/yehunHwang/project'
 
 
 # words = path.split("/")
@@ -44,7 +44,7 @@ def csv_wrting(input_words):
     """
     받은 데이터를 CSV에 넣는 함수
     """
-    csv_path = os.path.expanduser('~/Justin/exercises/ex_0110_02.csv')
+    csv_path = os.path.expanduser('~/yehunHwang/exercises/ex_0110_02.csv')
     # print(input_words)
     
     with open(csv_path, 'w') as f:

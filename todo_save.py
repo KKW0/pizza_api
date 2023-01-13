@@ -191,7 +191,8 @@ class ToDoList():
 def main():
     todo = ToDoList()
     args = todo.arg_parse()
-    path = '/home/rapa/TEST/VScode/To_Do_List.txt'
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "To_Do_List.txt")
+    print(path)
     todo.run_program(args, path)
 
 if __name__ == "__main__" :

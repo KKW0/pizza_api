@@ -5,7 +5,7 @@ import maya.cmds as mc
 # import sys
 # sys.path.append("/home/rapa/TEST/git/pizza/ahyeon/GazuTest")
 # import main
-# from main import GetModelInformation
+# from main import GetSelectedPreviews
 # reload(get_model)
 #
 # gmi = GetModelInformation()

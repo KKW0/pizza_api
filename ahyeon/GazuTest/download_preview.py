@@ -113,7 +113,7 @@ class GetSelectedPreviews:
 def main():
     obj = GetSelectedPreviews()
     obj.task_type = 'Modeling'
-    obj.extension = 'png'
+    obj.extension = 'obj'
     obj.asset_name = 'Hulkbuster'
     obj.download_previews()
 

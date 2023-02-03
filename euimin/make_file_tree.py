@@ -21,6 +21,7 @@ class UploadNewFileToDB:
         self.concept = None
         self.uv = None
         self.layout = None
+        self._path = os.getcwd()
 
     def create_project_and_etc(self):
         self.new_prod = gazu.project.new_project("Test_Euimin")

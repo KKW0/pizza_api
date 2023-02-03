@@ -12,16 +12,8 @@ gazu.log_in("pipeline@rapa.org", "netflixacademy")
 
 dot = gazu.task.get_task_type_by_name(".")
 projects = gazu.project.all_projects()
-for pro in projects:
-    try:
-        show = gazu.task.all_tasks_for_task_type(pro, dot)
-        pp.pprint(show)
-        for s in show:
-            pp.pprint(gazu.project.get_project(s['project_id']))
-            gazu.task.remove_task(s)
-    except:
-        print(f"no dot in f{pro}\n")
-# gazu.task.remove_task_type(dot)
+gazu.task.remove_task_type(dot)
+# 오류 발생!!!!!! 삭제가 안됨!!!!!!!!!
 # set host and log in
 
 # human = gazu.asset.new_asset_type('Human')

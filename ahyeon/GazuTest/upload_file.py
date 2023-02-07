@@ -43,21 +43,20 @@ class MakeKitsuTree:
     def shot(self, value):
         self._shot = gazu.shot.get_shot_by_name(self._sequence, value)
 
-    def make_new_kitsu_tree(self):
-        human = gazu.asset.new_asset_type('Human')
-        dog = gazu.asset.new_asset_type('Dog')
-        # Set New asset type
+    def Make_new_kitsu_tree(self):
+        Characters = gazu.asset.new_asset_type('Characters')
+        Props = gazu.asset.new_asset_type('Props')
 
         all_tasks = gazu.task.all_task_types()
         for task_dict in all_tasks:
-            if 'Puppy' or 'Kitty' or 'Dear' == task_dict['name']:
-                puppy = gazu.task.get_task_type_by_name("Puppy")
-                kitty = gazu.task.get_task_type_by_name("Kitty")
-                dear = gazu.task.get_task_type_by_name("Dear")
+            if 'Cow' or 'Mouse' or 'Desk' == task_dict['name']:
+                cow = gazu.task.get_task_type_by_name("Cow")
+                mouse = gazu.task.get_task_type_by_name("Mouse")
+                desk = gazu.task.get_task_type_by_name("Desk")
             else:
-                puppy = gazu.task.new_task_type('Puppy', color='#00FF01')
-                kitty = gazu.task.new_task_type('Kitty', color='#00FF01')
-                dear = gazu.task.new_task_type('Dear', color='#00FF01', entity='Shot')
+                cow = gazu.task.new_task_type('Cow', color='#00FF01')
+                mouse = gazu.task.new_task_type('Mouse', color='#00FF01')
+                desk = gazu.task.new_task_type('Desk', color='#00FF01', entity='Shot')
         # Set New task type for asset, shot
 
         all_status = gazu.task.all_task_statuses()
@@ -70,7 +69,7 @@ class MakeKitsuTree:
                 bad = gazu.task.new_task_status("Bad", "bad", color='#00FF01')
         # Set New task status
 
-        project = gazu.project.new_project("A_project", "featurefilm", asset_types=[dog, human],
+        project = gazu.project.new_project("Test_bbr", "featurefilm", asset_types=[dog, human],
                                            task_types=[puppy, kitty, dear], task_statuses=[good, bad])
         # Set New project
 

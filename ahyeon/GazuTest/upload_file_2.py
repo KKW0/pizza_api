@@ -69,6 +69,7 @@ class MakeKitsuFiles:
     def asset(self, value):
         """
         self._shot에 지정된 이름의 에셋 딕셔너리를 할당하는 세터
+
         Args:
             value(self): 정보를 얻길 원하는 에셋 이름
         """
@@ -77,6 +78,7 @@ class MakeKitsuFiles:
     def update_filetree(self, mountpoint, root):
         """
         파일 트리를 업데이트하는 매서드
+
         Args:
             mountpoint(str/path): 폴더 트리를 생성할 위치의 전체 경로
             root(str/folder name): 폴더 트리를 생성할 mountpoint의 자식 폴더 이름

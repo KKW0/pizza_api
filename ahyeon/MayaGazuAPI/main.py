@@ -24,6 +24,7 @@ class SaveAsKitsuPath:
         # output, working file 만들기 위한 분류
         self._project = None
         self._sequence = None
+        self._asset_type = None
         self._entity = None
         # output file의 entity(asset / shot)
         self._task_type = None
@@ -48,6 +49,13 @@ class SaveAsKitsuPath:
         self._sequence = gazu.shot.get_sequence_by_name(self.project)
 
     @property
+    def asset_type(self):
+        return self._asset_type
+
+    @asset_type.setter
+    def asset_type(self, value):
+        self._asset_type = gazu.asset.get_asset_type_by_name(value)
+    @property
     def entity(self):
         return self._entity
 
@@ -56,7 +64,7 @@ class SaveAsKitsuPath:
         if value == "Shot":
             self._entity = gazu.shot.get_shot_by_name(self.sequence, value)
         elif value == "Asset":
-            self._entity = gazu.shot.get_shot_by_name(self.project, value, asset_type)
+            self._entity = gazu.shot.get_shot_by_name(self.project, value, self.asset_type)
 
     @property
     def task_type(self):

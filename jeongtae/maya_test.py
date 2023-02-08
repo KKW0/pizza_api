@@ -29,7 +29,7 @@ class MayaLayout:
         mc.lookThru(cam_list[0])
         mc.playblast(
             format='image',
-            filename=output_path,
+            filename='%s'%output_path,
             sequenceTime=0,
             clearCache=1, viewer=1,
             showOrnaments=1,

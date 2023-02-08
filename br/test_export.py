@@ -1,3 +1,7 @@
+import os
+import re
+import imageio
+import progressbar
 import numpy as np
 import os
 import re
@@ -83,9 +87,14 @@ def convert_rod_to_roi(intrinsic, rod):
     roi = (-x_offset, intrinsic.w - x_offset, -y_offset, intrinsic.h - y_offset)
     return roi
 
+<<<<<<< HEAD
+def undistort_images(sfm_data, view_filter, undistorted_images, undistorted_images_folder_path,
+                     output_file_type, correct_principal_point, roi_for_intrinsic, export_full_roi):
+=======
 
 # 측정된 값으로 rod와 roi값을 추가(?)
 def undistort_images(sfm_data, view_filter, undistorted_images, undistorted_images_folder_path, output_file_type, correct_principal_point, roi_for_intrinsic, export_full_roi):
+>>>>>>> 3cf1d0d2cc14b5b3072b6aaa3e14cd7416727b7d
     print("Build animated camera(s)...")
 
     # 사용되는 진행률 표시줄 라이브러리
@@ -138,11 +147,13 @@ def undistort_images(sfm_data, view_filter, undistorted_images, undistorted_imag
                     else:
                         rod = roi_for_intrinsic[key]
                     print(f"rod:{rod.xbegin};{rod.xend};{rod.ybegin};{rod.yend}")
-                    image_ud = intrinsic.undistort(image, black_fill_value=np.array([0,0,0]), correct_principal_point=correct_principal_point, roi=rod)
+                    image_ud = intrinsic.undistort(image, black_fill_value=np.array([0,0,0]),
+                                                   correct_principal_point=correct_principal_point, roi=rod)
                     roi = convert_rod_to_roi(intrinsic, rod)
                     write_image(dst_image, image_ud, metadata, roi)
                 else:
-                    image_ud = intrinsic.undistort(image, black_fill_value=np.array([0,0,0]), correct_principal_point=correct_principal_point)
+                    image_ud = intrinsic.undistort(image, black_fill_value=np.array([0,0,0]),
+                                                   correct_principal_point=correct_principal_point)
                     imageio.imwrite(dst_image, image_ud, plugin=None, format=output_file_type, metadata=metadata)
             else: # 왜곡이 없는 경우
                 imageio.imwrite(dst_image, image, plugin=None, format=output_file_type, metadata=metadata)

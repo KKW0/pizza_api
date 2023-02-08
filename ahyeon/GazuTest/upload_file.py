@@ -251,15 +251,16 @@ class MakeKitsuTree:
 
 def main():
     kt = MakeKitsuTree()
-    # kt.make_new_kitsu_tree()
+    kt.make_new_kitsu_tree()
     kt.project = "A_project"
     kt.sequence = "My Dog"
     kt.shot = "tail"
-
-    kt.print_info()
-    kt.make_working_file()
-    kt.make_output_file()
+    #
+    # kt.print_info()
+    # kt.make_working_file()
+    # kt.make_output_file()
     # kt.make_preview_file()
+    pp.pprint(kt.make_output_file())
 
 
 if __name__ == "__main__":

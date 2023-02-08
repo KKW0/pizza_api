@@ -253,7 +253,7 @@ class MakeKitsuTree:
 def main():
     kt = MakeKitsuTree()
     # kt.make_new_kitsu_tree()
-    kt.project = "A_project"
+    kt.project = "Test_Euimin"
     kt.sequence = "My Dog"
     kt.shot = "tail"
 

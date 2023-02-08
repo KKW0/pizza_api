@@ -203,7 +203,7 @@ class MakeKitsuTree:
         # maya_output = gazu.files.new_output_type("Maya Output Type", "maya output")
         maya_output = gazu.files.get_output_type_by_name("Maya Output Type")
         task_types = gazu.task.all_task_types_for_asset(self._asset[0])
-        # output = gazu.files.new_entity_output_file(self._asset[0], maya_output, task_types[0],
+        output = gazu.files.new_entity_output_file(self._asset[0], maya_output, task_types[0],
         #                                            comment="output file test", working_file=working,
         #                                            name="maya output file", representation="ma")
         output = gazu.files.all_output_files_for_entity(self._asset[0], maya_output, task_types[0],

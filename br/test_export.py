@@ -1,3 +1,7 @@
+import os
+import re
+import imageio
+import progressbar
 import numpy as np
 
 def compute_rod(intrinsic, correct_principal_point=True):
@@ -42,13 +46,8 @@ def convert_rod_to_roi(intrinsic, rod):
     roi = (-x_offset, intrinsic.w - x_offset, -y_offset, intrinsic.h - y_offset)
     return roi
 
-import os
-import re
-import imageio
-import numpy as np
-import progressbar
-
-def undistort_images(sfm_data, view_filter, undistorted_images, undistorted_images_folder_path, output_file_type, correct_principal_point, roi_for_intrinsic, export_full_roi):
+def undistort_images(sfm_data, view_filter, undistorted_images, undistorted_images_folder_path,
+                     output_file_type, correct_principal_point, roi_for_intrinsic, export_full_roi):
     print("Build animated camera(s)...")
 
     bar = progressbar.ProgressBar(max_value=len(sfm_data.views))
@@ -81,11 +80,13 @@ def undistort_images(sfm_data, view_filter, undistorted_images, undistorted_imag
                     else:
                         rod = roi_for_intrinsic[key]
                     print(f"rod:{rod.xbegin};{rod.xend};{rod.ybegin};{rod.yend}")
-                    image_ud = intrinsic.undistort(image, black_fill_value=np.array([0,0,0]), correct_principal_point=correct_principal_point, roi=rod)
+                    image_ud = intrinsic.undistort(image, black_fill_value=np.array([0,0,0]),
+                                                   correct_principal_point=correct_principal_point, roi=rod)
                     roi = convert_rod_to_roi(intrinsic, rod)
                     write_image(dst_image, image_ud, metadata, roi)
                 else:
-                    image_ud = intrinsic.undistort(image, black_fill_value=np.array([0,0,0]), correct_principal_point=correct_principal_point)
+                    image_ud = intrinsic.undistort(image, black_fill_value=np.array([0,0,0]),
+                                                   correct_principal_point=correct_principal_point)
                     imageio.imwrite(dst_image, image_ud, plugin=None, format=output_file_type, metadata=metadata)
             else: # (no distortion)
                 imageio.imwrite(dst_image, image, plugin=None, format=output_file_type, metadata=metadata)

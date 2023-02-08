@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/MayaLayout_ahyeon.iml" filepath="$PROJECT_DIR$/.idea/MayaLayout_ahyeon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/MayaGazuAPI.iml" filepath="$PROJECT_DIR$/.idea/MayaGazuAPI.iml" />
     </modules>
   </component>
 </project>

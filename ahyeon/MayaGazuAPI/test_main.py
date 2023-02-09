@@ -105,18 +105,29 @@ class TestSaveAsKitsuPath(TestCase):
     def test_publish_file_data(self, comment, representation='mov'):
         # 테스크에 대한 워킹 파일 새로 생성
         # person은 user 또는 선택한 person(자신)
-        # 테스크 하나에 워킹 파일이 여러개일 수 있나..? 그러면 revision +1
+
+        # working file 생성
+        # 테스크 하나에 워킹 파일이 여러개일 수는 없음. 리비전만 올라감
         self.origin.select_software(0)
         working_file = gazu.files.new_working_file(self.origin._task['id'],
                                                    software=self.origin._software,
                                                    comment=comment,
                                                    person=self.origin._person)
 
-        # output file 존재 여부 판별 후 새로 생성
+        # output file 존재 여부 판별 후 이미 있으면 계승하고, 없으면 전부 새로 생성
         output_file_list = gazu.files.get_last_output_files_for_entity(self.origin._shot['id'],
                                                                        task_type=self.origin._task['task_type'])
         if output_file_list is []:
+            # output file 없으면 아웃풋 타입 선택해서 새로 생성
             self.origin.select_output_type(0)
+            output_file = gazu.files.new_entity_output_file(self.origin._shot['id'],
+                                                            self.origin._output_type['id'],
+                                                            self.origin._task['task_type'],
+                                                            comment=comment,
+                                                            working_file=working_file,
+                                                            person=self.origin._person,
+                                                            representation=self.origin._software['file_extension'])
+
             self._output_path = gazu.files.build_entity_output_file_path(self.origin._shot['id'],
                                                                          self.origin._output_type,
                                                                          self.origin._task['task_type'])
@@ -129,12 +140,7 @@ class TestSaveAsKitsuPath(TestCase):
                                                                          representation=output_file['representation'],
                                                                          revision=output_file['revision'] + 1,
                                                                          nb_elements=output_file['nb_elements'])
-        output_file = gazu.files.new_entity_output_file(self.origin._shot,
-                                                        self.origin._output_type,
-                                                        self.origin._task['task_type'],
-                                                        comment=comment,
-                                                        working_file=working_file,
-                                                        representation=representation)
+
         self.origin._software['file_extension']
 
         if working_file_list is []:

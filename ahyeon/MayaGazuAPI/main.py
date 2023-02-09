@@ -19,23 +19,13 @@ class SaveAsKitsuPath(object):
         gazu.set_event_host("http://192.168.3.116")
         gazu.log_in("pipeline@rapa.org", "netflixacademy")
 
-        self._working_path = None
-        self._output_path = None
-
-        # output, working file 만들기 위한 파라미터
         self._person = None
+        # user 쓸거면 안써도 되려나 싶음...
         self._project = None
         self._task = None
         self._shot = None
-        self._sequence = None
-        self._asset = None
-        self._asset_type = None
-        # self._entity = None
-        # # output file의 entity(asset / shot)
         self._software = None
         self._output_type = None
-        self._casting_dict = None
-        # casting된 정보들을 저장하기 위한 딕셔너리
 
     @property
     def person(self):
@@ -155,8 +145,8 @@ class SaveAsKitsuPath(object):
         """
         path_list = []
         self._shot = gazu.entity.get_entity(self._task['entity_id'])
-        self._casting_dict = gazu.casting.get_shot_casting(self._shot)
-        for casting in self._casting_dict:
+        casting_dict = gazu.casting.get_shot_casting(self._shot)
+        for casting in casting_dict:
             path_list = self.get_kitsu_path(casting)
         for path in path_list:
             # self.load_data(path)
@@ -251,7 +241,7 @@ class SaveAsKitsuPath(object):
 
     def select_software(self, num=0):
         """
-        테스크에 working file을 생성할 때, 작업에 사용한 소프트웨어를 선택하는 매서드
+        테스크에 working file을 생성하기 위해, 작업에 사용한 소프트웨어를 선택하는 매서드
 
         Args:
             num: 소프트웨어 목록의 인덱스 번호

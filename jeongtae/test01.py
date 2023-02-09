@@ -8,7 +8,7 @@ class TestGazu:
         gazu.client.set_host("http://192.168.3.116/api")
         gazu.set_event_host("http://192.168.3.116")
         gazu.log_in("pipeline@rapa.org", "netflixacademy")
-        self.project = gazu.project.get_project_by_name("jeongtae")
+        self._project = None
         self._asset_type = None
         self._asset = None
         self._seq = None
@@ -16,7 +16,15 @@ class TestGazu:
         self._path = None
         self._task = None
         self._status = None
-        self.output_type = None
+        self._output_type = None
+
+    @property
+    def project(self):
+        return self._project
+
+    @project.setter
+    def project(self, value):
+        self._project = gazu.project.get_project_by_name(value)
 
     @property
     def asset(self):
@@ -76,7 +84,7 @@ class TestGazu:
 
     @property
     def output_type(self):
-        return ouput_type
+        return self._output_type
 
     @output_type.setter
     def output_type(self, value):
@@ -149,8 +157,8 @@ class TestGazu:
         if self._task_type == None:
             print("Please input task_type")
         else:
-            # task_type = gazu.task.get_task_type_by_name(task_type_name)
-            task_type = gazu.task.new_task_type(task_type_name, color='#00FF01')
+            task_type = gazu.task.get_task_type_by_name(task_type_name)
+            # task_type = gazu.task.new_task_type(task_type_name)
             return task_type
 
     def new_task(self, entity, name):
@@ -186,7 +194,7 @@ class TestGazu:
                         shot_task2 = gazu.task.new_task(shot_dict, task_type, name=name)
                         return shot_task2
 
-    def upload_preview(self,task):
+    def upload_preview(self, task):
         task_status = gazu.task.get_task_status_by_name("todo")
         comment = gazu.task.add_comment(task, task_status, comment="Change status to work in progress")
         preview_file = gazu.task.add_preview(task, comment, '/home/rapa/channels4_profile.jpg')
@@ -233,76 +241,107 @@ class TestGazu:
         }
         return tree
 
-    def new_working_file(self,task):
+    def new_working_file(self, task):
         project = self.project
         tree = self.get_file_tree()
         gazu.files.update_project_file_tree(project, tree)
         working_file = gazu.files.new_working_file(task)
         working_file_path = os.path.dirname(working_file.get('path'))
         if os.path.exists(working_file_path):
-            print("path exists :", working_file_path)
+            print("path exists")
         else:
             print("create working file path :", working_file_path)
             os.makedirs(working_file_path)
         # working_file_info = gazu.files.get_working_file(working_file["id"])
         # return working_file_info
 
-    def template_working_path(self,task):
+    def template_working_path(self, task):
         last_revision = gazu.files.get_last_working_file_revision(task)
         all_working_files = gazu.files.get_working_files_for_task(task)
         working_file_path = os.path.dirname(
             gazu.files.build_working_file_path(task, revision=last_revision.get('revision')+1)
         )
         for a in all_working_files:
-            print(f'revision : {a["revision"]} \npath : {a["path"]}')
             print(f'revision : {a.get("revision")} \npath : {a.get("path")}')
         print(f'Saved working file path : {working_file_path}')
 
-    def new_output_file(self, entity, task):
+    def new_output_file(self, entity):
         output_type = self._output_type
+        task_type = self.get_task_type()
         gazu.files.update_project_file_tree(self.project, self.get_file_tree())
-        output_file = gazu.files.new_entity_output_file(entity, output_type, task, "publish output_file")
+        output_file = gazu.files.new_entity_output_file(entity, output_type, task_type, "publish output_file")
         output_file_path = os.path.dirname(output_file.get('path'))
         if os.path.exists(output_file_path):
-            print("path exists :", output_file_path)
+            print("path exists")
         else:
             print("create output file path :", output_file_path)
             os.makedirs(output_file_path)
-        # output_file_info = gazu.files.get_output_file(output_file["id"])
-        # return output_file_info
 
-    def output_path(self):
+    def template_output_path(self, entity):
+        output_type = self._output_type
+        task_type = self.get_task_type()
+        last_revision = gazu.files.get_last_entity_output_revision(entity, output_type, task_type, name='main')
+        output_file_path = os.path.dirname(
+            gazu.files.build_entity_output_file_path(entity, output_type, task_type, revision=last_revision + 1)
+        )
+        all_output_files = gazu.files.all_output_files_for_entity(entity, output_type, task_type)
+        for a in all_output_files:
+            print(f'revision : {a["revision"]} \npath : {a["path"]}')
+        print(f'Saved output file path : {output_file_path}')
+
+    def new_casting_path_for_shot(self, entity, new):
+        project = self.project
+        shot_casting = gazu.casting.get_shot_casting(entity)
+        shot_casting.append(new)
+        gazu.casting.update_shot_casting(project, entity, casting=shot_casting)
+
+    def get_casting_path_for_shot(self, entity):
+        file_list = []
+        file_dict = {
+            'path': "",
+            'nb_elements': 0
+        }
+        casting_shot = gazu.casting.get_shot_casting(entity)
+        # pp.pprint(casting_shot)
+        for x in casting_shot:
+            asset = gazu.asset.get_asset(x['asset_id'])
+            output_file_list = gazu.files.get_last_output_files_for_entity(asset)
+            pp.pprint(output_file_list)
 
 
-    def update_output_file(self):
-        all_output = gazu.files.all_output_files_for_entity(entity=self.new_shot(), output_type=self.output_type, task_type=self.get_task_type())
-        gazu.files.update_output_file(all_output[0], data={"extension": "jpg"})
-        output_file_info = gazu.files.get_output_file(all_output[0]["id"])
-        return output_file_info
+
+    # def update_output_file(self):
+    #     all_output = gazu.files.all_output_files_for_entity(entity=self.new_shot(), output_type=self.output_type, task_type=self.get_task_type())
+    #     gazu.files.update_output_file(all_output[0], data={"extension": "jpg"})
+    #     output_file_info = gazu.files.get_output_file(all_output[0]["id"])
+    #     return output_file_info
 
 
 def main():
     tg = TestGazu()
+    tg.project = 'jeongtae'
     tg.path = "/mnt/project/pizza", "/kitsu"
     tg.asset_type = 'Dog'
     tg.asset = 'thomas'
     tg.seq = 'seq1'
-    tg.shot = 'shot01'
-    tg.task_type = "lighting"
+    tg.shot = 'shot02'
+    tg.task_type = "modeling"
     tg.status = "todo"
     tg.output_type = "geometry", "geo"
-    shot_task = tg.new_task("shot", "new")
-    tg.upload_preview(shot_task)
-    tg.new_working_file(shot_task)
-    tg.template_working_path(shot_task)
-    # tg.new_shot()
-    # pp.pprint(tg.new_asset())
-    # pp.pprint(tg.new_shot())
+    shot_task = tg.new_task("shot", "new3")
+    # asset_task = tg.new_task("asset", "new")
+    # tg.upload_preview(asset_task)
+    # tg.new_working_file(asset_task)
+    # tg.template_working_path(asset_task)
+    tg.new_output_file(tg.new_asset())
+    # tg.upload_preview(shot_task)
+    # tg.new_working_file(shot_task)
+    # pp.pprint(tg.template_working_path(shot_task))
+    # tg.new_output_file(tg.new_shot())
+    # tg.template_output_path(tg.new_shot())
     # new = {"asset_id": tg.new_asset()['id'], "nb_occurences": 3}
-    # shot_casting = gazu.casting.get_shot_casting(tg.new_shot())
-    # shot_casting.append(new)
-    # gazu.casting.update_shot_casting(tg.project, tg.new_shot(), casting=shot_casting)
-    # pp.pprint(gazu.casting.get_shot_casting(tg.new_shot()))
+    # # tg.new_casting_path_for_shot(tg.new_shot(), new)
+    # tg.get_casting_path_for_shot(tg.new_shot())
 
 if __name__ == "__main__":
     main()

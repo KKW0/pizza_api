@@ -1,3 +1,4 @@
+# coding=utf-8
 import os
 import gazu
 import pprint as pp

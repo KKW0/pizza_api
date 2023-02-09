@@ -1,3 +1,4 @@
+#coding:utf8
 import maya.cmds as mc
 import gazu
 import os

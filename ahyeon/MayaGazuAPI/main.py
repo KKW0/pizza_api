@@ -3,6 +3,7 @@ import os
 import gazu
 import pprint as pp
 import maya.cmds as mc
+from maya_test2 import MayaLayout
 
 
 class SaveAsKitsuPath(object):
@@ -18,6 +19,10 @@ class SaveAsKitsuPath(object):
         gazu.client.set_host("http://192.168.3.116/api")
         gazu.set_event_host("http://192.168.3.116")
         gazu.log_in("pipeline@rapa.org", "netflixacademy")
+
+        self._working_path = None
+        self._output_path = None
+        # publish할 때 사용
 
         self._person = None
         # user 쓸거면 안써도 되려나 싶음...
@@ -137,21 +142,6 @@ class SaveAsKitsuPath(object):
                 task_list.append(task)
         self._task = task_list[num]
 
-    def get_casting(self):
-        """
-        수행중인 테스크(샷)에 캐스팅된 에셋의 패스들을 모두 추출하는 매서드
-        get_kitsu_path로 각각의 패스를 추출하고,
-        추출한 패스를 기반으로 마야에 import 한다(self.load_data())
-        """
-        path_list = []
-        self._shot = gazu.entity.get_entity(self._task['entity_id'])
-        casting_dict = gazu.casting.get_shot_casting(self._shot)
-        for casting in casting_dict:
-            path_list = self.get_kitsu_path(casting)
-        for path in path_list:
-            # self.load_data(path)
-            pass
-
     def get_kitsu_path(self, casting):
         """
         캐스팅된 에셋의 최신 아웃풋 파일들의 패스 리스트를 추출하는 매서드
@@ -160,12 +150,13 @@ class SaveAsKitsuPath(object):
             casting(dict): 샷에 캐스팅된 에셋의 간략한 정보가 담긴 dict
 
         Returns:
-            list: 아웃풋 파일들의 패스, 개수가 담긴 dict를 수집한 리스트
+            list: 아웃풋 파일들의 패스(확장자 포함), 개수가 담긴 dict를 수집한 리스트
         """
         file_list = []
         file_dict = {
             'path': "",
-            'nb_elements': 0
+            'nb_elements': 0,
+            'representation': ''
         }
         asset = gazu.asset.get_asset(casting['asset_id'])
         output_file_list = gazu.files.get_last_output_files_for_entity(asset)
@@ -176,53 +167,92 @@ class SaveAsKitsuPath(object):
             path = out_path + '.' + out_file['representation']
             file_dict['path'] = path
             file_dict['nb_elements'] = out_file['nb_elements']
+            file_dict['representation'] = out_file['representation']
             file_list.append(file_dict)
 
         return file_list
 
     # ----------------------------- maya -----------------------------
 
-    def load_data(self, file_type):
+    def load_data(self, path):
         """
         마야에서 샷에 캐스팅된 에셋들을 import하는 매서드
 
         Args:
-            file_type:
+            path: 파일명까지 포함된 에셋의 아웃풋 파일의 패스
 
         Returns:
+            list: import한 파일이 가지고 있는 요소(트랜스폼, 쉐입 등등)들의 리스트
 
         """
-        pass
+        imported_file_list = mc.file(
+            path, i=1, ignoreVersion=1,
+            mergeNamespacesOnClash=0, importTimeRange="combine",
+            loadReferenceDepth="all",
+            returnNewNodes=True
+        )
 
-    def edit_path(self, path):
+        return imported_file_list
+
+    def filter_elements(self, element_list):
         """
-        build 된 패스에서 파일명을 잘라낸 패스를 만들어내는 매서드
+        아웃풋 파일에 포함된 요소들 중 트랜스폼과 매쉬만 걸러내어,
+        각각의 이름을 담은 리스트를 반환하는 매서드
 
         Args:
-            path: extension을 제외한 파일명이 포함된 패스
+            element_list(list): 아웃풋 파일에 포함된 모든 요소들
 
         Returns:
-            str: 파일명 부분이 잘린 패스
-        """
-        dir_path_list = self._working_path.split('/')[:-1]
-        dir_path = '/'.join(dir_path_list)
+            list(cam_list): 아웃풋 파일에 포함된 카메라(트랜스폼) 이름. 하나임
+            list(mesh_list): 아웃풋 파일에 포함된 매쉬 이름들
 
-        return dir_path
-
-    def make_folder_tree(self, path):
         """
-        working file, output file을 save/export 하기 위한 실제 폴더를
-        생성하는 매서드
+        cam_list = []
+        mesh_list = []
+        for element in element_list:
+            if mc.objectType(element) == "camera":
+                cam = mc.listRelatives(element, p=1)
+                cam_list.append(cam)
+            elif mc.objectType(element) == "mesh":
+                mesh = mc.listRelatives(element, p=1)
+                mesh_list.append(mesh)
+
+        return cam_list, mesh_list
+
+    def get_casting(self):
+        """
+        수행중인 테스크(샷)에 캐스팅된 에셋의 패스들을 모두 추출하는 매서드
+        get_kitsu_path로 각각의 패스를 추출하고,
+        추출한 패스를 기반으로 마야에 import 한다.(self.load_data)
+        그리고 에셋의 element를 필터링하여 리턴한다.(filter_element)
+        """
+        path_list = []
+        element_list = []
+        self._shot = gazu.entity.get_entity(self._task['entity_id'])
+        casting_dict = gazu.casting.get_shot_casting(self._shot)
+        for casting in casting_dict:
+            path_list = self.get_kitsu_path(casting)
+            for path in path_list:
+                element_list = (self.load_data(path['path']))
+                cam_list, mesh_list = self.filter_elements(element_list)
+                if path['representation'] == 'jpg':
+                    # 아웃풋 파일이 시퀀스 이미지면 캠과 연결시켜준다.
+                    self.connect_image(path, cam_list[0])
+
+    def connect_image(self, path, camera):
+        """
+        언디스토션 이미지(아웃풋 파일) 시퀀스를 cam에 연결시켜주는 매서드
+        카메라가 바라보는 방향에 언디스토션 이미지가 뜨고,
+        카메라의 움직임에 따라 감
+        카메라에 이미지 연결 후 시퀀스 옵션을 True로 해서 이미지가 영상처럼 넘어가게 함
 
         Args:
-            path: 파일명을 제외한 폴더 경로
+            path(str): 확장자까지 포함된 언디스토션 이미지 파일경로
+            camera(str): 캐스팅에 있는 카메라의 이름
         """
-        if not os.path.exists(path):
-            os.makedirs(path)
-        else:
-            parent = os.path.dirname(path)
-            if parent != "/":
-                self.make_folder_tree(parent)
+        image_plane = mc.imagePlane(c=camera)
+        mc.setAttr('%s.imageName' % image_plane[0], path, type='string')
+        mc.setAttr("%s.useFrameExtension" % image_plane[0], True)
 
     def save_working_file(self):
         pass
@@ -267,16 +297,42 @@ class SaveAsKitsuPath(object):
 
         self._output_type = output_type_list[num]
 
-    def make_publish_file_data(self, comment, representation='mov'):
+    def edit_path(self, path):
         """
-        working file, output file 데이터를 생성하는 매서드
+        build 된 패스에서 파일명을 잘라낸 패스를 만들어내는 매서드
+
+        Args:
+            path: extension을 제외한 파일명이 포함된 패스
+
+        Returns:
+            str: 파일명 부분이 잘린 패스
+        """
+        dir_path_list = self._working_path.split('/')[:-1]
+        dir_path = '/'.join(dir_path_list)
+
+        return dir_path
+
+    def make_folder_tree(self, path):
+        """
+        working file, output file을 save/export 하기 위한 실제 폴더를
+        생성하는 매서드
+
+        Args:
+            path: 파일명을 제외한 폴더 경로
+        """
+        if not os.path.exists(path):
+            os.makedirs(path)
+        else:
+            parent = os.path.dirname(path)
+            if parent != "/":
+                self.make_folder_tree(parent)
+
+    def make_publish_file_data(self, comment):
+        """
+        working file, output file 데이터를 생성하고 Kitsu에 publish하는 매서드
 
         Args:
             comment: working file, output file에 대한 설명
-            representation(str): output file의 확장자 정보. 디폴트는 mov
-
-        Returns:
-
         """
         pass
 

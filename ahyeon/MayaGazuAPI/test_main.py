@@ -102,7 +102,7 @@ class TestSaveAsKitsuPath(TestCase):
     #
     # ################### Maya ###################
     #
-    def test_publish_file_data(self, comment, representation='mov'):
+    def test_publish_file_data(self, comment):
         # 테스크에 대한 워킹 파일 새로 생성
         # person은 user 또는 선택한 person(자신)
 
@@ -127,38 +127,30 @@ class TestSaveAsKitsuPath(TestCase):
                                                             working_file=working_file,
                                                             person=self.origin._person,
                                                             representation=self.origin._software['file_extension'])
-
-            self._output_path = gazu.files.build_entity_output_file_path(self.origin._shot['id'],
-                                                                         self.origin._output_type,
-                                                                         self.origin._task['task_type'])
-            self.test_make_folder_tree(self._output_path)
         else:
-            output_file = output_file_list[num]
-            self._output_path = gazu.files.build_entity_output_file_path(self.origin._shot['id'],
-                                                                         self.origin._output_type,
-                                                                         self.origin._task['task_type'],
-                                                                         representation=output_file['representation'],
-                                                                         revision=output_file['revision'] + 1,
-                                                                         nb_elements=output_file['nb_elements'])
+            # 이미 있으면 정보 계승함
+            old_output = output_file_list[0]
+            output_file = gazu.files.new_entity_output_file(self.origin._shot['id'],
+                                                            old_output['output_type'],
+                                                            self.origin._task['task_type'],
+                                                            comment=comment,
+                                                            working_file=old_output['working_file'],
+                                                            person=self.origin._person,
+                                                            revision=old_output['revision']+1,
+                                                            representation=old_output['representation'])
 
-        self.origin._software['file_extension']
-
-        if working_file_list is []:
-            self.origin.select_software(0)
-            self._working_path = gazu.files.build_working_file_path(self.origin._task['id'],
-                                                                    software=self._software)
-            path = self.origin.edit_path(self._working_path)
-            self.origin.make_folder_tree(path)
-        else:
-            # 테스크에 워킹 파일이 이미 존재할 경우, 기존 파일의 정보를 계승
-            working_file = working_file_list[num]
-            self._software = gazu.files.get_software(working_file['software'])
-            print('\n#### working_file ####')
-            pp.pprint(working_file)
-            self._working_path = gazu.files.build_working_file_path(self._task['id'],
-                                                                    software=self._software,
-                                                                    revision=working_file['revision']+1)
-    working_file_list = gazu.files.get_working_files_for_task(self._task['id'])
+        #### ------------------- build -----------------------
+        self._working_path = gazu.files.build_working_file_path(self.origin._task['id'],
+                                                                software=self.origin._software)
+        self._output_path = gazu.files.build_entity_output_file_path(self.origin._shot['id'],
+                                                                     self.origin._output_type,
+                                                                     self.origin._task['task_type'],
+                                                                     representation=output_file['representation'],
+                                                                     revision=output_file['revision'] + 1,
+                                                                     nb_elements=output_file['nb_elements'])
+        path = self.origin.edit_path(self._working_path)
+        self.origin.make_folder_tree(path)
+        # 폴더 구조 만들기
 
 
 

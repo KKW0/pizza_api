@@ -54,6 +54,8 @@ class TestSaveAsKitsuPath(TestCase):
     def test_get_kitsu_path(self, casting):
         self.origin._asset = gazu.asset.get_asset(casting['asset_id'])
         working_file_list = gazu.files.get_all_working_files_for_entity(self.origin._asset, self.origin._task)
+        # 에셋에 워킹 파일이 있는지 판별
+        working_file_list_tast = gazu.files.get_working_files_for_task(self.origin._task)
 
         if working_file_list is []:
             self.origin.select_software(0)

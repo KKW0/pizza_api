@@ -3,29 +3,21 @@ import gazu
 import pprint as pp
 
 
-class MakeKitsuTree:
-    '''
-    dot = gazu.task.get_task_type_by_name(".")
-    projects = gazu.project.all_projects()
-    gazu.task.remove_task_type(dot)
-    오류 발생!!!!!! 삭제가 안됨!!!!!!!!!
-    '''
+class MakeKitsuFiles:
+    """
+    Kitsu에 트리 구조를 가진 프로젝트를 생성하고 그에 맞춘 폴더 트리를 만드는 클래스
+    워킹 파일, 아웃풋 파일, 프리뷰 파일의 업로드와 다운로드 가능
+    """
 
     def __init__(self):
-        gazu.client.set_host("http://192.168.3.116/api")
-        gazu.set_event_host("http://192.168.3.116")
-        gazu.log_in("pipeline@rapa.org", "netflixacademy")
-        # set host and log in
+        """
+        클래스에서 쓰일 프라이빗 변수를 정의하는 매서드
+        """
 
         self._project = None
-        self._asset = None
-        self._episode = None
         self._sequence = None
         self._shot = None
-        self._all_task_types = None
-        self._tasks_for_shot = None
-        self._tasks_for_asset = None
-        self._path = os.getcwd()
+        self._asset = None
 
     @property
     def project(self):
@@ -33,6 +25,12 @@ class MakeKitsuTree:
 
     @project.setter
     def project(self, value):
+        """
+        self._project에 지정된 이름의 프로젝트 딕셔너리를 할당하는 세터
+
+        Args:
+            value(str): 정보를 얻길 원하는 프로젝트 이름
+        """
         self._project = gazu.project.get_project_by_name(value)
 
     @property
@@ -41,6 +39,12 @@ class MakeKitsuTree:
 
     @sequence.setter
     def sequence(self, value):
+        """
+        self._sequence에 지정된 이름의 시퀀스 딕셔너리를 할당하는 세터
+
+        Args:
+            value(str): 정보를 얻길 원하는 시퀀스 이름
+        """
         self._sequence = gazu.shot.get_sequence_by_name(self.project, value)
 
     @property
@@ -49,79 +53,40 @@ class MakeKitsuTree:
 
     @shot.setter
     def shot(self, value):
-        self._shot = gazu.shot.get_shot_by_name(self._sequence, value)
+        """
+        self._shot에 지정된 이름의 샷 딕셔너리를 할당하는 세터
 
-    def make_new_kitsu_tree(self):
-        human = gazu.asset.new_asset_type('Human')
-        dog = gazu.asset.new_asset_type('Dog')
-        # Set New asset type
+        Args:
+            value(str): 정보를 얻길 원하는 샷 이름
+        """
+        self._shot = gazu.shot.get_shot_by_name(self.sequence, value)
 
-        all_tasks = gazu.task.all_task_types()
-        for task_dict in all_tasks:
-            if 'Puppy' or 'Kitty' or 'Dear' == task_dict['name']:
-                puppy = gazu.task.get_task_type_by_name("Puppy")
-                kitty = gazu.task.get_task_type_by_name("Kitty")
-                dear = gazu.task.get_task_type_by_name("Dear")
-            else:
-                puppy = gazu.task.new_task_type('Puppy', color='#00FF01')
-                kitty = gazu.task.new_task_type('Kitty', color='#00FF01')
-                dear = gazu.task.new_task_type('Dear', color='#00FF01', entity='Shot')
-        # Set New task type for asset, shot
+    @property
+    def asset(self):
+        return self._asset
 
-        all_status = gazu.task.all_task_statuses()
-        for status in all_status:
-            if 'Good' or 'Bad' in status['name']:
-                good = gazu.task.get_task_status_by_name("Good")
-                bad = gazu.task.get_task_status_by_name("Bad")
-            else:
-                good = gazu.task.new_task_status("Good", "good", color='#00FF00')
-                bad = gazu.task.new_task_status("Bad", "bad", color='#00FF01')
-        # Set New task status
+    @asset.setter
+    def asset(self, value):
+        """
+        self._shot에 지정된 이름의 에셋 딕셔너리를 할당하는 세터
 
-        project = gazu.project.new_project("A_project", "featurefilm", asset_types=[dog, human],
-                                           task_types=[puppy, kitty, dear], task_statuses=[good, bad])
-        # Set New project
+        Args:
+            value(self): 정보를 얻길 원하는 에셋 이름
+        """
+        self._asset = gazu.asset.get_asset_by_name(self.project, value)
 
-        first_walk = gazu.shot.new_episode(project, "First Walk")
-        second_walk = gazu.shot.new_episode(project, "Second Walk")
-        # Set New episode in project
+    def update_filetree(self, mountpoint, root):
+        """
+        파일 트리를 업데이트하는 매서드
 
-        my_dog = gazu.shot.new_sequence(project, "My Dog", episode=first_walk)
-        your_dog = gazu.shot.new_sequence(project, "Your Dog", episode=first_walk)
-        # Set New sequence in episode
-
-        shot_datadict = {
-            'Description': 'This shot is for filming Thomas\'s tail',
-            'extra_data': 'shot data'}
-        # Set New extra data for shot
-
-        tail = gazu.shot.new_shot(project, my_dog, "tail", frame_in=1, frame_out=10,
-                                  data=shot_datadict)
-        tail2 = gazu.shot.new_shot(project, my_dog, "tail2", frame_in=1, frame_out=10,
-                                   data=shot_datadict)
-        # Set New shot in project, seq
-
-        gazu.task.new_task(tail, dear, task_status=good, name='first task')
-        # Set New task in shot as task type
-
-        thomas_data = {
-            'birth': '2017-05-17',
-            'adoption': '2018-02-28',
-            'color': 'blue merle'}
-        # Set New extra data for asset
-
-        thomas = gazu.asset.new_asset(project, dog, 'Thomas', description="He is very handsome dog",
-                                      extra_data=thomas_data, episode=first_walk)
-        # Set New asset
-
-        gazu.task.new_task(thomas, puppy, task_status=good, name='make walk')
-        # Set New task in asset as task type
-
-        # Set File Tree of the project
+        Args:
+            mountpoint(str/path): 폴더 트리를 생성할 위치의 전체 경로
+            root(str/folder name): 폴더 트리를 생성할 mountpoint의 자식 폴더 이름
+        """
         tree = {
             "working": {
-                "mountpoint": "/mnt/pipeline/personal/ahyeonJo",
-                "root": "kitsu",
+                "mountpoint": mountpoint,
+                "root": root,
                 "folder_path": {
                     "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/working/v<Revision>",
                     "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/working/v<Revision>",
@@ -134,8 +99,8 @@ class MakeKitsuTree:
                 }
             },
             "output": {
-                "mountpoint": "/mnt/pipeline/personal/ahyeonJo",
-                "root": "kitsu",
+                "mountpoint": mountpoint,
+                "root": root,
                 "folder_path": {
                     "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/output/<OutputType>/v<Revision>",
                     "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/output/<OutputType>/v<Revision>",
@@ -148,39 +113,38 @@ class MakeKitsuTree:
                 }
             }
         }
-        gazu.files.update_project_file_tree(project, tree)
+        gazu.files.update_project_file_tree(self.project, tree)
 
     def print_info(self):
         print("\n### project info ###")
-        pp.pprint(self._project)
-        # get project info
+        pp.pprint(self.project)
 
-        sequences = gazu.shot.all_sequences_for_project(self._project)
+        sequences = gazu.shot.all_sequences_for_project(self.project)
         print("\n### sequences info ###")
         pp.pprint(sequences)
 
-        shots = gazu.shot.all_shots_for_project(self._project)
+        shots = gazu.shot.all_shots_for_project(self.project)
         print("\n### shots info ###")
         pp.pprint(shots)
 
-        self._asset = gazu.asset.all_assets_for_project(self._project)
+        assets = gazu.asset.all_assets_for_project(self.project)
         print("\n### assets info ###")
-        pp.pprint(self._asset)
+        pp.pprint(assets)
 
         self._all_task_types = gazu.task.all_task_types_for_project(self.project)
-        print("\n### task_types info of A_project ###")
+        print("\n### task_types info of selected project ###")
         pp.pprint(self._all_task_types)
 
-        self._tasks_for_shot = gazu.task.all_tasks_for_shot(shots[0])
-        print("\n### tasks info of thomas shot ###")
-        pp.pprint(self._tasks_for_shot)
+        tasks_for_shot = gazu.task.all_tasks_for_shot(self.shot)
+        print("\n### tasks info of selected shot ###")
+        pp.pprint(tasks_for_shot)
 
-        self._tasks_for_asset = gazu.task.all_tasks_for_asset(self._asset[0])
-        print("\n### tasks info of thomas asset ###")
-        pp.pprint(self._tasks_for_asset)
+        tasks_for_asset = gazu.task.all_tasks_for_asset(self.asset)
+        print("\n### tasks info of selected asset ###")
+        pp.pprint(tasks_for_asset)
 
     def make_working_file(self):
-        # maya = gazu.files.new_software("Maya", "maya", "ma")
+        # maya = gazu.files.new_software("Maya", "maya", "ma", ['mb', 'fbx'])
         maya = gazu.files.get_software_by_name("Maya")
         print("\n### software info of maya ###")
         pp.pprint(maya)
@@ -189,9 +153,10 @@ class MakeKitsuTree:
         #                                       comment="This is for test")
         print("\n### working files info for 'make walk' task ###")
         # pp.pprint(working)
-        working_file = gazu.files.get_working_files_for_task(self._tasks_for_asset[0])
+        tasks = gazu.task.all_tasks_for_asset(self.asset)
+        working_file = gazu.files.get_working_files_for_task(tasks[0])
         pp.pprint(working_file)
-        path = gazu.files.build_working_file_path(self._tasks_for_asset[0], name="working file path",
+        path = gazu.files.build_working_file_path(tasks[0], name="working file path",
                                                   software=maya)
         print("\n### working file path for 'maya working file' ###")
         pp.pprint(path)
@@ -203,7 +168,7 @@ class MakeKitsuTree:
         # Make local folders
 
         # gazu.files.upload_working_file(working_file[0], path+"."+maya['file_extension']')
-        gazu.files.download_working_file(working_file[0], file_path=path+'_down'+"."+maya['file_extension'])
+        gazu.files.download_working_file(working_file[0], file_path=path + '_down' + "." + maya['file_extension'])
 
         return working_file[0]
 
@@ -239,21 +204,21 @@ class MakeKitsuTree:
                                         comment="task comment")
         # preview = gazu.task.create_preview((self._tasks_for_asset[0]), comment=comment)
         # # Make new preview file model
-        # # ??? upload와 차이가 뭔지 모르겠음
+
         preview = gazu.files.get_all_preview_files_for_task(self._tasks_for_asset[0])
         print("\n### all preview files info for 'make walk' ###")
         pp.pprint(preview)
 
         gazu.task.upload_preview_file(preview[0], path)
         gazu.task.add_preview(self._tasks_for_asset[0], comment, preview_file_path=path2)
-        gazu.task.set_main_preview(preview[2])
+        gazu.task.set_main_preview(preview[1])
         # Upload preview file
 
 
 def main():
-    kt = MakeKitsuTree()
+    kt = MakeKitsuFiles()
     # kt.make_new_kitsu_tree()
-    kt.project = "Test_Euimin"
+    kt.project = "A_project"
     kt.sequence = "My Dog"
     kt.shot = "tail"
 

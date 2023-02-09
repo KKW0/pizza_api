@@ -179,6 +179,9 @@ class MakeKitsuTree:
         print("\n### tasks info of thomas asset ###")
         pp.pprint(self._tasks_for_asset)
 
+    def casting_update(self):
+
+
     def make_working_file(self):
         # maya = gazu.files.new_software("Maya", "maya", "ma")
         maya = gazu.files.get_software_by_name("Maya")

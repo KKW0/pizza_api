@@ -53,27 +53,30 @@ class TestSaveAsKitsuPath(TestCase):
 
     def test_get_kitsu_path(self, casting):
         self.origin._asset = gazu.asset.get_asset(casting['asset_id'])
-        working_file_list = gazu.files.get_all_working_files_for_entity(self.origin._asset, self.origin._task)
+        working_file_list_asset = gazu.files.get_all_working_files_for_entity(self.origin._asset, self.origin._task)
         # 에셋에 워킹 파일이 있는지 판별
-        working_file_list_tast = gazu.files.get_working_files_for_task(self.origin._task)
+        working_file_list_task = gazu.files.get_working_files_for_task(self.origin._task)
 
-        if working_file_list is []:
-            self.origin.select_software(0)
-            self._working_path = gazu.files.build_working_file_path(self.origin._task['id'],
-                                                                    software=self._software)
-            path = self.origin.edit_path(self._working_path)
-            self.origin.make_folder_tree(path)
-        else:
-            # 테스크에 워킹 파일이 이미 존재할 경우, 기존 파일의 정보를 계승
-            working_file = working_file_list[num]
-            self._software = gazu.files.get_software(working_file['software'])
-            print('\n#### working_file ####')
-            pp.pprint(working_file)
-            self._working_path = gazu.files.build_working_file_path(self._task['id'],
-                                                                    software=self._software,
-                                                                    revision=working_file['revision']+1)
+        pp.pprint(working_file_list_task)
+        pp.pprint(working_file_list_asset)
 
-        return working_path_list, output_path_list
+        # if working_file_list is []:
+        #     self.origin.select_software(0)
+        #     self._working_path = gazu.files.build_working_file_path(self.origin._task['id'],
+        #                                                             software=self._software)
+        #     path = self.origin.edit_path(self._working_path)
+        #     self.origin.make_folder_tree(path)
+        # else:
+        #     # 테스크에 워킹 파일이 이미 존재할 경우, 기존 파일의 정보를 계승
+        #     working_file = working_file_list[num]
+        #     self._software = gazu.files.get_software(working_file['software'])
+        #     print('\n#### working_file ####')
+        #     pp.pprint(working_file)
+        #     self._working_path = gazu.files.build_working_file_path(self._task['id'],
+        #                                                             software=self._software,
+        #                                                             revision=working_file['revision']+1)
+
+        # return working_path_list, output_path_list
     #     working_file_list = gazu.files.get_working_files_for_task(self._task['id'])
     #
     #     output_file_list = gazu.files.get_last_output_files_for_entity(self._shot['id'],

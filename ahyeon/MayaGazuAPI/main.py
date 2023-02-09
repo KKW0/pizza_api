@@ -127,12 +127,13 @@ class SaveAsKitsuPath(object):
     def get_casting(self):
         """
         수행중인 테스크(샷)에 캐스팅된 에셋의 패스들을 모두 추출하는 매서드
+        get_kitsu_path로 각각의 패스를 추출하고,
         추출한 패스를 기반으로 마야에 import 한다(self.load_data())
         """
         self._shot = gazu.entity.get_entity(self._task['entity_id'])
         self._casting_dict = gazu.casting.get_shot_casting(self._shot)
-        # for casting in self._casting_dict:
-        #     path = self.get_kitsu_path(casting)
+        for casting in self._casting_dict:
+            path = self.get_kitsu_path(casting)
         #     self.load_data(path)
 
     def get_informations(self):
@@ -175,7 +176,7 @@ class SaveAsKitsuPath(object):
 
         return dir_path
 
-    def get_kitsu_path(self, num=0):
+    def get_kitsu_path(self, casting):
         """
         캐스팅된 에셋의 패스를 추출하는 매서드
         Args:

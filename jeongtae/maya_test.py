@@ -8,7 +8,7 @@ class MayaLayout:
     def import_out_file(self):
         path = '임시경로'
         oupput_camera = []
-        mc.file(path, i=1, ignoreVersion=1, options = "mo=0", mergeNamespacesOnClash=0, importTimeRange="combine",loadReferenceDepth  = "all")
+        mc.file(path, i=1, ignoreVersion=1, options = "mo=0", mergeNamespacesOnClash=0, importTimeRange="combine",loadReferenceDepth  = "all",gr = True, gn = "camera_GRP")
         perspCameras = mc.listCameras(p=True)
         for x in perspCameras:
             if x not in 'persp':

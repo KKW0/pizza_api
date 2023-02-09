@@ -23,6 +23,7 @@ class SaveAsKitsuPath(object):
         self._output_path = None
 
         # output, working file 만들기 위한 파라미터
+        self._person = None
         self._project = None
         self._task = None
         self._shot = None
@@ -34,8 +35,15 @@ class SaveAsKitsuPath(object):
         self._software = None
         self._output_type = None
         self._casting_dict = None
-        self._casting = None
         # casting된 정보들을 저장하기 위한 딕셔너리
+
+    @property
+    def person(self):
+        return self._person
+
+    @person.setter
+    def person(self, value):
+        self._person = gazu.person.get_person_by_full_name(value)
 
     @property
     def project(self):
@@ -107,7 +115,25 @@ class SaveAsKitsuPath(object):
         Args:
             num: task list의 인덱스 번호
         """
-        pass
+        # task_list_user = gazu.user.all_tasks_to_do()
+        task_list_user = gazu.task.all_tasks_for_person(self.person)
+        task_list = []
+        for task in task_list_user:
+            # print(task['project_id'], self.origin.project['id'])
+            if task['project_id'] == self.project['id']:
+                task_list.append(task)
+        self._task = task_list[num]
+
+    def get_casting(self):
+        """
+        수행중인 테스크(샷)에 캐스팅된 에셋의 패스들을 모두 추출하는 매서드
+        추출한 패스를 기반으로 마야에 import 한다(self.load_data())
+        """
+        self._shot = gazu.entity.get_entity(self._task['entity_id'])
+        self._casting_dict = gazu.casting.get_shot_casting(self._shot)
+        # for casting in self._casting_dict:
+        #     path = self.get_kitsu_path(casting)
+        #     self.load_data(path)
 
     def get_informations(self):
         """
@@ -116,22 +142,44 @@ class SaveAsKitsuPath(object):
         """
         pass
 
-    def get_casting(self):
+    def select_software(self, num=0):
         """
-        수행중인 테스크(샷)에 캐스팅된 에셋의 패스들을 모두 추출하는 매서드
-        추출한 패스를 기반으로 마야에 import 한다(self.load_data())
+        테스크에 working file을 처음 생성할 경우, 필요한 소프트웨어를 선택하는 매서드
+        Args:
+            num: 소프트웨어 목록의 인덱스 번호
         """
-        pass
+        software_list = gazu.files.all_softwares()
+
+        print('\n#### software list ####')
+        pp.pprint(software_list)
+
+        self._software = software_list[num]
+
+    def select_output_type(self, num=0):
+        """
+        테스크에 output file을 처음 생성할 경우, 필요한 output type을 선택하는 매서드
+        Args:
+            num: output type 목록의 인덱스 번호
+        """
+        output_type_list = gazu.files.all_output_types_for_entity(self._shot['id'])
+
+        print('\n#### output type list ####')
+        pp.pprint(output_type_list)
+
+        self._output_type = output_type_list[num]
+
+    def edit_path(self, path):
+        dir_path_list = self._working_path.split('/')[:-1]
+        num = 1
+        dir_path = '/'.join(dir_path_list[:num])
+
+        return dir_path
 
     def get_kitsu_path(self, num=0):
-        pass
-
-    def make_folder_tree(self, path):
         """
-        working file, output file을 save/export 하기 위한 실제 폴더를
-        생성하는 매서드
+        캐스팅된 에셋의 패스를 추출하는 매서드
         Args:
-            path:
+            num:
 
         Returns:
 
@@ -149,6 +197,20 @@ class SaveAsKitsuPath(object):
         """
         pass
 
+    def make_folder_tree(self, path):
+        """
+        working file, output file을 save/export 하기 위한 실제 폴더를
+        생성하는 매서드
+        Args:
+            path: 파일명을 제외한 폴더 경로
+        """
+        if not os.path.exists(path):
+            os.makedirs(path)
+        else:
+            parent = os.path.dirname(path)
+            if parent != "/":
+                self.make_folder_tree(parent)
+
     def save_working_file(self):
         pass
 
@@ -160,9 +222,9 @@ class SaveAsKitsuPath(object):
 
 
 def main():
-    save_path = SaveAsKitsuPath()
-    save_path.project = "A_project"
-    print(save_path.project)
+    save = SaveAsKitsuPath()
+    save.project = "A_project"
+    save.person = "Youngbin Park"
     # save_path.sequence = "My Dog"
     # save_path.shot = "tail"
     # save_path.select_task(0)

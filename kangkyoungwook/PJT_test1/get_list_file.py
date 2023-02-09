@@ -38,6 +38,7 @@ class App5(QtWidgets.QDialog):
         pass
 
 
+
 # ----------------------------------------------------------------------------------------------
 def main():
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)

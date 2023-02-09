@@ -3,11 +3,19 @@ import gazu
 import os
 
 class MayaLayout:
-
     def __init__(self):
         pass
 
-    def import_out_file(self, path):
+    @staticmethod
+    def import_out_file(path):
+        """
+
+        Args:
+            path: 입력한 project, sequence, shot과 관련된 캐스팅 파일 패스
+
+        Returns: import한 리스트
+
+        """
         output_files = mc.file(
             path, i = 1, ignoreVersion = 1,
             mergeNamespacesOnClash=0,importTimeRange="combine",
@@ -17,6 +25,16 @@ class MayaLayout:
         return output_files
 
     def get_casting_path(self, project, sequence, shot):
+        """
+
+        Args:
+            project: project_dict
+            sequence: sequence_dict
+            shot: shot_dict
+
+        Returns: 입력한 project, sequence, shot과 관련된 캐스팅 안 어셋 패스리스트
+
+        """
         pick_sequence = gazu.shot.get_sequence_by_name(project, sequence)
         pick_shot = gazu.shot.get_shot_by_name(pick_sequence, shot)
         casting_shot = gazu.casting.get_shot_casting(pick_shot)
@@ -29,13 +47,6 @@ class MayaLayout:
             for task in tasks:
                 last_revision = gazu.files.get_last_working_file_revision(task)
 
-            print(f'*********lastest updated working file path********** \n'
-                  f'task type       : {task.get("task_type_name")} \n'
-                  f'entity name     : {task.get("entity_name")} \n'
-                  f'revision        : {last_revision.get("revision")} \n'
-                  f'basename        : {os.path.basename(last_revision.get("path"))} \n'
-                  f'path            : {os.path.dirname(last_revision.get("path"))}')
-
             basename_list = os.path.basename(last_revision.get("path"))
             path = os.path.dirname(last_revision.get("path"))
             for basename in basename_list:
@@ -45,6 +56,18 @@ class MayaLayout:
         return full_path_list
 
     def get_output_file_for_shot(self, project, sequence, shot, output_type, task_type):
+        """
+
+        Args:
+            project: project_dict
+            sequence: sequence_dict
+            shot: shot_dict
+            output_type: output_type_dict
+            task_type: task_type_dict
+
+        Returns: 원하는 shot에 관련한 아웃풋 파일 패스리스트
+
+        """
         pick_sequence = gazu.shot.get_sequence_by_name(project, sequence)
         pick_shot = gazu.shot.get_shot_by_name(pick_sequence, shot)
         output = gazu.files.get_output_type_by_name(output_type)
@@ -61,6 +84,17 @@ class MayaLayout:
         return undistortion_list
 
     def get_working_path_for_shot(self, project, sequence, shot, task_type):
+        """
+
+        Args:
+            project: project_dict
+            sequence: sequence_dict
+            shot: shot_dict
+            task_type: task_type_dict
+
+        Returns: 씬파일을 내보낼 워킹 파일패스
+
+        """
         pick_sequence = gazu.shot.get_sequence_by_name(project, sequence)
         pick_shot = gazu.shot.get_shot_by_name(pick_sequence, shot)
         tasks = gazu.task.all_tasks_for_shot(pick_shot)
@@ -74,11 +108,24 @@ class MayaLayout:
         return working_file_path
 
     def setting_scene(self, project, sequence, shot, output_type, task_type):
+        """
+
+        Args:
+            project: project_dict
+            sequence: sequence_dict
+            shot: shot_dict
+            output_type: output_type_dict
+            task_type: task_type_dice
+
+        Returns: 캐스팅파일 임포트 > 카메라에 이미지연결 > 플레이블라스트 출력 > 워킹파저장일
+
+        """
         casting_asset_path_list = self.get_casting_path(project, sequence, shot)
         undistortion_path_list = self.get_output_file_for_shot(project, sequence, shot, output_type, task_type)
         working_file_path_list = self.get_working_path_for_shot(project, sequence, shot, task_type)
         cam_list = []
         mesh_list = []
+        maya_format = ""
         for p in casting_asset_path_list:
             output_file = self.import_out_file(p)
             if mc.objectType(output_file) == "camera":
@@ -92,13 +139,34 @@ class MayaLayout:
         mc.group(mesh_list, n="asset_GRP")
         self.connect_image(undistortion_path_list[0], cam_list[0])
         self.export_playblast(working_file_path_list, cam_list[0])
+        self.save_working_file("플레이블라스트 저장할패스",maya_format)
 
-    def connect_image(self, path, camera):
+    @staticmethod
+    def connect_image(path, camera):
+        """
+
+        Args:
+            path: undistortion이미지 파일경로
+            camera: 캐스팅에 있는 카메라
+
+        Returns: 카메라에 이미지 연결 후 시퀀스 옵션체크
+
+        """
         image_plane = mc.imagePlane(c=camera)
         mc.setAttr('%s.imageName' % image_plane[0], path, type='string')
         mc.setAttr("%s.useFrameExtension" % image_plane[0], 1)
 
-    def export_playblast(self, path, camera):
+    @staticmethod
+    def export_playblast(path, camera):
+        """
+
+        Args:
+            path: 플레이블라스 내보낼 파일경로
+            camera: 뷰포트 카메라
+
+        Returns: 아웃풋파일에다가 플레이블라스트 시퀀스 출력
+
+        """
         output_path = path
         mc.lookThru(camera)
         mc.playblast(
@@ -112,8 +180,18 @@ class MayaLayout:
             quality=100
         )
 
-    def save_working_file(self, path, format):
-        if format == "mayaAscii":
+    @staticmethod
+    def save_working_file(path, format):
+        """
+
+        Args:
+            path: 저장할 경로 + 이름
+            format: "mayaAscii","mayaBinary" 둘중하나
+
+        Returns: 포맷을 받아서 원하는 형식으로 저장한.
+
+        """
+        if format == "mayaAscii":다
             mc.file(rename = "%s"%path + ".ma")
         elif format == "mayaBinary":
             mc.file(rename = "%s"%path + ".mb")

@@ -3,7 +3,7 @@ import gazu
 import os
 
 class MayaLayout:
-    def __init__(self):
+    def __init__(self): 
         pass
 
     @staticmethod

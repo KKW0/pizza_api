@@ -8,11 +8,12 @@ from maya_test2 import MayaLayout
 
 class SaveAsKitsuPath(object):
     """
-    선택한 테스크타입에 있는 테스크 중 하나를 선택하고,
-    선택한 테스크가 있는 샷에 캐스팅된 에셋 데이터를 가져오고,
-    각 에셋의 워킹 파일과 아웃풋 파일 패스를 가져오고,
-    작업한 워킹파일과 아웃풋 파일을 폴더 트리에 저장하고,
-    Kitsu에 퍼블리싱하고, 워킹 파일을 업로드하는 클래스
+    프로젝트에서 사용자에게 주어진 테스크 중 하나를 선택하고,
+    테스크가 소속된 샷에 캐스팅되어 있는 에셋 데이터를 가져오고,
+    각 에셋의 working file과 output file을 추출하여,
+    씬에 import 해서 레이아웃 작업을 한 뒤에,
+    작업한 working file과 output file을 실제 폴더 트리에 저장하고,
+    그것들을 Kitsu에 퍼블리싱하고, working file을 업로드도 해주는 클래스
     Layout 팀을 위한 api
     """
     def __init__(self):

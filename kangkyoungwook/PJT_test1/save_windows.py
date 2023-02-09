@@ -3,6 +3,9 @@ import sys
 import csv
 from PySide2 import QtWidgets, QtCore, QtUiTools
 
+'''
+# save_windows_yes_or_no
+'''
 from save_windows_yes_or_no import App4
 
 class App2(QtWidgets.QDialog):
@@ -23,10 +26,29 @@ class App2(QtWidgets.QDialog):
         self.File_ListBox()
         self.File_ListBox_2()
 
+        '''
+        # save 클릭시 save_windows_yes_or_no ui로 전환
+        '''
         self.ui.Save_Button.clicked.connect(self.Save_Button)
         self.app4 = App4()
 
     # ----------------------------------------------------------------------------------------------
+
+    '''
+    # Working_File이 적용 되야하는부분
+    '''
+    def Working_File_CheckBox(self):
+        pass
+
+    '''
+    # OutPut_File이 적용 되야하는부분
+    '''
+    def OutPut_File_CheckBox(self):
+        pass
+
+    '''
+    # Working_File의 리스트가 적용 되야하는부분
+    '''
     def File_ListBox(self):
         self.combo = QtWidgets.QComboBox(self.ui)
         self.combo.addItem("1")
@@ -34,6 +56,9 @@ class App2(QtWidgets.QDialog):
         self.combo.addItem("3")
         self.combo.setGeometry(QtCore.QRect(215, 204, 90, 28))
 
+    '''
+    # OutPut_File의 리스트가 적용 되야하는부분
+    '''
     def File_ListBox_2(self):
         self.combo2 = QtWidgets.QComboBox(self.ui)
         self.combo2.addItem("4")
@@ -42,7 +67,9 @@ class App2(QtWidgets.QDialog):
         self.combo2.setGeometry(QtCore.QRect(215, 238, 90, 28))
 
 
-
+    '''
+    # 주어진 저장 경로에 저장되며 키츄에 업데이트 할 부분
+    '''
     def Save_Button(self):
         with open('/home/rapa/git/pizza/kangkyoungwook/PJT_test1/test.csv', 'w', encoding='utf-8', newline="") as f:
             writer = csv.writer(f)
@@ -54,6 +81,7 @@ class App2(QtWidgets.QDialog):
         for line in rdr:
             print(line)
         f.close()
+
         self.app4.ui.exec()
 
 # ----------------------------------------------------------------------------------------------

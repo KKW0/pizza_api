@@ -2,9 +2,15 @@ import os
 import sys
 from PySide2 import QtWidgets, QtCore, QtUiTools
 
+'''
+# save_windows
+'''
 from save_windows import App2
 
 from load_windows import App3
+'''
+# load_windows
+'''
 
 
 class App(QtWidgets.QMainWindow, App2, App3):
@@ -21,9 +27,16 @@ class App(QtWidgets.QMainWindow, App2, App3):
 
         self.ui.show()
 
-        self.ui.save_windows.clicked.connect(self.save_windows)  # save 클릭시 save_windows ui로 전환
+        '''
+        # save 클릭시 save_windows ui로 전환
+        '''
+        self.ui.save_windows.clicked.connect(self.save_windows)
         self.app2 = App2()
-        self.ui.load_windows.clicked.connect(self.load_windows)  # load 클릭시 load_windows ui로 전환
+
+        '''
+        # load 클릭시 load_windows ui로 전환
+        '''
+        self.ui.load_windows.clicked.connect(self.load_windows)
         self.app3 = App3()
 
     # ----------------------------------------------------------------------------------------------
@@ -39,7 +52,6 @@ class App(QtWidgets.QMainWindow, App2, App3):
         # self.ui.show()  # ui 출력
         self.app2.ui.exec()
 
-
     def load_windows(self):
         self.hide()  # 메인 윈도우 숨김
         # ui_path = os.path.expanduser('/home/rapa/git/pizza/kangkyoungwook/PJT_test1/load_windows.ui')
@@ -52,11 +64,11 @@ class App(QtWidgets.QMainWindow, App2, App3):
         self.app3.ui.exec()
 
 
-
 # ----------------------------------------------------------------------------------------------
 def main():
     app = QtWidgets.QApplication(sys.argv)
     myapp = App()
+    myapp.ui.show()
     sys.exit(app.exec_())
 
 

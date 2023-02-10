@@ -1,11 +1,10 @@
-#coding:utf8
+# coding:utf8
 import os
 import gazu
 import pprint as pp
 import maya.cmds as mc
 from unittest import TestCase
-from main import SaveAsKitsuPath
-# from maya_test import MayaLayout
+from work_kitsugazu import SaveAsKitsuPath
 
 
 class TestSaveAsKitsuPath(TestCase):
@@ -14,95 +13,75 @@ class TestSaveAsKitsuPath(TestCase):
         self.origin.project = "NetflixAcademy"
         self.origin.person = "Youngbin Park"
 
-    # def test_select_task(self, num=0):
-    #     pass
+    def test_update_filetree(self):
+        pass
 
-    # def test_get_casting(self):
-    #     pass
-    #
-    # def test_get_informations(self):
-    #     self._shot = gazu.entity.get_entity(self._task['entity id'])
-    #     self._sequence = gazu.shot.get_sequence_from_shot(self._shot['id'])
-    #     self.test_get_casting(0)
-    #     self._asset = gazu.asset.get_asset(self._casting['asset_id'])
-    #     self._asset_type = gazu.asset.get_asset_type_from_asset(self._asset['id'])
-    #
-    #     print('\n#### shot ####')
-    #     pp.pprint(self._shot)
-    #     print('\n#### sequence ####')
-    #     pp.pprint(self._sequence)
-    #     print('\n#### asset ####')
-    #     pp.pprint(self._asset)
-    #     print('\n#### asset_type ####')
-    #     pp.pprint(self._asset_type)
-    #
-    #     self.assertEqual(type(self._shot), dict)
-    #     self.assertEqual(type(self._sequence), dict)
-    #
-    #     self.assertEqual(type(self._asset), dict)
-    #     self.assertEqual(type(self._asset_type), dict)
-    #
-    # def test_select_software(self, num=0):
-    #     pass
-    #
-    # def test_select_output_type(self, num=0):
-    #     pass
+    def test_select_task(self):
+        pass
 
-    # def test_make_folder_tree(self, path):
-    #     pass
+    def test_get_kitsu_path(self):
+        pass
 
-    # def test_get_kitsu_path(self, casting=0):
-    #     # --------------------------------------------
-    #     self.origin.select_task()
-    #     self.origin._asset = gazu.asset.get_asset_by_name(self.origin.project, "Hulkbuster")
-    #     # --------------------------------------------
-    #
-    #     pass
-    #
-    # ################### Maya ###################
-    # def test_load_data(self, data_type):
-    #     path = ""
-    #     file_type = ""
-    #     if data_type is 'output':
-    #         file_type = self._output_type['file extension']
-    #         path = self._output_path + '.' + file_type
-    #     elif data_type is 'working':
-    #         file_type = self._software['file extension']
-    #         path = self._working_path + '.' + file_type
-    #
-    #     files = mc.getFileList(folder=path, filespec=('.'+file_type))
-    #
-    #     if len(files) is 0:
-    #         raise ValueError("File not found")
-    #     else:
-    #         for item in files:
-    #             mc.file(path, i=1, ignoreVersion=1, options="mo=0", mergeNamespacesOnClash=0,
-    #                     importTimeRange="combine", loadReferenceDepth="all", gr=True, gn="imported_GRP")
-    #
-    #     imported_file = mc.ls("hulk:*", type="transform")
-    #     for item in imported_file:
-    #         mc.xform(item, t=(0, 0, 0), ro=(-90, 0, 0), ws=1)
-    # #
-    # # def test_save_working_file(self):
-    # #     self.fail()
-    # #
-    # def test_export_output_file(self):
-    #     cam_list = self.connect_image()
-    #     output_path = '플레이블라스트 저장할 파일경로'
-    #     mc.lookThru(cam_list[0])
-    #     mc.playblast(
-    #         format='image',
-    #         filename='%s' % output_path,
-    #         sequenceTime=0,
-    #         clearCache=1, viewer=1,
-    #         showOrnaments=1,
-    #         fp=4, percent=50,
-    #         compression="jpg",
-    #         quality=100
-    #
-    # ################### Maya ###################
-    #
-    def test_publish_file_data(self, comment):
+    def test_load_data(self):
+        pass
+
+    def test_filter_elements(self):
+        pass
+
+    def test_connect_image(self):
+        pass
+
+    def test_get_casting_asset(self):
+        pass
+
+    def test_get_undistort_img(self):
+        pass
+
+    def test_get_camera(self):
+        pass
+
+    def test_save_working_file(self):
+        pass
+
+    def test_export_output_file(self):
+        self.fail()
+
+    def test_get_informations(self):
+        self.fail()
+        # self._shot = gazu.entity.get_entity(self._task['entity id'])
+        # self._sequence = gazu.shot.get_sequence_from_shot(self._shot['id'])
+        # self.test_get_casting(0)
+        # self._asset = gazu.asset.get_asset(self._casting['asset_id'])
+        # self._asset_type = gazu.asset.get_asset_type_from_asset(self._asset['id'])
+        #
+        # print('\n#### shot ####')
+        # pp.pprint(self._shot)
+        # print('\n#### sequence ####')
+        # pp.pprint(self._sequence)
+        # print('\n#### asset ####')
+        # pp.pprint(self._asset)
+        # print('\n#### asset_type ####')
+        # pp.pprint(self._asset_type)
+        #
+        # self.assertEqual(type(self._shot), dict)
+        # self.assertEqual(type(self._sequence), dict)
+        #
+        # self.assertEqual(type(self._asset), dict)
+        # self.assertEqual(type(self._asset_type), dict)
+
+    def test_select_software(self):
+        pass
+
+    def test_select_output_type(self):
+        pass
+
+    def test_edit_path(self):
+        pass
+
+    def test_make_folder_tree(self):
+        pass
+
+    def test_make_publish_file_data(self, comment):
         # 테스크에 대한 워킹 파일 새로 생성
         # person은 user 또는 선택한 person(자신)
 
@@ -136,7 +115,7 @@ class TestSaveAsKitsuPath(TestCase):
                                                             comment=comment,
                                                             working_file=old_output['working_file'],
                                                             person=self.origin._person,
-                                                            revision=old_output['revision']+1,
+                                                            revision=old_output['revision'] + 1,
                                                             representation=old_output['representation'])
 
         #### ------------------- build -----------------------
@@ -151,6 +130,3 @@ class TestSaveAsKitsuPath(TestCase):
         path = self.origin.edit_path(self._working_path)
         self.origin.make_folder_tree(path)
         # 폴더 구조 만들기
-
-
-

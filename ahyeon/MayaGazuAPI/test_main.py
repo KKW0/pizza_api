@@ -107,7 +107,7 @@ class TestSaveAsKitsuPath(TestCase):
         # person은 user 또는 선택한 person(자신)
 
         # working file 생성
-        # 테스크 하나에 워킹 파일이 여러개일 수는 없음. 리비전만 올라감
+        # 테스크 하나에 워킹 파일이 여러개일 수는 없음. 리비전만 올라감.
         self.origin.select_software(0)
         working_file = gazu.files.new_working_file(self.origin._task['id'],
                                                    software=self.origin._software,

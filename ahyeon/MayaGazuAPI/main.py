@@ -18,7 +18,6 @@ class SaveAsKitsuPath(object):
     """
     def __init__(self):
         gazu.client.set_host("http://192.168.3.116/api")
-        gazu.set_event_host("http://192.168.3.116")
         gazu.log_in("pipeline@rapa.org", "netflixacademy")
 
         self._working_path = None
@@ -45,7 +44,7 @@ class SaveAsKitsuPath(object):
         영빈님한테만 테스크가 할당되어 있어서 테스트 용으로 만듦....
 
         Args:
-            value:
+            value(str): 영빈 td님 성함...
 
         Returns:
 
@@ -62,7 +61,7 @@ class SaveAsKitsuPath(object):
         테스크가 있는 프로젝트를 선택하는 세터
 
         Args:
-            value:
+            value(str): 프로젝트 이름
 
         Returns:
 
@@ -134,18 +133,22 @@ class SaveAsKitsuPath(object):
         Args:
             num: task list의 인덱스 번호
         """
+        task_list = []
         task_list_user = gazu.task.all_tasks_for_person(self.person)
         # user에게 테스크가 충분히 할당되어 있다면 gazu.user.all_tasks_to_do() 로 대체
-        task_list = []
         for task in task_list_user:
             if task['project_id'] == self.project['id'] \
                     and task['task_status_name'] == 'Todo':
                 task_list.append(task)
+
+        print('\n#### task list ####')
+        pp.pprint(task_list)
+
         self._task = task_list[num]
 
     def get_kitsu_path(self, casting):
         """
-        캐스팅된 에셋의 최신 아웃풋 파일들의 패스 리스트를 추출하는 매서드
+        캐스팅된 에셋의 최신 output file들의 패스 리스트를 추출하는 매서드
 
         Args:
             casting(dict): 샷에 캐스팅된 에셋의 간략한 정보가 담긴 dict
@@ -163,7 +166,8 @@ class SaveAsKitsuPath(object):
         output_file_list = gazu.files.get_last_output_files_for_entity(asset)
         for out_file in output_file_list:
             # 각 output file의 패스를 생성하고, 리스트에 append
-            out_path = gazu.files.build_entity_output_file_path(asset, out_file['output_type'],
+            out_path = gazu.files.build_entity_output_file_path(asset,
+                                                                out_file['output_type'],
                                                                 out_file['task_type'])
             path = out_path + '.' + out_file['representation']
             file_dict['path'] = path

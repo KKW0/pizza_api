@@ -154,7 +154,7 @@ class SaveAsKitsuPath(object):
             casting(dict): 샷에 캐스팅된 에셋의 간략한 정보가 담긴 dict
 
         Returns:
-            list: 아웃풋 파일들의 패스(확장자 포함), 개수가 담긴 dict를 수집한 리스트
+            list: 아웃풋 파일들의 패스(확장자 포함), 개수, 확장자가 담긴 dict를 수집한 리스트
         """
         file_list = []
         file_dict = {
@@ -168,7 +168,8 @@ class SaveAsKitsuPath(object):
             # 각 output file의 패스를 생성하고, 리스트에 append
             out_path = gazu.files.build_entity_output_file_path(asset,
                                                                 out_file['output_type'],
-                                                                out_file['task_type'])
+                                                                out_file['task_type'],
+                                                                revision=out_file['revision'])
             path = out_path + '.' + out_file['representation']
             file_dict['path'] = path
             file_dict['nb_elements'] = out_file['nb_elements']
@@ -181,7 +182,7 @@ class SaveAsKitsuPath(object):
 
     def load_data(self, path):
         """
-        마야에서 샷에 캐스팅된 에셋들을 import하는 매서드
+        마야에서 샷에 캐스팅된 에셋의 output file들을 import하는 매서드
 
         Args:
             path: 파일명까지 포함된 에셋의 아웃풋 파일의 패스
@@ -190,59 +191,39 @@ class SaveAsKitsuPath(object):
             list: import한 파일이 가지고 있는 요소(트랜스폼, 쉐입 등등)들의 리스트
 
         """
-        imported_file_list = mc.file(
-            path, i=1, ignoreVersion=1,
-            mergeNamespacesOnClash=0, importTimeRange="combine",
+        element_list = mc.file(
+            path, i=True, ignoreVersion=True,
+            mergeNamespacesOnClash=False, importTimeRange="combine",
             loadReferenceDepth="all",
             returnNewNodes=True
         )
 
-        return imported_file_list
+        return element_list
 
     def filter_elements(self, element_list):
         """
         아웃풋 파일에 포함된 요소들 중 트랜스폼과 매쉬만 걸러내어,
-        각각의 이름을 담은 리스트를 반환하는 매서드
+        cam(위치값)의 이름을 반환하는 매서드
 
         Args:
             element_list(list): 아웃풋 파일에 포함된 모든 요소들
 
         Returns:
-            list(cam_list): 아웃풋 파일에 포함된 카메라(트랜스폼) 이름. 하나임
-            list(mesh_list): 아웃풋 파일에 포함된 매쉬 이름들
+            str(cam_name): 아웃풋 파일에 포함된 카메라(트랜스폼) 이름. 하나임
+            list(mesh_list): 아웃풋 파일에 포함된 매쉬 이름들 (필요 없을 것 같아서 주석처리)
 
         """
-        cam_list = []
-        mesh_list = []
+        cam_name = ""
+        # mesh_list = []
         for element in element_list:
             if mc.objectType(element) == "camera":
-                cam = mc.listRelatives(element, p=1)
-                cam_list.append(cam)
-            elif mc.objectType(element) == "mesh":
-                mesh = mc.listRelatives(element, p=1)
-                mesh_list.append(mesh)
+                cam_name = mc.listRelatives(element, p=True)
+            # elif mc.objectType(element) == "mesh":
+            #     mesh = mc.listRelatives(element, p=True)
+            #     mesh_list.append(mesh)
 
-        return cam_list, mesh_list
-
-    def get_casting(self):
-        """
-        수행중인 테스크(샷)에 캐스팅된 에셋의 패스들을 모두 추출하는 매서드
-        get_kitsu_path로 각각의 패스를 추출하고,
-        추출한 패스를 기반으로 마야에 import 한다.(self.load_data)
-        그리고 에셋의 element를 필터링하여 리턴한다.(filter_element)
-        """
-        path_list = []
-        element_list = []
-        self._shot = gazu.entity.get_entity(self._task['entity_id'])
-        casting_dict = gazu.casting.get_shot_casting(self._shot)
-        for casting in casting_dict:
-            path_list = self.get_kitsu_path(casting)
-            for path in path_list:
-                element_list = (self.load_data(path['path']))
-                cam_list, mesh_list = self.filter_elements(element_list)
-                if path['representation'] == 'jpg':
-                    # 아웃풋 파일이 시퀀스 이미지면 캠과 연결시켜준다.
-                    self.connect_image(path, cam_list[0])
+        return cam_name\
+            # , mesh_list
 
     def connect_image(self, path, camera):
         """
@@ -259,6 +240,27 @@ class SaveAsKitsuPath(object):
         mc.setAttr('%s.imageName' % image_plane[0], path, type='string')
         mc.setAttr("%s.useFrameExtension" % image_plane[0], True)
 
+    def get_casting(self):
+        """
+        수행중인 테스크(샷)에 캐스팅된 에셋의 저장위치를 모두 추출하여 마야에 import 한다.
+        output file의 각각의 패스를 추출하고(get_kitsu_path),
+        추출한 패스를 기반으로 마야에 import 한다.(load_data)
+        그리고 에셋의 element 중 카메라만 필터링하여,(filter_element)
+        언디스토션 이미지를 카메라와 연결시킨다.(connect_image)
+        """
+        file_dict_list = []
+        element_list = []
+        self._shot = gazu.entity.get_entity(self._task['entity_id'])
+        casting_list = gazu.casting.get_shot_casting(self._shot)
+        for casting in casting_list:
+            file_dict_list = self.get_kitsu_path(casting)
+            for file_dict in file_dict_list:
+                element_list = (self.load_data(file_dict['path']))
+                cam_name = self.filter_elements(element_list)
+                if file_dict['representation'] == 'jpg':
+                    # 아웃풋 파일이 시퀀스 이미지면 캠과 연결시켜준다.
+                    self.connect_image(file_dict['path'], cam_name)
+
     def save_working_file(self):
         pass
 
@@ -269,7 +271,7 @@ class SaveAsKitsuPath(object):
 
     def get_informations(self):
         """
-        working file, output file, casting을 생성할 때
+        working file, output file을 생성할 때
         필요한 데이터들을 추출하는 매서드
         """
         pass

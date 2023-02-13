@@ -40,18 +40,18 @@ rabbit_info = gazu.asset.get_asset_by_name(new_prod, "Rabbit")
 # task = gazu.task.new_task(monkey, modeling)
 # gazu.task.start_task(task)
 
-# wip1 = gazu.task.get_task_status_by_short_name("wip")
-# test_rabbit = gazu.task.get_task_by_name(rabbit_info['id'], concept)
-# comment1 = gazu.task.add_comment(test_rabbit, wip1, "Cherry")
-# preview_file = gazu.task.add_preview(test_rabbit, comment1, "/home/rapa/test.jpeg")
-# gazu.task.set_main_preview(preview_file)
-#
-#
-# wip2 = gazu.task.get_task_status_by_short_name("wip")
-# test_monkey = gazu.task.get_task_by_name(monkey_info['id'], modeling)
-# comment2 = gazu.task.add_comment(test_monkey, wip2, "체리에요")
-# preview_file = gazu.task.add_preview(test_monkey, comment2, "/home/rapa/test.jpeg")
-# gazu.task.set_main_preview(preview_file)
+wip1 = gazu.task.get_task_status_by_short_name("wip")
+test_rabbit = gazu.task.get_task_by_name(rabbit_info['id'], concept)
+comment1 = gazu.task.add_comment(test_rabbit, wip1, "Cherry")
+preview_file = gazu.task.add_preview(test_rabbit, comment1, "/home/rapa/test.jpeg")
+gazu.task.set_main_preview(preview_file)
+
+
+wip2 = gazu.task.get_task_status_by_short_name("wip")
+test_monkey = gazu.task.get_task_by_name(monkey_info['id'], modeling)
+comment2 = gazu.task.add_comment(test_monkey, wip2, "체리에요")
+preview_file = gazu.task.add_preview(test_monkey, comment2, "/home/rapa/test.jpeg")
+gazu.task.set_main_preview(preview_file)
 
 
 for asset in gazu.asset.all_assets_for_project(new_prod):

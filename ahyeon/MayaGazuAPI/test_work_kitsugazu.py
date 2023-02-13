@@ -4,50 +4,68 @@ import gazu
 import pprint as pp
 import maya.cmds as mc
 from unittest import TestCase
-from work_kitsugazu import SaveAsKitsuPath
+from work_kitsugazu import ImportThings
 
-
-class TestSaveAsKitsuPath(TestCase):
+class TestImportThings(TestCase):
     def setUp(self):
-        self.origin = SaveAsKitsuPath()
+        self.origin = ImportThings()
         self.origin.project = "NetflixAcademy"
         self.origin.person = "Youngbin Park"
 
-    def test_update_filetree(self):
-        pass
+    # def test_update_filetree(self):
+    #     pass
+    #
+    # def test_select_task(self):
+    #     pass
+    #
+    # def test_get_kitsu_path(self):
+    #     pass
 
-    def test_select_task(self):
-        pass
+    # ----------------------------- maya -----------------------------
 
-    def test_get_kitsu_path(self):
-        pass
+    # def test_load_working(self):
+    #     self.fail()
 
-    def test_load_data(self):
-        pass
-
-    def test_filter_elements(self):
-        pass
-
-    def test_connect_image(self):
-        pass
-
-    def test_get_casting_asset(self):
-        pass
+    # def test_load_output(self):
+    #     pass
+    #
+    # def test_import_casting_asset(self):
+    #     pass
 
     def test_get_undistort_img(self):
-        pass
+        self.fail()
 
     def test_get_camera(self):
-        pass
+        self.fail()
+
+    # def test_connect_image(self):
+    #     pass
+
+    def test_import_cam_seq(self):
+        self.fail()
 
     def test_save_working_file(self):
-        pass
+        """
+        포맷을 받아서 원하는 형식으로 저장하는 매서드
+        Args:
+            path: 저장할 경로 + 이름
+            format: "mayaAscii","mayaBinary" 둘중하나
+
+        Returns:
+
+        """
+        # if format == "mayaAscii":다
+        #     mc.file(rename = "%s"%path + ".ma")
+        # elif format == "mayaBinary":
+        #     mc.file(rename = "%s"%path + ".mb")
+        # mc.file(save = True, type = format)
 
     def test_export_output_file(self):
         self.fail()
 
+    # ----------------------------- publish -----------------------------
+
     def test_get_informations(self):
-        self.fail()
         # self._shot = gazu.entity.get_entity(self._task['entity id'])
         # self._sequence = gazu.shot.get_sequence_from_shot(self._shot['id'])
         # self.test_get_casting(0)
@@ -69,35 +87,48 @@ class TestSaveAsKitsuPath(TestCase):
         # self.assertEqual(type(self._asset), dict)
         # self.assertEqual(type(self._asset_type), dict)
 
-    def test_select_software(self):
-        pass
-
-    def test_select_output_type(self):
-        pass
-
-    def test_edit_path(self):
-        pass
-
-    def test_make_folder_tree(self):
-        pass
+    # def test_select_software(self):
+    #     pass
+    #
+    # def test_select_output_type(self):
+    #     pass
+    #
+    # def test_edit_path(self):
+    #     pass
+    #
+    # def test_make_folder_tree(self):
+    #     pass
 
     def test_make_publish_file_data(self, comment):
-        # 테스크에 대한 워킹 파일 새로 생성
+        # 테스크에 대한 워킹/아웃풋 파일 새로 생성
         # person은 user 또는 선택한 person(자신)
+        # Layout 팀에서는 working file이 여러개 안 나옴. output file도 여러개 안 나옴(리비전만 올라감)
 
         # working file 생성
-        # 테스크 하나에 워킹 파일이 여러개일 수는 없음. 리비전만 올라감.
-        self.origin.select_software(0)
-        working_file = gazu.files.new_working_file(self.origin._task['id'],
-                                                   software=self.origin._software,
-                                                   comment=comment,
-                                                   person=self.origin._person)
+        # 테스크 하나에 워킹 파일이 여러개일 수는 없음. 리비전만 올라감(이름이 같으면 자동으로..)
+        working_file_list = gazu.files.get_working_files_for_task(self.origin._task['id'])
+        if working_file_list is []:
+            # working file 없으면 소프트웨어 선택해서 새로 생성
+            self.origin.select_software(0)
+            working_file = gazu.files.new_working_file(self.origin._task['id'],
+                                                       software=self.origin._software,
+                                                       comment=comment,
+                                                       person=self.origin._person)
+        else:
+            # 이미 있으면 기존 정보 계승하고 리비전만 올림
+            old_working = working_file_list[0]
+            self.origin._software = old_working['software']
+            working_file = gazu.files.new_working_file(self.origin._task['id'],
+                                                       software=self.origin._software,
+                                                       comment=comment,
+                                                       person=self.origin._person)
 
-        # output file 존재 여부 판별 후 이미 있으면 계승하고, 없으면 전부 새로 생성
+        # output file 생성
+        # 워킹 파일 하나에 아웃풋은 여러개 나올 수 있음
         output_file_list = gazu.files.get_last_output_files_for_entity(self.origin._shot['id'],
                                                                        task_type=self.origin._task['task_type'])
         if output_file_list is []:
-            # output file 없으면 아웃풋 타입 선택해서 새로 생성
+            # 샷에 선택한 아웃풋 타입의 output file이 없으면 타입 선택해서 새로 생성
             self.origin.select_output_type(0)
             output_file = gazu.files.new_entity_output_file(self.origin._shot['id'],
                                                             self.origin._output_type['id'],
@@ -107,15 +138,16 @@ class TestSaveAsKitsuPath(TestCase):
                                                             person=self.origin._person,
                                                             representation=self.origin._software['file_extension'])
         else:
-            # 이미 있으면 정보 계승함
+            # 샷에 선택한 아웃풋 타입의 output file이 이미 있으면 정보 계승함
             old_output = output_file_list[0]
+            self.origin._output_type = old_output['output_type']
             output_file = gazu.files.new_entity_output_file(self.origin._shot['id'],
-                                                            old_output['output_type'],
+                                                            self.origin._output_type,
                                                             self.origin._task['task_type'],
                                                             comment=comment,
-                                                            working_file=old_output['working_file'],
+                                                            working_file=working_file,
                                                             person=self.origin._person,
-                                                            revision=old_output['revision'] + 1,
+                                                            revision=old_output['revision'],
                                                             representation=old_output['representation'])
 
         #### ------------------- build -----------------------

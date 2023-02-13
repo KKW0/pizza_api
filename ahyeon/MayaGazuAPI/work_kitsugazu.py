@@ -5,7 +5,7 @@ import pprint as pp
 import maya.cmds as mc
 
 
-class SaveAsKitsuPath(object):
+class ImportThings(object):
     """
     프로젝트에서 사용자에게 주어진 테스크 중 하나를 선택하고,
     테스크가 소속된 샷에 캐스팅되어 있는 에셋 데이터를 가져오고,
@@ -141,7 +141,7 @@ class SaveAsKitsuPath(object):
 
     def get_kitsu_path(self, casting):
         """
-        캐스팅된 에셋의 최신 output file들의 패스 리스트를 추출하는 매서드
+        샷에 캐스팅된 에셋의 최신 output file들의 패스 리스트를 추출하는 매서드
 
         Args:
             casting(dict): 샷에 캐스팅된 에셋의 간략한 정보가 담긴 dict
@@ -171,6 +171,13 @@ class SaveAsKitsuPath(object):
 
     # ----------------------------- maya -----------------------------
 
+    def test_load_working(self):
+        """
+        마야에서 선택한 테스크에 working file이 이미 있을 경우,
+        해당 파일을 import 하는 매서드
+
+        """
+
     def load_output(self, path):
         """
         마야에서 샷에 캐스팅된 에셋의 output file들을 import하는 매서드
@@ -193,7 +200,7 @@ class SaveAsKitsuPath(object):
 
         file_dict_list: 에셋에 있는 각 output file들(최신버전)의
                         path, nb_elements가 기록된 dict를 모은 리스트
-        casting: 캐스팅된 에셋의 asset_id와 nb_elements가 기록된 dict
+        casting_list: 캐스팅된 에셋의 asset_id와 nb_elements가 기록된 dict가 모인 리스트
         """
         file_dict_list = []
         self._shot = gazu.entity.get_entity(self._task['entity_id'])
@@ -210,11 +217,11 @@ class SaveAsKitsuPath(object):
 
         Returns:
         """
-        return
+        pass
 
     def get_camera(self):
         """
-        shot에 소속된 task type이 Matchmove고,
+        _shot에 소속된 task type이 Matchmove고,
         ouput type이 Camera인 output file을 찾는 매서드
         """
         pass
@@ -227,7 +234,7 @@ class SaveAsKitsuPath(object):
         카메라에 이미지 연결 후 시퀀스 옵션을 True로 해서 이미지가 영상처럼 넘어가게 함
 
         Args:
-            path(str): 확장자까지 포함된 언디스토션 이미지 파일경로
+            path(str): 확장자까지 포함된 첫번째 언디스토션 이미지의 파일경로
             camera(str): 카메라 파일의 경로
         """
         image_plane = mc.imagePlane(c=camera)
@@ -240,22 +247,10 @@ class SaveAsKitsuPath(object):
         샷에 소속된 카메라 output file도 찾아서(get_camera)
         모두 import한 뒤, 언디스토션 시퀀스를 카메라와 연결시키는(connect_image) 매서드
         """
+        pass
 
     def save_working_file(self):
-        """
-        포맷을 받아서 원하는 형식으로 저장하는 매서드
-        Args:
-            path: 저장할 경로 + 이름
-            format: "mayaAscii","mayaBinary" 둘중하나
-
-        Returns:
-
-        """
-        # if format == "mayaAscii":다
-        #     mc.file(rename = "%s"%path + ".ma")
-        # elif format == "mayaBinary":
-        #     mc.file(rename = "%s"%path + ".mb")
-        # mc.file(save = True, type = format)
+        pass
 
     def export_output_file(self):
         pass
@@ -338,7 +333,7 @@ class SaveAsKitsuPath(object):
 
 
 def main():
-    save = SaveAsKitsuPath()
+    save = ImportThings()
     save.project = "NetfilxAcademy"
     save.person = "Youngbin Park"
     # save_path.sequence = "My Dog"

@@ -140,7 +140,10 @@ class SetThings(object):
 
     def run_program(self, comment):
         """
-        멍멍이 보고싶어ㅠㅠ
+        프로그램을 구동하는 매서드
+
+        Args:
+            comment(str): working/output/preview file에 대한 커밋 내용
         """
         self.import_casting_asset()
         # 샷에 캐스팅된 에셋을 마야에 모두 import

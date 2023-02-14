@@ -1,7 +1,7 @@
 #coding:utf8
 import gazu
 import pprint as pp
-from usemaya import MayaThings
+# from usemaya import MayaThings
 from publish import PublishThings
 
 
@@ -9,7 +9,7 @@ class SetThings(object):
     def __init__(self):
         gazu.client.set_host("http://192.168.3.116/api")
         gazu.log_in("pipeline@rapa.org", "netflixacademy")
-        self.maya = MayaThings()
+        # self.maya = MayaThings()
         self.pub = PublishThings()
         self._project = None
         self._shot = None
@@ -69,7 +69,7 @@ class SetThings(object):
         }
         gazu.files.update_project_file_tree(self.project, tree)
 
-    def _select_task(self, num=0):
+    def select_task(self, num=0):
         """
         수행할 task를 선택하는 매서드
         task는 선택한 person 또는 user에 assign되어 있어야 하고, 상태가 Todo여야 한다.
@@ -121,22 +121,22 @@ class SetThings(object):
 
         return file_list
 
-    def import_casting_asset(self):
-        """
-        수행중인 테스크(샷)에 캐스팅된 에셋의 저장위치를 모두 추출하여 마야에 import 하는 매서드
-        output file의 각각의 확장자 포함된 패스를 추출하고(get_kitsu_path),
-        추출한 패스를 기반으로 마야에 import 한다.(load_output)
-
-        file_dict_list: 에셋에 있는 각 output file들(최신버전)의
-                        path, nb_elements가 기록된 dict를 모은 리스트
-        casting_list: 캐스팅된 에셋의 asset_id와 nb_elements가 기록된 dict가 모인 리스트
-        """
-        file_dict_list = []
-        casting_list = gazu.casting.get_shot_casting(self._shot)
-        for casting in casting_list:
-            file_dict_list = self._get_kitsu_path(casting)
-            for file_dict in file_dict_list:
-                self.maya.load_output(file_dict['path'])
+    # def import_casting_asset(self):
+    #     """
+    #     수행중인 테스크(샷)에 캐스팅된 에셋의 저장위치를 모두 추출하여 마야에 import 하는 매서드
+    #     output file의 각각의 확장자 포함된 패스를 추출하고(get_kitsu_path),
+    #     추출한 패스를 기반으로 마야에 import 한다.(load_output)
+    #
+    #     file_dict_list: 에셋에 있는 각 output file들(최신버전)의
+    #                     path, nb_elements가 기록된 dict를 모은 리스트
+    #     casting_list: 캐스팅된 에셋의 asset_id와 nb_elements가 기록된 dict가 모인 리스트
+    #     """
+    #     file_dict_list = []
+    #     casting_list = gazu.casting.get_shot_casting(self._shot)
+    #     for casting in casting_list:
+    #         file_dict_list = self._get_kitsu_path(casting)
+    #         for file_dict in file_dict_list:
+    #             self.maya.load_output(file_dict['path'])
 
     def run_program(self, comment):
         """
@@ -145,10 +145,12 @@ class SetThings(object):
         Args:
             comment(str): working/output/preview file에 대한 커밋 내용
         """
-        self.import_casting_asset()
-        # 샷에 캐스팅된 에셋을 마야에 모두 import
-        self.maya.import_cam_seq(self._shot)
-        # 샷의 카메라와 언디스토션 이미지를 마야에 import하고 둘을 연결
+        self.select_task(0)
+        # 유저에게 할당되고, 프로젝트에 속한 테스크 선택(0번째), 테스크가 속한 샷 추출
+        # self.import_casting_asset()
+        # # 샷에 캐스팅된 에셋을 마야에 모두 import
+        # self.maya.import_cam_seq(self._shot)
+        # # 샷의 카메라와 언디스토션 이미지를 마야에 import하고 둘을 연결
         self.pub.publish_file_data(self._shot, self._task, comment=comment)
         # Kitsu에 데이터 퍼블리싱
         self.pub.save_publish_real_data(self._shot, self._task, comment=comment)
@@ -157,6 +159,7 @@ class SetThings(object):
 
 def main():
     mm = SetThings()
+    mm.project = "jeongtae"
     mm.run_program("This is like commit")
 
 

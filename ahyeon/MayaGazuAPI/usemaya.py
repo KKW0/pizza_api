@@ -31,7 +31,9 @@ class MayaThings:
 
         mc.file(
             path, i=True, ignoreVersion=True,
+            # 아웃풋 파일의 패스를 import 하는데, 이 때 fbx파일의 버전 번호를 무시한다.
             mergeNamespacesOnClash=False, importTimeRange="combine",
+            #
             loadReferenceDepth="all",
             returnNewNodes=True
         )
@@ -48,8 +50,7 @@ class MayaThings:
         if not padding_info:
             padding_info = 4
 
-        padding = '#' * (padding_info)
-        self._padding = '_' + padding.replace("#", "0")
+        self._padding = '_' + ('0' * padding_info)
 
     def _get_undistortion_img(self, shot):
         """

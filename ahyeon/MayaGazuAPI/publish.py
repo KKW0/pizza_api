@@ -11,7 +11,7 @@ class PublishThings:
         self._software = None
         self._output_type = None
 
-    def _select_software(self, num=0):
+    def _select_software(self, num=2):
         """
         테스크에 working file을 생성하기 위해, 작업에 사용한 소프트웨어를 선택하는 매서드
 
@@ -27,7 +27,7 @@ class PublishThings:
 
         return software_list[num]
 
-    def _select_output_type(self, shot, num=0):
+    def _select_output_type(self, shot, num=19):
         """
         테스크에 output file을 처음 생성할 경우, 필요한 output type을 선택하는 매서드
 
@@ -67,7 +67,7 @@ class PublishThings:
         working_file_list = gazu.files.get_working_files_for_task(task['id'])
         if working_file_list is []:
             # working file 없으면 소프트웨어 선택해서 새로 생성
-            self._software = self._select_software(0)
+            self._software = self._select_software()
             working_file = gazu.files.new_working_file(task['id'],
                                                        software=self._software['id'],
                                                        comment=comment,
@@ -83,32 +83,31 @@ class PublishThings:
                                                        person=gazu.client.get_current_user())
 
         # output file 생성
+        output_type = gazu.files.get_output_type_by_name('Previz_jpg')
         output_file_list = gazu.files.get_last_output_files_for_entity(shot['id'],
-                                                                       output_type='Previz',
-                                                                       task_type=task['task_type'])
+                                                                       output_type=output_type,
+                                                                       task_type=str(task['task_type_id']))
         if output_file_list is []:
             # 샷에 선택한 아웃풋 타입의 output file이 없으면 타입 선택해서 새로 생성
-            output_type = self._select_output_type(shot, 0)
+            output_type = self._select_output_type(shot)
             output_file = gazu.files.new_entity_output_file(shot['id'],
                                                             output_type['id'],
-                                                            task['task_type'],
+                                                            str(task['task_type_id']),
                                                             comment=comment,
                                                             working_file=working_file,
                                                             person=gazu.client.get_current_user(),
-                                                            representation=self._software['file_extension'])
-                                                            # 'jpg'라고 써도 됨
+                                                            representation='jpg')
         else:
             # 샷에 선택한 아웃풋 타입의 output file이 이미 있으면 정보 계승함
             old_output = output_file_list[0]
-            output_type = old_output['output_type_id']
+            self._output_type = old_output['output_type_id']
             output_file = gazu.files.new_entity_output_file(shot['id'],
-                                                            output_type,
-                                                            task['task_type'],
+                                                            self._output_type,
+                                                            str(task['task_type_id']),
                                                             comment=comment,
                                                             working_file=working_file,
                                                             person=gazu.client.get_current_user(),
-                                                            revision=old_output['revision']+1,
-                                                            # +1 안써도 리비전 올라감(아마도...)
+                                                            revision=old_output['revision'],
                                                             representation=old_output['representation'])
 
         # 마야에서 작업한 파일을 저장하기 위해 폴더 패스 build
@@ -117,7 +116,7 @@ class PublishThings:
                                                           revision=working_file['revision'])
         output_path = gazu.files.build_entity_output_file_path(shot['id'],
                                                                self._output_type,
-                                                               task['task_type'],
+                                                               task['task_type_id'],
                                                                representation=output_file['representation'],
                                                                revision=output_file['revision'],
                                                                nb_elements=output_file['nb_elements'])
@@ -128,26 +127,29 @@ class PublishThings:
         """
         working file, output file을 save/export 하기 위한 실제 폴더를
         생성하는 매서드
+        폴더가 이미 있으면 생성하지 않는다.
 
         Args:
             path(str): 파일명을 제외한 폴더 경로
         """
+
         if not os.path.exists(path):
             os.makedirs(path)
         else:
-            parent = os.path.dirname(path)
-            if parent != "/":
-                self._make_folder_tree(parent)
-        # 테스트 해봐야 함
+            # parent = os.path.dirname(path)
+            # if parent != "/":
+            #     self._make_folder_tree(parent)
+            raise SystemError("폴더 트리가 이미 존재합니다.")
 
-    def _upload_files(self, task, path, comment, file_type):
+    def _upload_files(self, task, path, file_type, comment=None):
         """
         작업한 working file과 task에 대한 preview file을 Kitsu에 업로드하는 매서드
+        output 파일에 대한 preview 모델을 생성한 뒤, 저장해둔 .mov 형식의 preview 파일을 업로드한다.
 
         Args:
             task(dict): 선택한 task의 딕셔너리
             path(str): working file 또는 output file의 확장자를 제외한 path
-            comment(str): working file, preview file에 대한 comment
+            comment(dict): preview file에 대한 comment dict
             file_type(dict): working file 또는 preview file을 만들 output file의 딕셔너리
         """
         if 'working' in path:
@@ -155,8 +157,14 @@ class PublishThings:
             gazu.files.upload_working_file(file_type, full_path)
         elif 'output' in path:
             full_path = path + '_preview.mov'
-            preview = gazu.task.create_preview(task, comment=comment)
-            gazu.task.upload_preview_file(preview, full_path)
+            if not gazu.files.get_all_preview_files_for_task(task):
+                preview = gazu.task.create_preview(task, comment)
+                gazu.task.upload_preview_file(preview, full_path)
+                gazu.task.set_main_preview(preview)
+            else:
+                gazu.task.add_preview(task, comment, full_path)
+        else:
+            raise ValueError("working 또는 output file의 경로를 입력해주세요.")
 
     def save_publish_real_data(self, shot, task, comment):
         """
@@ -182,5 +190,6 @@ class PublishThings:
         # self.maya.export_output_file(output_path)
 
         # Kitsu에 preview, working file 업로드
-        self._upload_files(task, working_path, working_file['comment'], working_file)
-        self._upload_files(task, output_path, output_file['comment'], output_file)
+        comment_dict = gazu.task.get_last_comment_for_task(task)
+        self._upload_files(task, working_path, working_file)
+        self._upload_files(task, output_path, output_file, comment_dict)

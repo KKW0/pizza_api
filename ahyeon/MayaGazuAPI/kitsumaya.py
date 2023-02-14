@@ -27,7 +27,14 @@ class SetThings(object):
         Args:
             value(str): 프로젝트 이름
         """
-        self._project = gazu.project.get_project_by_name(value)
+        open_proj = gazu.project.all_open_projects()
+        name_list = []
+        for proj in open_proj:
+            name_list.append(proj['name'])
+        if value not in name_list:
+            raise ValueError("오픈 상태인 프로젝트명을 입력해주세요.")
+        else:
+            self._project = gazu.project.get_project_by_name(value)
 
     def update_filetree(self, mountpoint, root):
         """
@@ -106,13 +113,13 @@ class SetThings(object):
             'path': "",
             'nb_elements': 0,
         }
-        asset = gazu.asset.get_asset(casting['asset_id'])
+        asset = gazu.asset.get_asset(casting['id'])
         output_file_list = gazu.files.get_last_output_files_for_entity(asset)
         for out_file in output_file_list:
             # 각 output file의 패스를 생성하고, 리스트에 append
             out_path = gazu.files.build_entity_output_file_path(asset,
-                                                                out_file['output_type'],
-                                                                out_file['task_type'],
+                                                                out_file['output_type_id'],
+                                                                out_file['task_type_id'],
                                                                 revision=out_file['revision'])
             path = out_path + '.' + out_file['representation']
             file_dict['path'] = path
@@ -145,23 +152,23 @@ class SetThings(object):
         Args:
             comment(str): working/output/preview file에 대한 커밋 내용
         """
-        self.select_task(0)
+        self.select_task()
         # 유저에게 할당되고, 프로젝트에 속한 테스크 선택(0번째), 테스크가 속한 샷 추출
         # self.import_casting_asset()
         # # 샷에 캐스팅된 에셋을 마야에 모두 import
         # self.maya.import_cam_seq(self._shot)
         # # 샷의 카메라와 언디스토션 이미지를 마야에 import하고 둘을 연결
         self.pub.publish_file_data(self._shot, self._task, comment=comment)
-        # Kitsu에 데이터 퍼블리싱
+        # Kitsu에 저장한 working, output file 데이터 퍼블리싱
         self.pub.save_publish_real_data(self._shot, self._task, comment=comment)
         # 폴더 트리에 working, output, preview 파일 저장하고 Kitsu에 업로드
 
 
-def main():
-    mm = SetThings()
-    mm.project = "jeongtae"
-    mm.run_program("This is like commit")
-
-
-main()
+# def main():
+#     mm = SetThings()
+#     mm.project = "jeongtae"
+#     mm.run_program("This is like commit")
+#
+#
+# main()
 

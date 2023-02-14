@@ -1,29 +1,19 @@
 #coding:utf8
 import gazu
 import pprint as pp
+from usemaya import MayaThings
+from publish import PublishThings
 
 
 class SetThings(object):
     def __init__(self):
-        self._person = None
+        gazu.client.set_host("http://192.168.3.116/api")
+        gazu.log_in("pipeline@rapa.org", "netflixacademy")
+        self.maya = MayaThings()
+        self.pub = PublishThings()
         self._project = None
-
-    @property
-    def person(self):
-        return self._person
-
-    @person.setter
-    def person(self, value):
-        """
-        task 목록을 보고 싶은 유저의 정보를 저장해주는 세터
-        user에게 할당된 테스크가 많다면 필요 없을 듯...
-        영빈님한테만 테스크가 할당되어 있어서 테스트 용으로 만듦....
-
-        Args:
-            value(str): 영빈 td님 성함...
-        """
-        self._person = gazu.person.get_person_by_full_name(value)
-        # 또는 세터 없이 그냥 client.get_current_user()
+        self._shot = None
+        self._task = None
 
     @property
     def project(self):
@@ -77,9 +67,9 @@ class SetThings(object):
                 }
             }
         }
-        gazu.files.update_project_file_tree(self._project, tree)
+        gazu.files.update_project_file_tree(self.project, tree)
 
-    def select_task(self, num=0):
+    def _select_task(self, num=0):
         """
         수행할 task를 선택하는 매서드
         task는 선택한 person 또는 user에 assign되어 있어야 하고, 상태가 Todo여야 한다.
@@ -87,13 +77,9 @@ class SetThings(object):
 
         Args:
             num(int): task list의 인덱스 번호
-        Returns:
-            dict(task): 사용자가 선택한 task의 딕셔너리
-            dict(shot): task가 속한 shot의 딕셔너리
         """
         task_list = []
-        task_list_user = gazu.task.all_tasks_for_person(self.person)
-        # user에게 테스크가 충분히 할당되어 있다면 gazu.user.all_tasks_to_do() 로 대체
+        task_list_user = gazu.user.all_tasks_to_do()
         for task in task_list_user:
             if task['project_id'] == self.project['id'] \
                     and task['task_status_name'] == 'Todo':
@@ -102,12 +88,10 @@ class SetThings(object):
         print('\n#### task list ####')
         pp.pprint(task_list)
 
-        task = task_list[num]
-        shot = gazu.entity.get_entity(task['entity_id'])
+        self._task = task_list[num]
+        self._shot = gazu.entity.get_entity(self._task['entity_id'])
 
-        return task, shot
-
-    def get_kitsu_path(self, casting):
+    def _get_kitsu_path(self, casting):
         """
         샷에 캐스팅된 에셋의 최신 output file들의 패스 리스트를 추출하는 매서드
 
@@ -136,3 +120,42 @@ class SetThings(object):
             file_list.append(file_dict)
 
         return file_list
+
+    def import_casting_asset(self):
+        """
+        수행중인 테스크(샷)에 캐스팅된 에셋의 저장위치를 모두 추출하여 마야에 import 하는 매서드
+        output file의 각각의 확장자 포함된 패스를 추출하고(get_kitsu_path),
+        추출한 패스를 기반으로 마야에 import 한다.(load_output)
+
+        file_dict_list: 에셋에 있는 각 output file들(최신버전)의
+                        path, nb_elements가 기록된 dict를 모은 리스트
+        casting_list: 캐스팅된 에셋의 asset_id와 nb_elements가 기록된 dict가 모인 리스트
+        """
+        file_dict_list = []
+        casting_list = gazu.casting.get_shot_casting(self._shot)
+        for casting in casting_list:
+            file_dict_list = self._get_kitsu_path(casting)
+            for file_dict in file_dict_list:
+                self.maya.load_output(file_dict['path'])
+
+    def run_program(self, comment):
+        """
+        멍멍이 보고싶어ㅠㅠ
+        """
+        self.import_casting_asset()
+        # 샷에 캐스팅된 에셋을 마야에 모두 import
+        self.maya.import_cam_seq(self._shot)
+        # 샷의 카메라와 언디스토션 이미지를 마야에 import하고 둘을 연결
+        self.pub.publish_file_data(self._shot, self._task, comment=comment)
+        # Kitsu에 데이터 퍼블리싱
+        self.pub.save_publish_real_data(self._shot, self._task, comment=comment)
+        # 폴더 트리에 working, output, preview 파일 저장하고 Kitsu에 업로드
+
+
+def main():
+    mm = SetThings()
+    mm.run_program("This is like commit")
+
+
+main()
+

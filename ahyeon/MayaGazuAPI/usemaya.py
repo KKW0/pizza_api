@@ -1,27 +1,34 @@
 #coding:utf8
+import os
 import gazu
 import maya.cmds as mc
-from kitsumaya import SetThings as sett
 
 
 class MayaThings:
     def __init__(self):
-        self._task, self._shot = sett.select_task()
+        pass
 
-    def load_working(self):
+    def _load_working(self):
         """
         마야에서 선택한 테스크에 working file이 이미 있을 경우,
         해당 파일을 import 하는 매서드
         """
         pass
+        ### 씬파일 import 판별 함수가 있어야 할지 의견 주세용
 
     def load_output(self, path):
         """
         마야에서 샷에 캐스팅된 에셋의 output file들을 import하는 매서드
+        입력된 패스가 언디스토션 이미지의 폴더라면 시퀀스 길이를 패딩에 맞게 재설정한다.
 
         Args:
-            path(str): 파일명까지 포함된 에셋의 아웃풋 파일의 패스
+            path(str): 파일명까지 포함된 아웃풋 파일의 패스
         """
+        if 'Undistortion_img' in path:
+            file_list = os.listdir(path)
+            file_num = len(file_list)
+            mc.playbackOptions(min=False, max=file_num)
+
         mc.file(
             path, i=True, ignoreVersion=True,
             mergeNamespacesOnClash=False, importTimeRange="combine",
@@ -29,51 +36,55 @@ class MayaThings:
             returnNewNodes=True
         )
 
-    def import_casting_asset(self):
+    def _get_frame_padding(self, shot):
         """
-        수행중인 테스크(샷)에 캐스팅된 에셋의 저장위치를 모두 추출하여 마야에 import 하는 매서드
-        output file의 각각의 확장자 포함된 패스를 추출하고(get_kitsu_path),
-        추출한 패스를 기반으로 마야에 import 한다.(load_output)
+        샷에 프레임 정보가 있을 경우 패딩을 생성해주는 매서드
+        프레임 정보가 없으면 4자리로 생성한다.
 
-        file_dict_list: 에셋에 있는 각 output file들(최신버전)의
-                        path, nb_elements가 기록된 dict를 모은 리스트
-        casting_list: 캐스팅된 에셋의 asset_id와 nb_elements가 기록된 dict가 모인 리스트
+        Args:
+            shot(dict): 선택한 테스크가 속한 샷
         """
-        file_dict_list = []
-        casting_list = gazu.casting.get_shot_casting(self._shot)
-        for casting in casting_list:
-            file_dict_list = sett.get_kitsu_path(casting)
-            for file_dict in file_dict_list:
-                self.load_output(file_dict['path'])
+        padding_info = shot.get('nb_frames')
+        if not padding_info:
+            padding_info = 4
 
-    def get_undistortion_img(self):
+        padding = '#' * (padding_info)
+        self._padding = '_' + padding.replace("#", "0")
+
+    def _get_undistortion_img(self, shot):
         """
         _shot에 소속된 task type이 Matchmove고,
         ouput type이 Undistortion_img인 output file을 찾는 매서드
 
+        Args:
+            shot(dict): 선택한 테스크가 속한 샷
         Returns:
-            str: 마지막 언디스토션 이미지가 저장된 path. ## padding을 여기서 추출해야 하려나 싶다.
+            str: 마지막 언디스토션 이미지가 저장된 path.
         """
-        undi_path = gazu.files.build_entity_output_file_path(self._shot, 'Undistortion_img', 'Matchmove')
-        full_path = undi_path + '.jpg'
+        undi_path = gazu.files.build_entity_output_file_path(shot, 'Undistortion_img', 'Matchmove')
+        self._get_frame_padding(shot)
+        path = undi_path + self._padding
+        full_path = path + '.jpg'
 
         return full_path
 
-    def get_camera(self):
+    def _get_camera(self, shot):
         """
         _shot에 소속된 task type이 Matchmove고,
         ouput type이 Camera인 output file을 찾는 매서드
 
+        Args:
+            shot(dict): 선택한 테스크가 속한 샷
         Returns:
-            str: 카메라(fbx) 아웃풋 파일이 저장된 path
+            str: 카메라(fbx 등) 아웃풋 파일이 저장된 path
         """
-        camera_files = gazu.files.get_last_output_files_for_entity(self._shot, 'Camera', 'Matchmove')
-        camera_path = gazu.files.build_entity_output_file_path(self._shot, 'Camera', 'Matchmove')
+        camera_files = gazu.files.get_last_output_files_for_entity(shot, 'Camera', 'Matchmove')
+        camera_path = gazu.files.build_entity_output_file_path(shot, 'Camera', 'Matchmove')
         full_path = camera_path + '.' + camera_files[0]['representation']
 
         return full_path
 
-    def connect_image(self, undi_path, camera):
+    def _connect_image(self, undi_path, camera_path):
         """
         import한 언디스토션 이미지(아웃풋 파일) 시퀀스와 camera를 연결시켜주는 매서드
         카메라가 바라보는 방향에 언디스토션 이미지가 뜨고,
@@ -82,21 +93,27 @@ class MayaThings:
 
         Args:
             undi_path(str): 확장자까지 포함된 마지막 언디스토션 이미지의 파일경로
-            camera(str): 카메라 파일의 경로
+            camera_path(str): 카메라 파일의 경로
         """
-        image_plane = mc.imagePlane(c=camera)
+        image_plane = mc.imagePlane(c=camera_path)
         mc.setAttr(image_plane[0] + '.imageName', undi_path, type='string')
         mc.setAttr(image_plane[0] + '.useFrameExtension', True)
 
-    def import_cam_seq(self):
+    def import_cam_seq(self, shot):
         """
         샷에 소속된 언디스토션 시퀀스를 찾고(get_undistort_img)
         샷에 소속된 카메라 output file도 찾아서(get_camera)
-        모두 import한 뒤, 언디스토션 시퀀스를 카메라와 연결시키는(connect_image) 매서드
+        모두 import한 뒤(_load_output), 언디스토션 시퀀스를 카메라와 연결시키는(connect_image) 매서드
+
+        Args:
+            shot(dict): 선택한 테스크가 속한 샷
         """
-        undi_seq_path = self.get_undistortion_img()
-        camera_path = self.get_camera()
-        self.connect_image(undi_seq_path, camera_path)
+        undi_seq_path = self._get_undistortion_img(shot)
+        camera_path = self._get_camera(shot)
+        self.load_output(undi_seq_path)
+        self.load_output(camera_path)
+        ### connect_image에서 import도 해주면 로드할 필요 없을 듯
+        self._connect_image(undi_seq_path, camera_path)
 
     def save_working_file(self, path, representation):
         """
@@ -112,21 +129,10 @@ class MayaThings:
             mc.file(rename=path + ".mb")
         mc.file(save=True, type=representation)
 
-    def export_preview(self, path, comment):
-        """
-        output file의 용량을 줄여서 preview file을 저장하는 매서드
-
-        Args:
-            path(str): _preview와 확장자를 붙인 전체 경로
-            comment(str): 프리뷰 파일에 대한 comment
-        """
-        # preview = gazu.task.create_preview(self._task, comment=comment)
-        # gazu.task.upload_preview_file(preview, path)
-        pass
-
     def export_output_file(self, path):
         """
         작업한 파일을 플레이블라스트 시퀀스로 저장하는 매서드
+        저용량 preview 파일도 저장한다.
 
         Args:
             path(str): output file 시퀀스를 저장할 경로 + 이름
@@ -139,7 +145,10 @@ class MayaThings:
                 startup_cameras.append(camera)
         custom_camera = list(set(all_cameras) - set(startup_cameras))
 
-        # 카메라가 바라보는 플레이블라스트 저장 (패딩이 자동으로 붙는지 확인 필요)
+        path = path + self._padding
+
+        # 카메라가 바라보는 플레이블라스트 저장
+        ### 저용량으로 mov 하나 더 저장하는 기능 필요
         mc.lookThru(custom_camera[0])
         mc.playblast(
             format='image',

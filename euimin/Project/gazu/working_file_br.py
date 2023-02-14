@@ -47,7 +47,7 @@ class MyGazu:
         for i in tasks:
             if i.get('task_type_name') == name:
                 task = i
-        pp.pprint(task2)
+        # pp.pprint(task2)
 
     def update_file_tree(self):
         gazu.files.update_project_file_tree(self.project, {

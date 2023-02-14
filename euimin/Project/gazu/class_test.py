@@ -4,18 +4,25 @@ import pprint as pp
 
 
 class GetSelectedPreviews:
-    """
-    테스크 타입을 선택하고, 해당하는 obj 프리뷰 파일들만 저장하는 클래스
-    """
+
     def __init__(self):
         gazu.client.set_host("http://192.168.3.116/api")
         gazu.set_event_host("http://192.168.3.116")
         gazu.log_in("pipeline@rapa.org", "netflixacademy")
-        self._asset_name = ""
+        self._project_name = ''
+        self._asset_name = ''
         self._task_type = ''
         self._extension = ''
         self._asset_info = {}
         self._path = os.getcwd()
+
+    @property
+    def project_name(self):
+        return self._project_name
+
+    @project_name.setter
+    def project_name(self, value):
+        self._project_name = value
 
     @property
     def asset_name(self):
@@ -41,11 +48,43 @@ class GetSelectedPreviews:
     def extension(self, value):
         self._extension = value
 
+    def update_file_tree(self):
+        gazu.files.update_project_file_tree(self.project_name, {
+            "working": {
+                "mountpoint": "/mnt/project",
+                "root": "pizza",
+                "folder_path": {
+                    "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/working/v<Revision>",
+                    "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/working/v<Revision>",
+                    "style": "lowercase"
+                },
+                "file_name": {
+                    "shot": "<Project>_<Sequence>_<Shot>_<TaskType>_<Revision>",
+                    "asset": "<Project>_<AssetType>_<Asset>_<TaskType>_<Revision>",
+                    "style": "lowercase"
+                }
+            },
+            "output": {
+                "mountpoint": "/mnt/project",
+                "root": "pizza",
+                "folder_path": {
+                    "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/output/<OutputType>/v<Revision>",
+                    "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/output/<OutputType>/v<Revision>",
+                    "style": "lowercase"
+                },
+                "file_name": {
+                    "shot": "<Project>_<Sequence>_<Shot>_<OutputType>_v<Revision>",
+                    "asset": "<Project>_<AssetType>_<Asset>_<OutputType>_v<Revision>",
+                    "style": "lowercase"
+                }
+            }
+        })
+
     def get_asset_info(self):
         """
         원하는 에셋 정보를 받아오는 함수
         """
-        project = gazu.project.get_project_by_name("NetflixAcademy")
+        project = gazu.project.get_project_by_name(self.project_name)
         self._asset_info = gazu.asset.get_asset_by_name(project, self.asset_name)
         print("\n### asset info ###")
         pp.pprint(self._asset_info)
@@ -110,12 +149,18 @@ class GetSelectedPreviews:
                                          self._path+"/hulk."+preview_dict['extension'])
 
 
+
+
+
 def main():
     obj = GetSelectedPreviews()
+    obj.project_name = 'Test_Euimin'
+    obj.asset_name = 'Rabbit'
     obj.task_type = 'Modeling'
-    obj.extension = 'png'
-    obj.asset_name = 'Hulkbuster'
-    obj.download_previews()
+    # obj.extension = 'png'
+    # obj.get_task_info()
+    obj.get_task_type()
+    # obj.update_file_tree()
 
 
 if __name__ == "__main__":

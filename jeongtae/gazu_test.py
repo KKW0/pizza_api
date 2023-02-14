@@ -34,7 +34,7 @@ class TestGazu:
         return self._person
 
     @person.setter
-    def person(self,value):
+    def person(self, value):
         self._person = value
 
     @property
@@ -50,7 +50,7 @@ class TestGazu:
         return self._asset_type
 
     @asset_type.setter
-    def asset_type(self,value):
+    def asset_type(self, value):
         self._asset_type = value
 
     @property
@@ -74,7 +74,7 @@ class TestGazu:
         return self._task_type
 
     @task_type.setter
-    def task_type(self,value):
+    def task_type(self, value):
         self._task_type = value
 
     @property
@@ -341,6 +341,8 @@ def main():
     tg.shot = 'shot02'
     tg.task_type = "layout"
     tg.status = "todo"
+    asset_dict = tg.new_asset()
+    shot_dict = tg.new_shot()
     tg.output_type = "playblast", "image"
     shot_task = tg.new_task("shot", "new")
     # asset_task = tg.new_task("asset", "new")
@@ -348,15 +350,15 @@ def main():
     # tg.upload_preview(asset_task)
     # tg.new_working_file(asset_task)
     # tg.template_working_path(asset_task)
-    # tg.new_output_file(tg.new_asset(), 'fbx')
+    # tg.new_output_file(asset_dict, 'fbx')
     # tg.upload_preview(asset_task)
     # tg.new_working_file(shot_task)
     # pp.pprint(tg.template_working_path(shot_task))
-    # tg.new_output_file(tg.new_shot(),'jpg')
-    # tg.template_output_path(tg.new_shot())
-    # tg.template_output_path(tg.new_asset())
-    # new = {"asset_id": tg.new_asset()['id'], "nb_occurences": 3}
-    # tg.new_casting_path_for_shot(tg.new_shot(), new)
+    # tg.new_output_file(shot_dict,'jpg')
+    # tg.template_output_path(shot_dict)
+    # tg.template_output_path(asset_dict)
+    # new = {"asset_id": asset_dict['id'], "nb_occurences": 3}
+    # tg.new_casting_path_for_shot(shot_dict, new)
 
 
 if __name__ == "__main__":

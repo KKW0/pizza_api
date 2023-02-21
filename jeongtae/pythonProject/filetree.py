@@ -27,7 +27,7 @@ class FileTree:
     def init_file_tree(self):
         if not self.file_tree:
             return self.update_filetree()
-        elif
+        elif 
 
 
     def update_filetree(self):

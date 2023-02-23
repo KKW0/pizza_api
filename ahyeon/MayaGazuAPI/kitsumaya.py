@@ -15,67 +15,6 @@ class SetThings(object):
         self._shot = None
         self._task = None
 
-    @property
-    def project(self):
-        return self._project
-
-    @project.setter
-    def project(self, value):
-        """
-        테스크가 있는 프로젝트를 선택하는 세터
-
-        Args:
-            value(str): 프로젝트 이름
-        """
-        open_proj = gazu.project.all_open_projects()
-        name_list = []
-        for proj in open_proj:
-            name_list.append(proj['name'])
-        if value not in name_list:
-            raise ValueError("오픈 상태인 프로젝트명을 입력해주세요.")
-        else:
-            self._project = gazu.project.get_project_by_name(value)
-
-    def update_filetree(self, mountpoint, root):
-        """
-        필요할 시 파일 트리를 업데이트하는 매서드
-
-        Args:
-            mountpoint(str/path): 폴더 트리를 생성할 위치의 전체 경로
-            root(str/folder name): 폴더 트리를 생성할 mountpoint의 자식 폴더 이름
-        """
-        tree = {
-            "working": {
-                "mountpoint": mountpoint,
-                "root": root,
-                "folder_path": {
-                    "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/working/v<Revision>",
-                    "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/working/v<Revision>",
-                    "style": "lowercase"
-                },
-                "file_name": {
-                    "shot": "<Project>_<Sequence>_<Shot>_<TaskType>_<Revision>",
-                    "asset": "<Project>_<AssetType>_<Asset>_<TaskType>_<Revision>",
-                    "style": "lowercase"
-                }
-            },
-            "output": {
-                "mountpoint": mountpoint,
-                "root": root,
-                "folder_path": {
-                    "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/output/<OutputType>/v<Revision>",
-                    "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/output/<OutputType>/v<Revision>",
-                    "style": "lowercase"
-                },
-                "file_name": {
-                    "shot": "<Project>_<Sequence>_<Shot>_<OutputType>_v<Revision>",
-                    "asset": "<Project>_<AssetType>_<Asset>_<OutputType>_v<Revision>",
-                    "style": "lowercase"
-                }
-            }
-        }
-        gazu.files.update_project_file_tree(self.project, tree)
-
     def select_task(self, num=0):
         """
         수행할 task를 선택하는 매서드

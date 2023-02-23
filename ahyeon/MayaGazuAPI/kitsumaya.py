@@ -15,6 +15,7 @@ class SetThings(object):
         self._shot = None
         self._task = None
 
+<<<<<<< HEAD
     @property
     def project(self):
         return self._project
@@ -76,6 +77,8 @@ class SetThings(object):
         }
         gazu.files.update_project_file_tree(self.project, tree)
 
+=======
+>>>>>>> jt
     def select_task(self, num=0):
         """
         수행할 task를 선택하는 매서드

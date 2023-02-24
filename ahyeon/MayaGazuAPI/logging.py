@@ -63,4 +63,3 @@ class Logger:
 
     def load_output_file_log(self, user_name, output_file_path):
         return self.molog.debug(f"\"{user_name}\" load output file from \"{output_file_path}\"")
-        # software(Nuke)연결 후 수정할 예정

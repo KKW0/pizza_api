@@ -1,4 +1,3 @@
-#coding:utf-8
 import pprint as pp
 import gazu
 import os
@@ -10,7 +9,7 @@ gazu.log_in("pipeline@rapa.org", "netflixacademy")
 
 # create project
 new_prod = gazu.project.new_project("Test_Euimin")
-pp.pprint(new_prod)
+# pp.pprint(new_prod)
 
 # create product?
 characters = gazu.asset.new_asset_type("Characters")
@@ -37,21 +36,23 @@ monkey_info = gazu.asset.get_asset_by_name(new_prod, "Monkey")
 rabbit_info = gazu.asset.get_asset_by_name(new_prod, "Rabbit")
 
 # create asset tasks type / status hip
-# task = gazu.task.new_task(monkey, modeling)
-# gazu.task.start_task(task)
+task = gazu.task.new_task(monkey, modeling)
+gazu.task.start_task(task)
 
 wip1 = gazu.task.get_task_status_by_short_name("wip")
 test_rabbit = gazu.task.get_task_by_name(rabbit_info['id'], concept)
-comment1 = gazu.task.add_comment(test_rabbit, wip1, "Cherry")
-preview_file = gazu.task.add_preview(test_rabbit, comment1, "/home/rapa/test.jpeg")
-gazu.task.set_main_preview(preview_file)
+# comment1 = gazu.task.add_comment(test_rabbit, wip1, "Cherry")
+# preview_file = gazu.task.add_preview(test_rabbit, comment1, "/home/rapa/test.jpeg")
+# gazu.task.set_main_preview(preview_file)
 
 
 wip2 = gazu.task.get_task_status_by_short_name("wip")
-test_monkey = gazu.task.get_task_by_name(monkey_info['id'], modeling)
-comment2 = gazu.task.add_comment(test_monkey, wip2, "체리에요")
-preview_file = gazu.task.add_preview(test_monkey, comment2, "/home/rapa/test.jpeg")
-gazu.task.set_main_preview(preview_file)
+# test_monkey = gazu.task.get_task_by_name(monkey_info['id'], modeling)
+# comment2 = gazu.task.add_comment(test_monkey, wip2, "체리에요")
+# preview_file = gazu.task.add_preview(test_monkey, comment2, "/home/rapa/test.jpeg")
+# gazu.task.set_main_preview(preview_file)
+
+# test_download = gazu.files.download_preview_file(test_rabbit, '/home/rapa')
 
 
 for asset in gazu.asset.all_assets_for_project(new_prod):
@@ -61,6 +62,10 @@ for asset in gazu.asset.all_assets_for_project(new_prod):
     gazu.task.new_task(asset, uv)
 
 gazu.task.new_task(shot, layout)
+
+
+task_type = gazu.task.get_task_type_by_name(layout)
+pp.pprint(task_type)
 
 
 # for asset in gazu.asset.all_assets_for_project(new_prod):
@@ -73,12 +78,12 @@ gazu.task.new_task(shot, layout)
 #         path = os.path.dirname(gazu.files.build_working_file_path(task))[1:]
 #         os.makedirs(path, exist_ok=True)
 
-my_asset = gazu.asset.get_asset_by_name('proj_name', 'asset_name')
-my_sequence = gazu.shot.get_sequence_by_name('proj_name', 'seq_name')
-my_shot = gazu.shot.get_shot_by_name(my_sequence, 'shot_name')
-asset_castings = gazu.casting.get_shot_casting(my_shot)
-new = {"추가사항" : "입니다"}
-asset_castings.append(new)
-gazu.casting.update_shot_casting('proj_name', my_shot, casting=asset_castings)
-
-cast_in = gazu.casting.get_asset_cast_in(my_asset)
+# my_asset = gazu.asset.get_asset_by_name('proj_name', 'asset_name')
+# my_sequence = gazu.shot.get_sequence_by_name('proj_name', 'seq_name')
+# my_shot = gazu.shot.get_shot_by_name(my_sequence, 'shot_name')
+# asset_castings = gazu.casting.get_shot_casting(my_shot)
+# new = {"추가사항" : "입니다"}
+# asset_castings.append(new)
+# gazu.casting.update_shot_casting('proj_name', my_shot, casting=asset_castings)
+#
+# cast_in = gazu.casting.get_asset_cast_in(my_asset)

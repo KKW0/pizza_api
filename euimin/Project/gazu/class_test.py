@@ -86,8 +86,8 @@ class GetSelectedPreviews:
         """
         project = gazu.project.get_project_by_name(self.project_name)
         self._asset_info = gazu.asset.get_asset_by_name(project, self.asset_name)
-        print("\n### asset info ###")
-        pp.pprint(self._asset_info)
+        # print("\n### asset info ###")
+        # pp.pprint(self._asset_info)
 
     def get_task_type(self):
         """
@@ -95,8 +95,8 @@ class GetSelectedPreviews:
         """
         self.get_asset_info()
         task_type_list = gazu.task.all_task_types_for_asset(self._asset_info['id'])
-        print("\n### all task type info ###")
-        pp.pprint(task_type_list)
+        # print("\n### all task type info ###")
+        # pp.pprint(task_type_list)
         for item in task_type_list:
             if item['name'] == self.task_type:
                 return item
@@ -107,8 +107,8 @@ class GetSelectedPreviews:
         """
         task_type = self.get_task_type()
         selected_task = gazu.task.get_task_by_name(self._asset_info, task_type['id'])
-        print("\n### selected task info ###")
-        pp.pprint(selected_task)
+        # print("\n### selected task info ###")
+        # pp.pprint(selected_task)
 
         return selected_task
 
@@ -143,10 +143,10 @@ class GetSelectedPreviews:
         저장 경로는 현재 py 파일이 실행되는 폴더
         """
         preview_dict = gazu.files.get_preview_file(self._asset_info['preview_file_id'])
-        print("\n### main preview file info ###")
-        pp.pprint(preview_dict)
+        # print("\n### main preview file info ###")
+        # pp.pprint(preview_dict)
         gazu.files.download_preview_file(preview_dict['id'],
-                                         self._path+"/hulk."+preview_dict['extension'])
+                                         self._path+"/cherry."+preview_dict['extension'])
 
 
 
@@ -154,14 +154,18 @@ class GetSelectedPreviews:
 
 def main():
     obj = GetSelectedPreviews()
-    obj.project_name = 'Test_Euimin'
+    obj.project_name = 'Test proj'
     obj.asset_name = 'Rabbit'
-    obj.task_type = 'Modeling'
+    obj.task_type = 'Concept'
+    obj.
+    obj.shot = 'SH01'
     # obj.extension = 'png'
     # obj.get_task_info()
-    obj.get_task_type()
+    # obj.get_task_type()
     # obj.update_file_tree()
-
+    # obj.get_previews_info()
+    obj.download_previews()
+    obj.get_main_preview()
 
 if __name__ == "__main__":
     main()

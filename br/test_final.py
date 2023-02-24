@@ -1,5 +1,5 @@
 from unittest import TestCase
-from working_file2 import MyGazu
+from working_file2 import MyGazu 
 
 class TestMyGazu(TestCase):
     def setUp(self) -> None:

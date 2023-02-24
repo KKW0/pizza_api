@@ -3,10 +3,14 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$" />
 <<<<<<< HEAD
+<<<<<<< HEAD
     <orderEntry type="jdk" jdkName="Python 3.9 (pizza)" jdkType="Python SDK" />
 =======
     <orderEntry type="inheritedJdk" />
 >>>>>>> jeongtae
+=======
+    <orderEntry type="jdk" jdkName="Python 3.9 (pizza)" jdkType="Python SDK" />
+>>>>>>> euimin
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">

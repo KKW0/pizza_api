@@ -8,13 +8,23 @@ class MayaThings:
     def __init__(self):
         pass
 
-    def _load_working(self):
+    def load_working(self, task):
         """
         마야에서 선택한 테스크에 working file이 이미 있을 경우,
         해당 파일을 import 하는 매서드
+
+        Args:
+            task(dict): 사용자가 선택한 task의 딕셔너리
         """
-        pass
-        ### 씬파일 import 판별 함수가 있어야 할지 의견 주세용
+        working = gazu.files.get_last_working_file_revision(task)
+
+        if working is None:
+            raise ValueError("working file이 존재하지 않습니다")
+        else:
+            path = gazu.files.build_working_file_path(task, software=working['software_id'],
+                                                      revision=working['revision'])
+            path = path + '.' + working['representation']
+            mc.file(path, i=True)
 
     def load_output(self, path):
         """
@@ -33,7 +43,7 @@ class MayaThings:
             path, i=True, ignoreVersion=True,
             # 아웃풋 파일의 패스를 import 하는데, 이 때 fbx파일의 버전 번호를 무시한다.
             mergeNamespacesOnClash=False, importTimeRange="combine",
-            #
+            ### 파라미터 설명 필요함
             loadReferenceDepth="all",
             returnNewNodes=True
         )
@@ -49,8 +59,9 @@ class MayaThings:
         padding_info = shot.get('nb_frames')
         if not padding_info:
             padding_info = 4
+        padding = '_' + ('0' * padding_info)
 
-        self._padding = '_' + ('0' * padding_info)
+        return padding
 
     def _get_undistortion_img(self, shot):
         """
@@ -62,9 +73,10 @@ class MayaThings:
         Returns:
             str: 마지막 언디스토션 이미지가 저장된 path.
         """
+        padding = self._get_frame_padding(shot)
         undi_path = gazu.files.build_entity_output_file_path(shot, 'Undistortion_img', 'Matchmove')
         self._get_frame_padding(shot)
-        path = undi_path + self._padding
+        path = undi_path + padding
         full_path = path + '.jpg'
 
         return full_path
@@ -107,7 +119,7 @@ class MayaThings:
         모두 import한 뒤(_load_output), 언디스토션 시퀀스를 카메라와 연결시키는(connect_image) 매서드
 
         Args:
-            shot(dict): 선택한 테스크가 속한 샷
+            shot(dict): 선택한 테스크가 있는 시퀀스에 속한 샷
         """
         undi_seq_path = self._get_undistortion_img(shot)
         camera_path = self._get_camera(shot)
@@ -146,7 +158,7 @@ class MayaThings:
                 startup_cameras.append(camera)
         custom_camera = list(set(all_cameras) - set(startup_cameras))
 
-        path = path + self._padding
+        path = path + '_0000'
 
         # 카메라가 바라보는 플레이블라스트 저장
         ### 저용량으로 mov 하나 더 저장하는 기능 필요
@@ -161,6 +173,7 @@ class MayaThings:
             compression="jpg",
             quality=100
         )
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 =======
@@ -170,4 +183,6 @@ class MayaThings:
         # 원래 값을 돌리는 것을 보정
         # 감마보정을 통해 이미지를 예쁘게 보여줌
 >>>>>>> jeongtae
+=======
+>>>>>>> ah
         

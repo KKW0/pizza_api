@@ -68,7 +68,11 @@ class login:
         pass
 
     def log_out(self):
+
+
+
         pass
+
 
 
 def main():

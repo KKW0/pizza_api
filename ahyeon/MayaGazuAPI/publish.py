@@ -1,6 +1,7 @@
 #coding:utf8
 import os
 import gazu
+import fnmatch
 from usemaya import MayaThings
 
 
@@ -112,13 +113,21 @@ class PublishThings:
             full_path = path + '.' + self._software['file_extension']
             gazu.files.upload_working_file(file_type, full_path)
         elif 'output' in path:
-            full_path = path + '_preview' + '\d' + '.mov'
-            if not gazu.files.get_all_preview_files_for_task(task):
-                preview = gazu.task.create_preview(task, comment)
-                gazu.task.upload_preview_file(preview, full_path)
-                gazu.task.set_main_preview(preview)
-            else:
-                gazu.task.add_preview(task, comment, full_path)
+            mov_files = []
+            filenames = os.listdir(os.path.dirname(path))
+            for filename in filenames:
+                if '.mov' in filename:
+                    mov_files.append(filename)
+            # output 폴더에 저장된 mov 파일명을 모두 mov_files에 저장
+            for index in range(len(mov_files)):
+                # preview 파일(mov 파일) 모두 Kitsu에 업로드
+                full_path = path + '_preview' + str(index) + '.mov'
+                if not gazu.files.get_all_preview_files_for_task(task):
+                    preview = gazu.task.create_preview(task, comment)
+                    gazu.task.upload_preview_file(preview, full_path)
+                    gazu.task.set_main_preview(preview)
+                else:
+                    gazu.task.add_preview(task, comment, full_path)
         else:
             raise ValueError("working 또는 output file의 경로를 입력해주세요.")
 
@@ -144,7 +153,7 @@ class PublishThings:
         self.maya.save_working_file(working_path, self._software['file_extension'])
         self.maya.export_output_file(output_path)
 
-        # Kitsu에 preview, working file 업로드
+        # Kitsu에 working, preview file 업로드
         comment_dict = gazu.task.get_last_comment_for_task(task)
         self._upload_files(task, working_path, working_file)
         self._upload_files(task, output_path, output_file, comment_dict)

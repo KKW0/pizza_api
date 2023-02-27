@@ -36,11 +36,11 @@ class MayaThings:
         Args:
             path(str): 확장자를 포함한 아웃풋 파일의 패스
         """
+        # 시퀀스 길이 재설정
         if 'Undistortion_img' in path:
             file_list = os.listdir(path)
             file_num = len(file_list)
             mc.playbackOptions(min=False, max=file_num)
-        # 시퀀스 길이 재설정
 
         mc.file(
             path, i=True, ignoreVersion=True,
@@ -52,6 +52,7 @@ class MayaThings:
             returnNewNodes=True
         )
         ### nb_elements에 맞게 여러개 import 하는 코드 필요함
+        ### 근데 중복으로 로드 안되게 처리도 해야 함... how...?
         ### 각 카메라마다 시퀀스 길이가 다르면 어떻게 되지..? 패딩에 맞게 재설정...?
 
     def _connect_image(self, undi_path, camera_path):
@@ -121,7 +122,7 @@ class MayaThings:
     def export_output_file(self, path):
         """
         작업한 파일을 output file로 저장하는 매서드(.mb)
-        저용량 preview 파일도 mov로 저장한다.
+        각 카메라 별 저용량 preview 파일도 mov로 저장한다.
 
         Args:
             path(str): output file 시퀀스를 저장할 경로 + 이름
@@ -150,4 +151,3 @@ class MayaThings:
                 compression="mov",
                 quality=50
             )
-

@@ -1,3 +1,4 @@
+#coding:utf8
 import pprint as pp
 import gazu
 import os
@@ -47,7 +48,7 @@ test_rabbit = gazu.task.get_task_by_name(rabbit_info['id'], concept)
 
 
 wip2 = gazu.task.get_task_status_by_short_name("wip")
-# test_monkey = gazu.task.get_task_by_name(monkey_info['id'], modeling)
+test_monkey = gazu.task.get_task_by_name(monkey_info['id'], modeling)
 # comment2 = gazu.task.add_comment(test_monkey, wip2, "체리에요")
 # preview_file = gazu.task.add_preview(test_monkey, comment2, "/home/rapa/test.jpeg")
 # gazu.task.set_main_preview(preview_file)
@@ -62,10 +63,11 @@ for asset in gazu.asset.all_assets_for_project(new_prod):
     gazu.task.new_task(asset, uv)
 
 gazu.task.new_task(shot, layout)
+# pp.pprint(test_monkey)
 
 
 task_type = gazu.task.get_task_type_by_name(layout)
-pp.pprint(task_type)
+# pp.pprint(task_type)
 
 
 # for asset in gazu.asset.all_assets_for_project(new_prod):

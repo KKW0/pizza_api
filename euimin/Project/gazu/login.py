@@ -141,9 +141,9 @@ class login:
 
 def main():
     test = login()
-    test.setting()
-    test.host("http://192.168.3.116/api")
-    test.log_in("pipeline@rapa.org", "netflixacademy")
+    # test.setting()
+    # test.host("http://192.168.3.116/api")
+    # test.log_in("pipeline@rapa.org", "netflixacademy")
     test.load_setting()
     # test.reset_setting()
 

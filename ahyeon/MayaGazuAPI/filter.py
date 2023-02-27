@@ -25,8 +25,8 @@ class Filter:
     def sort_names_output(self, num=0):
         seq = gazu.shot.get_sequence(self._task['sequence_id'])
         all_casts = gazu.casting.get_sequence_casting(seq)
-        casting_list = all_casts.values()
+        all_casting_list = all_casts.values()
         info_list = []
-        for casts in casting_list:
-            for cast in casts:
+        for casting_list in all_casting_list:
+            for cast in casting_list:
                 info_list.append([cast['name'], cast['nb_occurences'], cast['output_type']])

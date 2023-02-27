@@ -1,9 +1,49 @@
 #coding:utf-8
-from logger import Pizzalogger
-from exception_ import *
+from logger import Pizza_logger as logging
 import os
 import json
 import gazu
+
+
+@property
+def valid_host(self):
+    """
+
+    현재 호스트 연결의 유효성을 반환하는 속성입니다.
+
+    """
+    return self._valid_host
+
+
+@property
+def valid_user(self):
+    """
+
+    현재 사용자 로그인의 유효성을 반환하는 속성입니다.
+
+    """
+    return self._valid_user
+
+
+@property
+def host(self):
+    """
+
+    현재 호스트의 URL을 반환하는 속성입니다.
+
+    """
+    return self._host
+
+
+@property
+def user(self):
+    """
+
+    Returns:
+        현재 로그인한 사용자의 사용자 사전을 반환합니다.
+
+    """
+    return self._user
 
 
 def connect_host(self, try_host):
@@ -16,17 +56,17 @@ def connect_host(self, try_host):
     Returns:
         bool : 연결이 성공하면 True이고, 그렇지 않으면 False입니다.
     Raises:
-        InvalidAuthError: 호스트 URL이 잘못된 경우.
+        ValueError: 호스트 URL이 잘못된 경우.
 
     """
 
     gazu.set_host(try_host)
     if not gazu.client.host_is_valid():
-        raise InvalidAuthError('Error: Invalid host URL.')
+        raise ValueError('에러 메시지 : 호스트 URL이 잘못되었습니다.')
     self._host = gazu.get_host()
     self._valid_host = True
     self.save_setting()
-    self.pizza.connect_log(self.host)
+    self.logging.connect_log(self.host)
     return True
 
 
@@ -41,25 +81,25 @@ def log_in(self, try_id, try_pw):
     Returns:
         bool : 로그인이 성공하면 True이고, 그렇지 않으면 False입니다.
     Raises:
-        InvalidAuthError: 자격 증명이 올바르지 않은 경우
-        UnconnectedHostError: 호스트가 연결되어 있지 않은 경우
+        SystemError: 자격 증명이 올바르지 않은 경우
+        ValueError: 호스트가 연결되어 있지 않은 경우
 
     """
 
     if not self._valid_host:
-        raise UnconnectedHostError('Error: Host to login is not connected.')
+        raise SystemError('에러 메시지 : 로그인할 호스트가 연결되어 있지 않습니다.')
 
     try:
         log_in = gazu.log_in(try_id, try_pw)
     except gazu.AuthFailedException:
-        raise InvalidAuthError('Error: Invalid user ID or password.')
+        raise ValueError('에러 메시지 : 사용자 ID 또는 암호가 잘못 입력되었습니다.')
 
     self._user = log_in['user']
     self._user_id = try_id
     self._user_pw = try_pw
     self._valid_user = True
     self.save_setting()
-    self.pizza.enter_log(self.user.get("full_name"))
+    self.logging.enter_log(self.user.get("full_name"))
     return True
 
 
@@ -81,12 +121,12 @@ def log_out(self):
 def access_setting(self):
     """
 
-    인증 디렉토리에 대한 액세스 설정을 확인하고 존재하지 않는 경우 user.json을 생성합니다.
+    인증 디렉터리에 대한 액세스 설정을 확인하고 존재하지 않는 경우 user.json을 생성합니다.
 
     Returns:
         bool: 액세스 검사가 성공하면 True이고, 그렇지 않으면 False입니다.
     Raises:
-        AuthFileIOError: OS 오류로 인해 dir_path에서 지정한 디렉토리를 생성할 수 없거나 OS 오류로 인해 user.json 파일을 생성할 수 없는 경우.
+        ValueError: OS 오류로 인해 dir_path에서 지정한 디렉토리를 생성할 수 없거나 user.json 파일을 생성할 수 없는 경우.
 
     """
 
@@ -94,25 +134,25 @@ def access_setting(self):
         try:
             os.makedirs(self.dir_path)
         except OSError:
-            raise AuthFileIOError("Error: Failed to create the directory.")
+            raise ValueError("에러 메시지 : 디렉터리를 만들지 못했습니다.")
 
     try:
         if not os.path.exists(self.user_path):
             self.reset_setting()
     except OSError:
-        raise AuthFileIOError("Error: Failed to create user.json file.")
+        raise ValueError("에러 메시지 : user.json 파일을 생성하지 못했습니다.")
     return True
 
 
 def load_setting(self):
     """
 
-    user.json 파일에서 인증 설정을 로드하고 필요한 경우 호스트에 연결합니다.
+    user.json 파일에서 인증 설정을 load하고 필요한 경우 호스트에 연결합니다.
 
     Raises:
-        InvalidAuthError : 호스트 URL 또는 사용자 ID 및 암호가 잘못된 경우
-        UnconnectedHostError : 로그인할 호스트가 연결되어 있지 않은 경우
-        AuthFileIOError : OS 오류로 인해 user.json 파일을 열 수 없는 경우
+        ValueError : 호스트 URL 또는 사용자 ID 및 암호가 잘못된 경우
+        SystemError : 로그인할 호스트가 연결되어 있지 않은 경우
+        OSError : OS 오류로 인해 user.json 파일을 열 수 없는 경우
 
     """
     user_dict = {}
@@ -131,7 +171,7 @@ def save_setting(self):
     현재 인증 설정을 user.json 파일에 저장합니다.
 
     Raises:
-        AuthFIleIOError : OS 오류로 인해 user.json 파일을 쓸 수 없는 경우
+        OSError : OS 오류로 인해 user.json 파일을 쓸 수 없는 경우
 
     """
 

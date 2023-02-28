@@ -8,11 +8,11 @@
 작업한 working file과 output file을 실제 폴더 트리에 저장하고,
 그것들을 Kitsu에 퍼블리싱하고, working file, preview file을 업로드도 해주는 클래스
 Layout 팀을 위한 api
-"""
+""" 
 
 from .kitsumaya import SetThings as sett
 from .publish import PublishThings as pub
-# from .usemaya import MayaThings as mayat
+from .usemaya import MayaThings as mayat
 
 """
 

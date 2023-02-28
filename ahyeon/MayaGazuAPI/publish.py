@@ -4,7 +4,7 @@ import gazu
 import fnmatch
 from usemaya import MayaThings
 
-
+ 
 class PublishThings:
     def __init__(self):
         self.maya = MayaThings()

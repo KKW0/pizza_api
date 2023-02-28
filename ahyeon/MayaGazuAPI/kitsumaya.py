@@ -5,7 +5,7 @@ from login import LogIn
 from usemaya import MayaThings
 from publish import PublishThings
 
-
+ 
 class SetThings(object):
     def __init__(self):
         LogIn()

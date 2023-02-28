@@ -3,6 +3,8 @@ from pizza.login import Pizza_login
 
 
 class TestPizza_login(TestCase):
+    def setUp(self):
+        self.auth = Pizza_login()
     def test_host(self):
         self.assertTrue(True)
 

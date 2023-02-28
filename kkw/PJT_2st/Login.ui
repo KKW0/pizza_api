@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>392</width>
-    <height>299</height>
+    <width>393</width>
+    <height>293</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,84 +26,23 @@
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="3" column="0">
-     <widget class="QLabel" name="PW">
+    <item row="4" column="5">
+     <widget class="QLabel" name="Sin_File_Path_8">
       <property name="maximumSize">
        <size>
-        <width>16777215</width>
-        <height>50</height>
+        <width>30</width>
+        <height>25</height>
        </size>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(51, 51, 51);
-color: white;</string>
+       <string notr="true"/>
       </property>
       <property name="text">
-       <string>PW :</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
+       <string/>
       </property>
      </widget>
     </item>
-    <item row="4" column="0">
-     <widget class="QCheckBox" name="Auto_Login_Check">
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="layoutDirection">
-       <enum>Qt::RightToLeft</enum>
-      </property>
-      <property name="text">
-       <string>Auto Login</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="2">
-     <widget class="QLabel" name="Name_2">
-      <property name="maximumSize">
-       <size>
-        <width>300</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: rgb(51, 51, 51);
-color: white;</string>
-      </property>
-      <property name="text">
-       <string>Host :</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
+    <item row="3" column="1">
      <widget class="QLabel" name="Name">
       <property name="maximumSize">
        <size>
@@ -130,7 +69,164 @@ color: white;</string>
       </property>
      </widget>
     </item>
-    <item row="2" column="0">
+    <item row="4" column="0">
+     <widget class="QLabel" name="Sin_File_Path_7">
+      <property name="maximumSize">
+       <size>
+        <width>30</width>
+        <height>25</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="3">
+     <widget class="QLabel" name="Name_2">
+      <property name="maximumSize">
+       <size>
+        <width>300</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(51, 51, 51);
+color: white;</string>
+      </property>
+      <property name="text">
+       <string>Host :</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="1">
+     <widget class="QCheckBox" name="Auto_Login_Check">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::RightToLeft</enum>
+      </property>
+      <property name="text">
+       <string>Auto Login</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="3">
+     <widget class="QLabel" name="Sin_File_Path_9">
+      <property name="maximumSize">
+       <size>
+        <width>300</width>
+        <height>25</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="3" colspan="2">
+     <widget class="QLineEdit" name="Name_Box">
+      <property name="maximumSize">
+       <size>
+        <width>300</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(51, 51, 51);
+color: white;</string>
+      </property>
+      <property name="text">
+       <string>http://192.168.3.116/api</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="3" colspan="2">
+     <widget class="QLineEdit" name="ID_Box">
+      <property name="maximumSize">
+       <size>
+        <width>300</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(51, 51, 51);
+color: white;</string>
+      </property>
+      <property name="text">
+       <string>kang5349@gmail.com</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QLabel" name="PW">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(51, 51, 51);
+color: white;</string>
+      </property>
+      <property name="text">
+       <string>PW :</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
      <widget class="QLabel" name="ID">
       <property name="maximumSize">
        <size>
@@ -157,7 +253,7 @@ color: white;</string>
       </property>
      </widget>
     </item>
-    <item row="3" column="2" colspan="2">
+    <item row="5" column="3" colspan="2">
      <widget class="QLineEdit" name="PW_Box">
       <property name="maximumSize">
        <size>
@@ -181,31 +277,7 @@ color: white;</string>
       </property>
      </widget>
     </item>
-    <item row="1" column="2" colspan="2">
-     <widget class="QLineEdit" name="Name_Box">
-      <property name="maximumSize">
-       <size>
-        <width>300</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: rgb(51, 51, 51);
-color: white;</string>
-      </property>
-      <property name="text">
-       <string>http://192.168.3.116/api</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="2" colspan="2">
+    <item row="6" column="3" colspan="2">
      <widget class="QPushButton" name="Login_Button">
       <property name="maximumSize">
        <size>
@@ -232,27 +304,19 @@ color: white;</string>
       </property>
      </widget>
     </item>
-    <item row="2" column="2" colspan="2">
-     <widget class="QLineEdit" name="ID_Box">
+    <item row="7" column="3">
+     <widget class="QLabel" name="Sin_File_Path_10">
       <property name="maximumSize">
        <size>
         <width>300</width>
-        <height>50</height>
+        <height>25</height>
        </size>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(51, 51, 51);
-color: white;</string>
+       <string notr="true"/>
       </property>
       <property name="text">
-       <string>kang5349@gmail.com</string>
+       <string/>
       </property>
      </widget>
     </item>

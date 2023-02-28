@@ -27,7 +27,7 @@
         테스크가 있는 프로젝트를 선택하는 세터
 
         .. doctest::
-            self._project = gazu.project.get_project_by_name(value)
+            self._project = pizza.project.get_project_by_name(value)
 
         Output >>
             project_dict
@@ -36,7 +36,7 @@
         지정된 mountpoint 및 root로 프로젝트의 파일 트리를 업데이트한다.
 
         .. doctest::
-            gazu.files.update_project_file_tree(self.project, tree)
+            pizza.files.update_project_file_tree(self.project, tree)
 
         Output >>
             shot_path = "/home/pizza/kitsu/<Project>/shots/<Sequence>/<Shot>/<TaskType>...
@@ -47,7 +47,7 @@
 
         .. doctest::
             self._task = task_list[num]
-            self._shot = gazu.entity.get_entity(self._task['entity_id'])
+            self._shot = pizza.entity.get_entity(self._task['entity_id'])
 
         Output >>
             self._task = task_dict
@@ -96,7 +96,7 @@
         software_list를 출력하여 원하는 값을 반환한다.
 
         .. doctest::
-            software_list = gazu.files.all_softwares()
+            software_list = pizza.files.all_softwares()
 
             Output >>
             software_list[num] = {"name" : "None",
@@ -107,7 +107,7 @@
         output_type_list를 출력하여 원하는 값을 반환한다.
 
         .. doctest::
-            output_type_list = gazu.files.all_output_types_for_entity(shot['id'])
+            output_type_list = pizza.files.all_output_types_for_entity(shot['id'])
 
             Output >>
             output_type_list[num] = {"name" : "main",
@@ -122,8 +122,8 @@
 
         .. doctest::
             publish = PublishThings()
-            shot = gazu.shot.create_shot("Test Shot")
-            task = gazu.task.create_task("Test Task")
+            shot = pizza.shot.create_shot("Test Shot")
+            task = pizza.task.create_task("Test Task")
 
            Output >>
             working_file = {"working_file_id": "1234"}
@@ -151,11 +151,11 @@
 
         .. doctest::
             full_path = path + '.' + self._software['file_extension']
-            gazu.files.upload_working_file(file_type, full_path)
+            pizza.files.upload_working_file(file_type, full_path)
 
             full_path = path + '_preview.mov'
-            preview = gazu.task.create_preview(task, comment=comment)
-            gazu.task.upload_preview_file(preview, full_path)
+            preview = pizza.task.create_preview(task, comment=comment)
+            pizza.task.upload_preview_file(preview, full_path)
 
             Output >>
                 작업한 working파일과 Task에 대한 preview file을 Kitsu에 업로드

@@ -135,19 +135,19 @@ class MakeKitsuFiles:
         pp.pprint(tasks_for_asset)
 
     # def make_working_file(self):
-    #     # maya = gazu.files.new_software("Maya", "maya", "ma", ['mb', 'fbx'])
-    #     maya = gazu.files.get_software_by_name("Maya")
+    #     # maya = pizza.files.new_software("Maya", "maya", "ma", ['mb', 'fbx'])
+    #     maya = pizza.files.get_software_by_name("Maya")
     #     print("\n### software info of maya ###")
     #     pp.pprint(maya)
-    #     # working = gazu.files.new_working_file(self._tasks_for_asset[0],
+    #     # working = pizza.files.new_working_file(self._tasks_for_asset[0],
     #     #                                       name="maya working file", software=maya,
     #     #                                       comment="This is for test")
     #     print("\n### working files info for 'make walk' task ###")
     #     # pp.pprint(working)
-    #     tasks = gazu.task.all_tasks_for_asset(self.asset)
-    #     working_file = gazu.files.get_working_files_for_task(tasks[0])
+    #     tasks = pizza.task.all_tasks_for_asset(self.asset)
+    #     working_file = pizza.files.get_working_files_for_task(tasks[0])
     #     pp.pprint(working_file)
-    #     path = gazu.files.build_working_file_path(tasks[0], name="working file path",
+    #     path = pizza.files.build_working_file_path(tasks[0], name="working file path",
     #                                               software=maya)
     #     print("\n### working file path for 'maya working file' ###")
     #     pp.pprint(path)
@@ -158,25 +158,25 @@ class MakeKitsuFiles:
     #     os.makedirs(dir_path, exist_ok=True)
     #     # Make local folders
     #
-    #     # gazu.files.upload_working_file(working_file[0], path+"."+maya['file_extension']')
-    #     gazu.files.download_working_file(working_file[0], file_path=path + '_down' + "." + maya['file_extension'])
+    #     # pizza.files.upload_working_file(working_file[0], path+"."+maya['file_extension']')
+    #     pizza.files.download_working_file(working_file[0], file_path=path + '_down' + "." + maya['file_extension'])
     #
     #     return working_file[0]
     #
     # def make_output_file(self):
     #     working = self.make_working_file()
-    #     # maya_output = gazu.files.new_output_type("Maya Output Type", "maya output")
-    #     maya_output = gazu.files.get_output_type_by_name("Maya Output Type")
-    #     task_types = gazu.task.all_task_types_for_asset(self._asset[0])
-    #     # output = gazu.files.new_entity_output_file(self._asset[0], maya_output, task_types[0],
+    #     # maya_output = pizza.files.new_output_type("Maya Output Type", "maya output")
+    #     maya_output = pizza.files.get_output_type_by_name("Maya Output Type")
+    #     task_types = pizza.task.all_task_types_for_asset(self._asset[0])
+    #     # output = pizza.files.new_entity_output_file(self._asset[0], maya_output, task_types[0],
     #     #                                            comment="output file test", working_file=working,
     #     #                                            name="maya output file", representation="ma")
-    #     output = gazu.files.all_output_files_for_entity(self._asset[0], maya_output, task_types[0],
+    #     output = pizza.files.all_output_files_for_entity(self._asset[0], maya_output, task_types[0],
     #                                                     'maya output file')
     #     print("\n### output file info for 'maya output file' ###")
-    #     file = gazu.files.get_output_file(output[0]['id'])
+    #     file = pizza.files.get_output_file(output[0]['id'])
     #     pp.pprint(file)
-    #     path = gazu.files.build_entity_output_file_path(self._asset[0], maya_output, task_types[0],
+    #     path = pizza.files.build_entity_output_file_path(self._asset[0], maya_output, task_types[0],
     #                                                     name="output file path", representation="ma")
     #     print("\n### output file path for 'maya output file' ###")
     #     pp.pprint(path)
@@ -188,21 +188,21 @@ class MakeKitsuFiles:
     #     # Make local folders
     #
     # def make_preview_file(self):
-    #     good = gazu.task.get_task_status_by_name("Good")
+    #     good = pizza.task.get_task_status_by_name("Good")
     #     path = '/mnt/project/pizza/shots/jt_seq/jt0010/layout/output/play_test.mov'
     #     path2 = '/home/rapa/사진/스크린샷, 2023-01-11 14-15-59.png'
-    #     comment = gazu.task.add_comment(self._tasks_for_asset[0], task_status=good,
+    #     comment = pizza.task.add_comment(self._tasks_for_asset[0], task_status=good,
     #                                     comment="task comment")
-    #     # preview = gazu.task.create_preview((self._tasks_for_asset[0]), comment=comment)
+    #     # preview = pizza.task.create_preview((self._tasks_for_asset[0]), comment=comment)
     #     # # Make new preview file model
     #
-    #     preview = gazu.files.get_all_preview_files_for_task(self._tasks_for_asset[0])
+    #     preview = pizza.files.get_all_preview_files_for_task(self._tasks_for_asset[0])
     #     print("\n### all preview files info for 'make walk' ###")
     #     pp.pprint(preview)
     #
-    #     gazu.task.upload_preview_file(preview[0], path)
-    #     gazu.task.add_preview(self._tasks_for_asset[0], comment, preview_file_path=path2)
-    #     gazu.task.set_main_preview(preview[1])
+    #     pizza.task.upload_preview_file(preview[0], path)
+    #     pizza.task.add_preview(self._tasks_for_asset[0], comment, preview_file_path=path2)
+    #     pizza.task.set_main_preview(preview[1])
     #     # Upload preview file
 
 

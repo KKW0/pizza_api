@@ -5,9 +5,9 @@ import pprint as pp
 
 class MakeKitsuTree:
     '''
-    dot = gazu.task.get_task_type_by_name(".")
-    projects = gazu.project.all_projects()
-    gazu.task.remove_task_type(dot)
+    dot = pizza.task.get_task_type_by_name(".")
+    projects = pizza.project.all_projects()
+    pizza.task.remove_task_type(dot)
     오류 발생!!!!!! 삭제가 안됨!!!!!!!!!
     '''
 
@@ -180,11 +180,11 @@ class MakeKitsuTree:
         pp.pprint(self._tasks_for_asset)
 
     def make_working_file(self):
-        # maya = gazu.files.new_software("Maya", "maya", "ma")
+        # maya = pizza.files.new_software("Maya", "maya", "ma")
         maya = gazu.files.get_software_by_name("Maya")
         print("\n### software info of maya ###")
         pp.pprint(maya)
-        # working = gazu.files.new_working_file(self._tasks_for_asset[0],
+        # working = pizza.files.new_working_file(self._tasks_for_asset[0],
         #                                       name="maya working file", software=maya,
         #                                       comment="This is for test")
         print("\n### working files info for 'make walk' task ###")
@@ -202,17 +202,17 @@ class MakeKitsuTree:
         os.makedirs(dir_path, exist_ok=True)
         # Make local folders
 
-        # gazu.files.upload_working_file(working_file[0], path+"."+maya['file_extension']')
+        # pizza.files.upload_working_file(working_file[0], path+"."+maya['file_extension']')
         gazu.files.download_working_file(working_file[0], file_path=path+'_down'+"."+maya['file_extension'])
 
         return working_file[0]
 
     def make_output_file(self):
         working = self.make_working_file()
-        # maya_output = gazu.files.new_output_type("Maya Output Type", "maya output")
+        # maya_output = pizza.files.new_output_type("Maya Output Type", "maya output")
         maya_output = gazu.files.get_output_type_by_name("Maya Output Type")
         task_types = gazu.task.all_task_types_for_asset(self._asset[0])
-        # output = gazu.files.new_entity_output_file(self._asset[0], maya_output, task_types[0],
+        # output = pizza.files.new_entity_output_file(self._asset[0], maya_output, task_types[0],
         #                                            comment="output file test", working_file=working,
         #                                            name="maya output file", representation="ma")
         output = gazu.files.all_output_files_for_entity(self._asset[0], maya_output, task_types[0],
@@ -237,7 +237,7 @@ class MakeKitsuTree:
         path2 = '/home/rapa/사진/스크린샷, 2023-01-11 14-15-59.png'
         comment = gazu.task.add_comment(self._tasks_for_asset[0], task_status=good,
                                         comment="task comment")
-        # preview = gazu.task.create_preview((self._tasks_for_asset[0]), comment=comment)
+        # preview = pizza.task.create_preview((self._tasks_for_asset[0]), comment=comment)
         # # Make new preview file model
         # # ??? upload와 차이가 뭔지 모르겠음
         preview = gazu.files.get_all_preview_files_for_task(self._tasks_for_asset[0])

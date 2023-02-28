@@ -214,7 +214,7 @@ class MyGazu:
         :param shot:
         :return:
         """
-        # sequence = gazu.shot.get_sequence_by_name(self.project, self.seq)
+        # sequence = pizza.shot.get_sequence_by_name(self.project, self.seq)
         pick_sequence = gazu.shot.get_sequence_by_name(self.project, sequence)
         pick_shot = gazu.shot.get_shot_by_name(pick_sequence, shot)
         tasks = gazu.task.all_tasks_for_shot(pick_shot)
@@ -244,7 +244,7 @@ class MyGazu:
         """
         pick_sequence = gazu.shot.get_sequence_by_name(self.project, sequence)
         pick_shot = gazu.shot.get_shot_by_name(pick_sequence, shot)
-        # output_type = gazu.files.new_output_type("OBJ", "obj")
+        # output_type = pizza.files.new_output_type("OBJ", "obj")
         output = gazu.files.get_output_type_by_name("OBJ")
         task_types = gazu.task.all_task_types_for_shot(pick_shot)
         task_type = None
@@ -352,13 +352,13 @@ class MyGazu:
     #     :param shot:
     #     :return:
     #     """
-    #     pick_sequence = gazu.shot.get_sequence_by_name(self.project, sequence)
-    #     pick_shot = gazu.shot.get_shot_by_name(pick_sequence, shot)
-    #     pick_asset = gazu.asset.get_asset_by_name(self.project, asset)
+    #     pick_sequence = pizza.shot.get_sequence_by_name(self.project, sequence)
+    #     pick_shot = pizza.shot.get_shot_by_name(pick_sequence, shot)
+    #     pick_asset = pizza.asset.get_asset_by_name(self.project, asset)
     #     asset_name = pick_asset['name']
-    #     asset_castings = gazu.casting.get_shot_casting(pick_shot)
+    #     asset_castings = pizza.casting.get_shot_casting(pick_shot)
     #     filtered_assets = [a for a in asset_castings if asset_name != a.get('asset_name')]
-    #     gazu.casting.update_shot_casting(self.project, pick_shot, casting=filtered_assets)
+    #     pizza.casting.update_shot_casting(self.project, pick_shot, casting=filtered_assets)
 
     def get_path_for_casting(self, asset):
         """

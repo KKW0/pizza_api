@@ -3,7 +3,7 @@ import pprint as pp
 import gazu
 import os
 
-# gazu - login
+# pizza - login
 gazu.client.set_host("http://192.168.3.116/api")
 gazu.set_event_host("http://192.168.3.116")
 gazu.log_in("pipeline@rapa.org", "netflixacademy")
@@ -42,18 +42,18 @@ gazu.task.start_task(task)
 
 wip1 = gazu.task.get_task_status_by_short_name("wip")
 test_rabbit = gazu.task.get_task_by_name(rabbit_info['id'], concept)
-# comment1 = gazu.task.add_comment(test_rabbit, wip1, "Cherry")
-# preview_file = gazu.task.add_preview(test_rabbit, comment1, "/home/rapa/test.jpeg")
-# gazu.task.set_main_preview(preview_file)
+# comment1 = pizza.task.add_comment(test_rabbit, wip1, "Cherry")
+# preview_file = pizza.task.add_preview(test_rabbit, comment1, "/home/rapa/test.jpeg")
+# pizza.task.set_main_preview(preview_file)
 
 
 wip2 = gazu.task.get_task_status_by_short_name("wip")
 test_monkey = gazu.task.get_task_by_name(monkey_info['id'], modeling)
-# comment2 = gazu.task.add_comment(test_monkey, wip2, "체리에요")
-# preview_file = gazu.task.add_preview(test_monkey, comment2, "/home/rapa/test.jpeg")
-# gazu.task.set_main_preview(preview_file)
+# comment2 = pizza.task.add_comment(test_monkey, wip2, "체리에요")
+# preview_file = pizza.task.add_preview(test_monkey, comment2, "/home/rapa/test.jpeg")
+# pizza.task.set_main_preview(preview_file)
 
-# test_download = gazu.files.download_preview_file(test_rabbit, '/home/rapa')
+# test_download = pizza.files.download_preview_file(test_rabbit, '/home/rapa')
 
 
 for asset in gazu.asset.all_assets_for_project(new_prod):
@@ -70,22 +70,22 @@ task_type = gazu.task.get_task_type_by_name(layout)
 # pp.pprint(task_type)
 
 
-# for asset in gazu.asset.all_assets_for_project(new_prod):
-#     for task in gazu.task.all_tasks_for_asset(asset):
-#         path = os.path.dirname(gazu.files.build_working_file_path(task))[1:]
+# for asset in pizza.asset.all_assets_for_project(new_prod):
+#     for task in pizza.task.all_tasks_for_asset(asset):
+#         path = os.path.dirname(pizza.files.build_working_file_path(task))[1:]
 #         os.makedirs(path, exist_ok=True)
 #
-# for shot in gazu.shot.all_shots_for_project(new_prod):
-#     for task in gazu.task.all_tasks_for_shot(shot):
-#         path = os.path.dirname(gazu.files.build_working_file_path(task))[1:]
+# for shot in pizza.shot.all_shots_for_project(new_prod):
+#     for task in pizza.task.all_tasks_for_shot(shot):
+#         path = os.path.dirname(pizza.files.build_working_file_path(task))[1:]
 #         os.makedirs(path, exist_ok=True)
 
-# my_asset = gazu.asset.get_asset_by_name('proj_name', 'asset_name')
-# my_sequence = gazu.shot.get_sequence_by_name('proj_name', 'seq_name')
-# my_shot = gazu.shot.get_shot_by_name(my_sequence, 'shot_name')
-# asset_castings = gazu.casting.get_shot_casting(my_shot)
+# my_asset = pizza.asset.get_asset_by_name('proj_name', 'asset_name')
+# my_sequence = pizza.shot.get_sequence_by_name('proj_name', 'seq_name')
+# my_shot = pizza.shot.get_shot_by_name(my_sequence, 'shot_name')
+# asset_castings = pizza.casting.get_shot_casting(my_shot)
 # new = {"추가사항" : "입니다"}
 # asset_castings.append(new)
-# gazu.casting.update_shot_casting('proj_name', my_shot, casting=asset_castings)
+# pizza.casting.update_shot_casting('proj_name', my_shot, casting=asset_castings)
 #
-# cast_in = gazu.casting.get_asset_cast_in(my_asset)
+# cast_in = pizza.casting.get_asset_cast_in(my_asset)

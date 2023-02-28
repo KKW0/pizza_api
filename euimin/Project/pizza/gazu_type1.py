@@ -194,7 +194,7 @@ class ProjectList:
 class Project:
     """
     Class to get object oriented representation of backend project data structure.
-    Can shortcut some functions from gazu api because active project is given through class instance.
+    Can shortcut some functions from pizza api because active project is given through class instance.
     Has multiple constructor functions (by_name, by_id, init>by_dict)
     """
 
@@ -685,7 +685,7 @@ class Task:
     entity_type_name: str = ""
     entity_name: str = ""
 
-    # extra attributes from gazu.user.all_tasks_to_do()
+    # extra attributes from pizza.user.all_tasks_to_do()
     project_has_avatar: str = "False"
     entity_description: str = ""
     entity_preview_file_id: str = ""
@@ -970,7 +970,7 @@ class User:
     def __post_init__(self):
         try:
             user_dict = gazu.client.get_current_user()
-        except:  # gazu.exception.NotAuthenticatedException
+        except:  # pizza.exception.NotAuthenticatedException
             logger.info("No current user authenticated")
         else:
             self.__dict__.update(user_dict)

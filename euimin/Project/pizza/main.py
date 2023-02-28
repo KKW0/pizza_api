@@ -74,16 +74,16 @@ class SaveAsKitsuPath(object):
     #
     # @sequence.setter
     # def sequence(self, value):
-    #     self._sequence = gazu.shot.get_sequence_by_name(self.project, value)
+    #     self._sequence = pizza.shot.get_sequence_by_name(self.project, value)
     # @property
     # def shot(self):
     #     return self._shot
     #
     # @shot.setter
     # def shot(self, value):
-    #     self._shot = gazu.shot.get_shot_by_name(self.sequence, value)
+    #     self._shot = pizza.shot.get_shot_by_name(self.sequence, value)
 
-    # ----------------------------- kitsu/gazu -----------------------------
+    # ----------------------------- kitsu/pizza -----------------------------
 
     def update_filetree(self, mountpoint, root):
         """
@@ -134,7 +134,7 @@ class SaveAsKitsuPath(object):
             num: task list의 인덱스 번호
         """
         task_list_user = gazu.task.all_tasks_for_person(self.person)
-        # user에게 테스크가 충분히 할당되어 있다면 gazu.user.all_tasks_to_do() 로 대체
+        # user에게 테스크가 충분히 할당되어 있다면 pizza.user.all_tasks_to_do() 로 대체
         task_list = []
         for task in task_list_user:
             if task['project_id'] == self.project['id'] \

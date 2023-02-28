@@ -4,9 +4,9 @@ import json
 import gazu
 
 
-class login:
+class Pizza_login:
     """
-    The above class helps you log in and out to use gazu,
+    The above class helps you log in and out to use pizza,
     and provides automatic login function through json.
     """
     def __init__(self):
@@ -17,8 +17,6 @@ class login:
         self._check_host = False
         self._check_user = False
 
-        # json 파일의 경로를 지정
-        # 지정된 경로에 join을 통한 파일 경로 지정?
         self.path = os.path.expanduser('~/.config/pizza/')
         self.user_path = os.path.join(self.path + 'pizza.json')
 
@@ -46,13 +44,15 @@ class login:
             try:
                 os.makedirs(self.path)
             except OSError:
-                raise Exception("Error")
+                pass
+                # raise Exception("Error")
 
         try:
             if not os.path.exists(self.user_path):
                 self.reset_setting()
         except OSError:
-            raise Exception("Error")
+            pass
+            # raise Exception("Error")
 
     def reset_setting(self):
         """
@@ -81,13 +81,14 @@ class login:
         with open(self.user_path, 'w') as json_file:
             json.dump(user, json_file)
 
-    def host(self, try_host):
+    def connect_host(self, try_host):
         """
-        Check the host path of gazu and add it to the json file if true.
+        Check the host path of pizza and add it to the json file if true.
         """
         gazu.set_host(try_host)
         if not gazu.client.host_is_valid():
-            raise Exception('Error')
+            pass
+            # raise Exception('Error')
         self._host = gazu.get_host()
         self._check_host = True
         self.save_setting()
@@ -97,15 +98,17 @@ class login:
     def log_in(self, try_id, try_pw):
         """
         If the path of the host is correct,
-        try to log in to gazu, and if successful,
+        try to log in to pizza, and if successful,
         save the login information value as a json file.
         """
         if not self._check_host:
-            raise Exception('Error')
+            pass
+            # raise Exception('Error')
         try:
             log_in = gazu.log_in(try_id, try_pw)
         except gazu.AuthFailedException:
-            raise Exception('Error')
+            pass
+            # raise Exception('Error')
 
         self._user = log_in['user']
         self._user_id = try_id
@@ -117,7 +120,7 @@ class login:
 
     def log_out(self):
         """
-        If you log out of gazu,
+        If you log out of pizza,
         change the user's information to None and call reset setting.
         """
         gazu.log_out()
@@ -134,19 +137,19 @@ class login:
             user = json.load(json_file)
 
         if user.get('check_host'):
-            self.host(user.get('host'))
+            self.connect_host(user.get('host'))
         if user.get('check_user'):
             self.log_in(user.get('user_id'), user.get('user_pw'))
 
 
-def main():
-    test = login()
-    # test.setting()
-    # test.host("http://192.168.3.116/api")
-    # test.log_in("pipeline@rapa.org", "netflixacademy")
-    test.load_setting()
-    # test.reset_setting()
-
-
-if __name__ == "__main__":
-    main()
+# def main():
+#     test = login()
+#     # test.setting()
+#     # test.host("http://192.168.3.116/api")
+#     # test.log_in("pipeline@rapa.org", "netflixacademy")
+#     test.load_setting()
+#     # test.reset_setting()
+#
+#
+# if __name__ == "__main__":
+#     main()

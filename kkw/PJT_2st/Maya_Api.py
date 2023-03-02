@@ -9,10 +9,14 @@ from PySide2 import QtWidgets, QtCore, QtUiTools
 from PySide2.QtWidgets import QDialog, QHeaderView, QLineEdit, QTableView, QVBoxLayout, QMainWindow, QAction, QTableWidgetItem, QTableWidget
 from PySide2.QtGui import QStandardItemModel, QStandardItem
 
+from PySide2.QtWidgets import (QGridLayout, QSizePolicy, QWidget)
+
 from Save import Save
 from Load import Load
 from main_widget import Widget
 from main_widget import Widget2
+
+from table_model import CustomTableModel
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -25,15 +29,15 @@ class MainWindow(QMainWindow):
         loader = QtUiTools.QUiLoader()
         self.ui = loader.load(ui_file)
 
-        widget = Widget(self.read_data())
-        widget.setFixedSize(600, 623)
-        widget.setGeometry(QtCore.QRect(200, 10, 600, 623))  # Set the position and size of the Widget
-        self.ui.Main_QGrid.addWidget(widget, 0, 0)
+        self.widget = Widget(self.read_data())
+        self.widget.setFixedSize(600, 600)
+        self.widget.setGeometry(QtCore.QRect(0, 0, 600, 600))  # Set the position and size of the Widget
+        self.ui.Main_QGrid.addWidget(self.widget, 0, 0)
 
-        widget2 = Widget2(self.read_data2())
-        widget2.setFixedSize(320, 300)
-        widget2.setGeometry(QtCore.QRect(0, 0, 320, 300))  # Set the position and size of the Widget2
-        self.ui.Main_QGrid.addWidget(widget2, 1, 2)
+        self.widget2 = Widget2(self.read_data2())
+        self.widget2.setFixedSize(320, 300)
+        self.widget2.setGeometry(QtCore.QRect(0, 0, 320, 300))  # Set the position and size of the Widget2
+        self.ui.Main_QGrid.addWidget(self.widget2, 1, 2)
 
         ui_file.close()
 
@@ -49,7 +53,14 @@ class MainWindow(QMainWindow):
         self.ui.Load_Button.clicked.connect(self.Load_Button)
         self.Load = Load()
 
+
+        # Event
+        self.widget.clicked.connect(self.widget_clicked)
         # ----------------------------------------------------------------------------------------------
+
+    def widget_clicked(self, event):
+        selected_data = self.read_data()[event.row()]
+        print(selected_data)
 
     class Table_widget(QMainWindow):
         def __init__(self, parent=None):
@@ -71,12 +82,29 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def read_data():
-        data1 = {'country1': ('Avatar', 'Topgun', 'DontLookUp', 'Flash', 'Flash', 'Flash', 'Flash', 'Flash', 'Flash', 'Flash', 'Flash', 'Flash')}
-        data2 = {'country2': ('Seq1', 'Seq2', 'Seq3', 'Seq4', 'Seq5', 'Seq6', 'Seq7', 'Seq8', 'Seq9', 'Seq10', 'Seq11', 'Seq12')}
-        data3 = {'country3': ('Seq1', 'Seq2', 'Seq3', 'Seq4', 'Seq5', 'Seq6', 'Seq7', 'Seq8', 'Seq9', 'Seq10', 'Seq11', 'Seq12')}
-        data4 = {'country4': ('Seq1', 'Seq2', 'Seq3', 'Seq4', 'Seq5', 'Seq6', 'Seq7', 'Seq8', 'Seq9', 'Seq10', 'Seq11', 'Seq12')}
-        data5 = {'country5': ('Seq1', 'Seq2', 'Seq3', 'Seq4', 'Seq5', 'Seq6', 'Seq7', 'Seq8', 'Seq9', 'Seq10', 'Seq11', 'Seq12')}
-        return data1, data2, data3, data4, data5
+        data = [
+            ['Avata', '1', '2023-03-02', '123', 'abcd'],
+            ['TopGun', '2', '2023-03-03', '456', 'efgh'],
+            ['DontLookUp', '3', '2023-03-04', '789', 'ijkl'],
+            ['Flash', '4', '2023-03-05', '456', 'mnop'],
+            ['DDong', '5', '2023-03-06', '123', 'qrstu'],
+            ['DDong', '6', '2023-03-06', '123', 'qrstu'],
+            ['DDong', '7', '2023-03-06', '123', 'qrstu'],
+            ['DDong', '8', '2023-03-06', '123', 'qrstu'],
+            ['DDong', '9', '2023-03-06', '123', 'qrstu'],
+            ['DDong', '10', '2023-03-06', '123', 'qrstu'],
+            ['DDong', '11', '2023-03-06', '123', 'qrstu'],
+            ['DDong', '12', '2023-03-06', '123', 'qrstu'],
+            ['DDong', '13', '2023-03-06', '123', 'qrstu'],
+            ['DDong', '14', '2023-03-06', '123', 'qrstu'],
+            ['DDong', '15', '2023-03-06', '123', 'qrstu'],
+            ['DDong', '16', '2023-03-06', '123', 'qrstu'],
+            ['DDong', '17', '2023-03-06', '123', 'qrstu'],
+            ['DDong', '18', '2023-03-06', '123', 'qrstu'],
+            ['DDong', '19', '2023-03-06', '123', 'qrstu'],
+            ['DDong', '20', '2023-03-06', '123', 'qrstu']
+        ]
+        return data
 
 # ----------------------------------------------------------------------------------------------
 
@@ -84,12 +112,6 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def read_data2():
-        # data1 = {'country1': ('Avatar', 'Topgun', 'DontLookUp', 'Flash', 'Flash', 'Flash')}
-        # data2 = {'country2': ('Seq1', 'Seq2', 'Seq3', 'Seq4', 'Seq5')}
-        # data3 = {'country3': ('Seq1', 'Seq2', 'Seq3', 'Seq4', 'Seq5')}
-        # data4 = {'country4': ('Seq1', 'Seq2', 'Seq3', 'Seq4', 'Seq5')}
-        # data5 = {'country5': ('Seq1', 'Seq2', 'Seq3', 'Seq4', 'Seq5')}
-        # return data1, data2, data3, data4, data5
         data = [
             ['/home/rapa/다운로드/1111.jpeg', 'Avata', '2023-03-02'],
             ['/home/rapa/다운로드/2222.jpeg', 'TopGun', '2023-03-03'],

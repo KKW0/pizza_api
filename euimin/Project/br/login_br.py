@@ -1,18 +1,21 @@
 #coding:utf-8
-from logger_br import Pizza_logger as logging
+from logger_br import Pizza_logger
 import os
 import json
 import gazu
 
 
-class Auth_br():
-    def __int__(self):
+class Auth_br:
+    def __init__(self):
         self._host = None
         self._user = None
         self._user_id = None
         self._user_pw = None
         self._valid_host = False
         self._valid_user = False
+        self.logging = Pizza_logger()
+        self.dir_path = os.path.expanduser('~/.config/pizza/')
+        self.user_path = os.path.join(self.dir_path, 'user.json')
 
     @property
     def valid_host(self):
@@ -90,8 +93,8 @@ class Auth_br():
 
         """
 
-        if not self._valid_host:
-            raise SystemError('에러 메시지 : 로그인할 호스트가 연결되어 있지 않습니다.')
+        # if not self._valid_host:
+        #     raise SystemError('에러 메시지 : 로그인할 호스트가 연결되어 있지 않습니다.')
 
         try:
             log_in = gazu.log_in(try_id, try_pw)

@@ -3,7 +3,7 @@ import os
 import json
 import gazu
 import logging
-from login_br import Auth_br
+# from login_br import Auth_br
 
 """
 
@@ -17,10 +17,6 @@ gazu 라이브러리를 사용하여 인증 및 원격 서버와의 통신을 �
 로깅 모듈을 사용하여 로그 메시지를 생성하고 파일에 기록합니다.
 
 """
-
-
-
-
 class Pizza_logger:
     """
 
@@ -81,21 +77,20 @@ class Pizza_logger:
         self._valid_user = False
         self.log = None
 
-        dir_path = os.path.expanduser('~/.config/pizza/')
-        self.set_logger()
+        # dir_path = os.path.expanduser('~/.config/pizza/')
 
-        self.dir_path = dir_path
+        self.dir_path = os.path.expanduser('~/.config/pizza/')
         if not os.path.exists(self.dir_path):
             try:
                 os.makedirs(self.dir_path)
             except OSError:
                 raise ValueError("에러 메시지 : 디렉터리를 만들지 못했습니다.")
 
-        self.user_path = os.path.join(self.dir_path, 'user.json')
+        self.set_logger()
 
-        self.login = Auth_br()
-        if self.login.access_setting():
-            self.login.load_setting()
+        # self.login = Auth_br()
+        # if self.login.access_setting():
+        #     self.login.load_setting()
 
     def set_logger(self):
         """
@@ -120,10 +115,8 @@ class Pizza_logger:
             file_handler.setLevel(logging.DEBUG)
             self.log.addHandler(file_handler)
 
-        for i in range(10):
-            self.log.info('{}번째 방문입니다.'.format(i))
-
-        return True
+        # for i in range(10):
+        #     self.log.info('{}번째 방문입니다.'.format(i))
 
     def connect_log(self, host_url):
         """
@@ -163,3 +156,14 @@ class Pizza_logger:
         """
         return self.log.debug("\"%s\" load output file from \"%s\"" % (user_name, output_file_path))
 
+def main():
+    test = Pizza_logger()
+    test.set_logger()
+    # test.connect_log
+    # test.enter_log
+    # test.create_working_file_log()
+    # test.load_output_file_log()
+
+
+if __name__ == "__main__":
+    main()

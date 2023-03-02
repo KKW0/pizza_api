@@ -48,7 +48,11 @@ class Table_widget(QDialog):
                     break
 # ----------------------------------------------------------------------------------------------
 def main():
-    app = QApplication(sys.argv)
+    try:
+        print(QApplication)
+        app = QApplication().instance()
+    except TypeError:
+        app = QApplication()
     dlg = Table_widget()
     dlg.show()
     sys.exit(app.exec_())

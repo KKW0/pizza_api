@@ -34,7 +34,10 @@ class Save(QtWidgets.QMainWindow):
 # ----------------------------------------------------------------------------------------------
 def main():
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
-    app = QtWidgets.QApplication()
+    try:
+        app = QtWidgets.QApplication().instance()
+    except TypeError:
+        app = QtWidgets.QApplication().instance()
     myapp = Save()
     myapp.ui.show()
     sys.exit(app.exec_())

@@ -30,7 +30,10 @@ class Login(QtWidgets.QMainWindow):
 # ----------------------------------------------------------------------------------------------
 def main():
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
-    app = QtWidgets.QApplication() # 2.7 QApplication 사용방법 .instance()
+    try:
+        app = QtWidgets.QApplication().instance()
+    except TypeError:
+        app = QtWidgets.QApplication(sys.argv)
     myapp = Login()
     myapp.ui.show()
     sys.exit(app.exec_())

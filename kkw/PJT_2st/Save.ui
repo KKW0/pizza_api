@@ -20,38 +20,12 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>0</y>
+     <y>10</y>
      <width>451</width>
-     <height>301</height>
+     <height>497</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="2" colspan="3">
-     <widget class="QLabel" name="Sin_File_Path_3">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: rgb(51, 51, 51);
-color: white;</string>
-      </property>
-      <property name="text">
-       <string>Save</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
     <item row="2" column="3" colspan="2">
      <widget class="QLabel" name="Sin_File_Path_2">
       <property name="maximumSize">
@@ -69,11 +43,51 @@ color: white;</string>
       </property>
      </widget>
     </item>
-    <item row="4" column="2" colspan="3">
-     <widget class="QLabel" name="Save_Path_2">
+    <item row="6" column="4">
+     <widget class="QPushButton" name="Back_Button">
       <property name="maximumSize">
        <size>
-        <width>16777215</width>
+        <width>100</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(51, 51, 51);
+color: white;</string>
+      </property>
+      <property name="text">
+       <string>Back</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="5">
+     <widget class="QLabel" name="Sin_File_Path_5">
+      <property name="maximumSize">
+       <size>
+        <width>30</width>
+        <height>25</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="2">
+     <widget class="QLabel" name="Sin_File_2">
+      <property name="maximumSize">
+       <size>
+        <width>100</width>
         <height>25</height>
        </size>
       </property>
@@ -89,7 +103,7 @@ color: white;</string>
 color: white;</string>
       </property>
       <property name="text">
-       <string>저장 &amp; 저장경로</string>
+       <string>씬 파일</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -107,22 +121,6 @@ color: white;</string>
       <property name="styleSheet">
        <string notr="true">background-color: rgb(51, 51, 51);
 color: white;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="6" column="5">
-     <widget class="QLabel" name="Sin_File_Path_5">
-      <property name="maximumSize">
-       <size>
-        <width>30</width>
-        <height>25</height>
-       </size>
-      </property>
-      <property name="styleSheet">
-       <string notr="true"/>
       </property>
       <property name="text">
        <string/>
@@ -178,30 +176,6 @@ color: white;</string>
       </property>
      </widget>
     </item>
-    <item row="6" column="4">
-     <widget class="QPushButton" name="Back_Button">
-      <property name="maximumSize">
-       <size>
-        <width>100</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: rgb(51, 51, 51);
-color: white;</string>
-      </property>
-      <property name="text">
-       <string>Back</string>
-      </property>
-     </widget>
-    </item>
     <item row="3" column="2">
      <widget class="QLabel" name="OutPut_File_2">
       <property name="maximumSize">
@@ -229,11 +203,37 @@ color: white;</string>
       </property>
      </widget>
     </item>
-    <item row="2" column="2">
-     <widget class="QLabel" name="Sin_File_2">
+    <item row="1" column="2" colspan="3">
+     <widget class="QLabel" name="Sin_File_Path_3">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>50</height>
+       </size>
+      </property>
       <property name="maximumSize">
        <size>
-        <width>100</width>
+        <width>16777215</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(51, 51, 51);
+color: white;</string>
+      </property>
+      <property name="text">
+       <string>Save</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="2" colspan="3">
+     <widget class="QLabel" name="Save_Path_2">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
         <height>25</height>
        </size>
       </property>
@@ -249,7 +249,7 @@ color: white;</string>
 color: white;</string>
       </property>
       <property name="text">
-       <string>씬 파일</string>
+       <string>저장 &amp; 저장경로</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>

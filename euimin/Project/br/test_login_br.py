@@ -52,10 +52,9 @@ class Testlogin_br(TestCase):
         self.assertIsNone(self.login._user)
 
     def test_access_setting(self):
-        os.removedirs(self.login.dir_path)
-        self.assertTrue(self.login.access_setting())
-        # self.assertTrue(os.path.exists(self.login.dir_path))
-        # self.assertTrue(os.path.exists(self.login.user_path))
+        self.login.access_setting()
+        self.assertTrue(os.path.exists(self.login.dir_path))
+        self.assertFalse(os.path.exists(self.login.user_path))
 
     def test_load_setting(self):
         invalid_dict = {

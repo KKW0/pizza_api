@@ -2,6 +2,7 @@
 from unittest import TestCase
 from login_br import Auth_br
 import json
+import os
 
 
 class Testlogin_br(TestCase):
@@ -42,7 +43,8 @@ class Testlogin_br(TestCase):
         self.assertFalse(self.login.valid_user)
 
         self.assertTrue(self.login.log_in(self.valid_id, self.valid_pw))
-
+        self.assertTrue(self.login._valid_user)
+        
     def test_log_out(self):
         self.login.connect_host(self.valid_url)
         self.login.log_in(self.valid_id, self.valid_pw)
@@ -50,7 +52,10 @@ class Testlogin_br(TestCase):
         self.assertIsNone(self.login._user)
 
     def test_access_setting(self):
-        pass
+        os.removedirs(self.login.dir_path)
+        self.assertTrue(self.login.access_setting())
+        # self.assertTrue(os.path.exists(self.login.dir_path))
+        # self.assertTrue(os.path.exists(self.login.user_path))
 
     def test_load_setting(self):
         invalid_dict = {
@@ -96,4 +101,8 @@ class Testlogin_br(TestCase):
         self.login.save_setting()
 
     def test_reset_setting(self):
-        pass
+        self.assertIsNone(self.login._host)
+        self.assertIsNone(self.login._user_id)
+        self.assertIsNone(self.login._user_pw)
+        self.assertFalse(self.login._valid_host)
+        self.assertFalse(self.login._valid_user)

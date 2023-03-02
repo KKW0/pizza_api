@@ -1,9 +1,8 @@
 #coding:utf8
 import pprint as pp
 import gazu
-import os
 
-# pizza - login
+# gazu - login
 gazu.client.set_host("http://192.168.3.116/api")
 gazu.set_event_host("http://192.168.3.116")
 gazu.log_in("pipeline@rapa.org", "netflixacademy")
@@ -40,52 +39,62 @@ rabbit_info = gazu.asset.get_asset_by_name(new_prod, "Rabbit")
 task = gazu.task.new_task(monkey, modeling)
 gazu.task.start_task(task)
 
-wip1 = gazu.task.get_task_status_by_short_name("wip")
-test_rabbit = gazu.task.get_task_by_name(rabbit_info['id'], concept)
-# comment1 = pizza.task.add_comment(test_rabbit, wip1, "Cherry")
-# preview_file = pizza.task.add_preview(test_rabbit, comment1, "/home/rapa/test.jpeg")
-# pizza.task.set_main_preview(preview_file)
+# wip1 = gazu.task.get_task_status_by_short_name("wip")
+# test_rabbit = gazu.task.get_task_by_name(rabbit_info['id'], concept)
+# comment1 = gazu.task.add_comment(test_rabbit, wip1, "Cherry")
+# preview_file = gazu.task.add_preview(test_rabbit, comment1, "/home/rapa/test.jpeg")
+# gazu.task.set_main_preview(preview_file)
 
 
-wip2 = gazu.task.get_task_status_by_short_name("wip")
-test_monkey = gazu.task.get_task_by_name(monkey_info['id'], modeling)
-# comment2 = pizza.task.add_comment(test_monkey, wip2, "체리에요")
-# preview_file = pizza.task.add_preview(test_monkey, comment2, "/home/rapa/test.jpeg")
-# pizza.task.set_main_preview(preview_file)
+# wip2 = gazu.task.get_task_status_by_short_name("wip")
+# test_monkey = gazu.task.get_task_by_name(monkey_info['id'], modeling)
+# comment2 = gazu.task.add_comment(test_monkey, wip2, "cherry2")
+# preview_file = gazu.task.add_preview(test_monkey, comment2, "/home/rapa/test.jpeg")
+# gazu.task.set_main_preview(preview_file)
 
-# test_download = pizza.files.download_preview_file(test_rabbit, '/home/rapa')
-
-
-for asset in gazu.asset.all_assets_for_project(new_prod):
-    gazu.task.new_task(asset, modeling)
-    gazu.task.new_task(asset, rigging)
-    gazu.task.new_task(asset, concept)
-    gazu.task.new_task(asset, uv)
-
-gazu.task.new_task(shot, layout)
-# pp.pprint(test_monkey)
+# test_download = gazu.files.download_preview_file(test_rabbit, '/home/rapa')
 
 
-task_type = gazu.task.get_task_type_by_name(layout)
+# for asset in gazu.asset.all_assets_for_project(new_prod):
+#     gazu.task.new_task(asset, modeling)
+#     gazu.task.new_task(asset, rigging)
+#     gazu.task.new_task(asset, concept)
+#     gazu.task.new_task(asset, uv)
+#
+# gazu.task.new_task(shot, layout)
+
+
+# task_type = gazu.task.get_task_type_by_name(layout)
 # pp.pprint(task_type)
 
 
-# for asset in pizza.asset.all_assets_for_project(new_prod):
-#     for task in pizza.task.all_tasks_for_asset(asset):
-#         path = os.path.dirname(pizza.files.build_working_file_path(task))[1:]
+# for asset in gazu.asset.all_assets_for_project(new_prod):
+#     for task in gazu.task.all_tasks_for_asset(asset):
+#         path = os.path.dirname(gazu.files.build_working_file_path(task))[1:]
 #         os.makedirs(path, exist_ok=True)
 #
-# for shot in pizza.shot.all_shots_for_project(new_prod):
-#     for task in pizza.task.all_tasks_for_shot(shot):
-#         path = os.path.dirname(pizza.files.build_working_file_path(task))[1:]
+# for shot in gazu.shot.all_shots_for_project(new_prod):
+#     for task in gazu.task.all_tasks_for_shot(shot):
+#         path = os.path.dirname(gazu.files.build_working_file_path(task))[1:]
 #         os.makedirs(path, exist_ok=True)
 
-# my_asset = pizza.asset.get_asset_by_name('proj_name', 'asset_name')
-# my_sequence = pizza.shot.get_sequence_by_name('proj_name', 'seq_name')
-# my_shot = pizza.shot.get_shot_by_name(my_sequence, 'shot_name')
-# asset_castings = pizza.casting.get_shot_casting(my_shot)
+# my_asset = gazu.asset.get_asset_by_name(new_prod, monkey)
+# # my_sequence = gazu.shot.get_sequence_by_name('proj_name', 'seq_name')
+# # my_shot = gazu.shot.get_shot_by_name(my_sequence, 'shot_name')
+# asset_castings = gazu.casting.get_asset_casting(rabbit)
 # new = {"추가사항" : "입니다"}
 # asset_castings.append(new)
-# pizza.casting.update_shot_casting('proj_name', my_shot, casting=asset_castings)
+# gazu.casting.update_asset_casting(new_prod, monkey, casting=asset_castings)
 #
-# cast_in = pizza.casting.get_asset_cast_in(my_asset)
+# cast_in = gazu.casting.get_asset_cast_in(monkey)
+
+
+pick_asset = gazu.asset.get_asset_by_name(new_prod, rabbit)
+pick_asset2 = gazu.asset.get_asset_by_name(new_prod, monkey_info)
+# pick_sequence = gazu.shot.get_sequence_by_name(new_prod, sequence)
+pick_shot = gazu.shot.get_shot_by_name(sequence, shot)
+asset_castings = gazu.casting.get_asset_casting(pick_asset)
+new = {"asset_id": pick_asset2['id'], "nb_occurences": 3}
+asset_castings.append(new)
+gazu.casting.update_asset_casting(new_prod, pick_asset2, casting=asset_castings)
+# gazu.casting.update_shot_casting(self.project_name, pick_shot, casting=asset_castings)

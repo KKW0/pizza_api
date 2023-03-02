@@ -3,7 +3,6 @@ import os
 import json
 import gazu
 import logging
-# from login_br import Auth_br
 
 """
 
@@ -17,6 +16,8 @@ gazu 라이브러리를 사용하여 인증 및 원격 서버와의 통신을 �
 로깅 모듈을 사용하여 로그 메시지를 생성하고 파일에 기록합니다.
 
 """
+
+
 class Pizza_logger:
     """
 
@@ -62,7 +63,7 @@ class Pizza_logger:
         Logger 개체를 초기화합니다.
 
         Args:
-            dir_path (str): 사용자 정보가 저장될 디렉터리의 경로
+            self.dir_path (str): 사용자 정보가 저장될 디렉터리의 경로
 
         Raises:
             ValueError: 디렉터리 생성이 실패할 경우
@@ -121,7 +122,7 @@ class Pizza_logger:
     def connect_log(self, host_url):
         """
 
-        DEBUG level에서 지정된 'host_url'에 대한 성공적인 연결을 기록합니다.
+        DEBUG level에서 지정된 'host_url'에 대한 성공적인 연결 및 실패를 기록합니다.
 
         """
         if host_url:
@@ -135,6 +136,9 @@ class Pizza_logger:
         """
         if user_name:
             self.log.debug("{}: log-in succeed".format(user_name))
+
+    def failed_log(self):
+        self.log.debug("Failed Connection")
 
     def create_working_file_log(self, user_name, working_file):
         """
@@ -155,6 +159,7 @@ class Pizza_logger:
 
         """
         return self.log.debug("\"%s\" load output file from \"%s\"" % (user_name, output_file_path))
+
 
 def main():
     test = Pizza_logger()

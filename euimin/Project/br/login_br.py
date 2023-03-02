@@ -70,6 +70,7 @@ class Auth_br:
 
         gazu.set_host(try_host)
         if not gazu.client.host_is_valid():
+            self.logging.failed_log()
             raise ValueError('에러 메시지 : 호스트 URL이 잘못되었습니다.')
         self._host = gazu.get_host()
         self._valid_host = True
@@ -93,12 +94,10 @@ class Auth_br:
 
         """
 
-        # if not self._valid_host:
-        #     raise SystemError('에러 메시지 : 로그인할 호스트가 연결되어 있지 않습니다.')
-
         try:
             log_in = gazu.log_in(try_id, try_pw)
         except gazu.AuthFailedException:
+            self.logging.failed_log()
             raise ValueError('에러 메시지 : 사용자 ID 또는 암호가 잘못 입력되었습니다.')
 
         self._user = log_in['user']
@@ -202,4 +201,18 @@ class Auth_br:
         self._valid_host = False
         self._valid_user = False
 
+def main():
+    test = Auth_br()
+    # test.connect_host("http://192.168.3.116/api")
+    # test.log_in("pipeline@rapa.org", "netflixacademy")
+    # test.log_out()
+    # test.access_setting()
+    test.load_setting()
+    # test.save_setting()
+    # test.reset_setting()
 
+
+if __name__ == "__main__":
+    main()
+
+# 출처 : Mola에 Molo의 SY

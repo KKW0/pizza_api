@@ -1,7 +1,5 @@
 #coding:utf8
 
-import pprint as pp
-import sys
 import gazu
 # from PySide2 import QtGui, QtWidgets
 

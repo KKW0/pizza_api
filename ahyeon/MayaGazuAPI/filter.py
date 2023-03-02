@@ -1,6 +1,5 @@
 #coding:utf8
 import gazu
-import pprint as pp
 from thumbnail import thumbnail_control
 
 
@@ -28,7 +27,6 @@ class Filter:
         task_info['description'] = task['description']
         task_info['last_comment'] = task['last_comment']
         # task asset이 사용되는 seq 구하기
-        # new = {"asset_id": pick_asset['id'], "nb_occurences": 55}
         task_asset = gazu.asset.get_asset(task['entity_id'])
         seq = gazu.casting.get_asset_casting(task_asset)
         task_info['sequence_name'] = seq['name']

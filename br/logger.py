@@ -17,8 +17,11 @@ gazu 라이브러리를 사용하여 인증 및 원격 서버와의 통신을 �
 """
 
 
+<<<<<<< Updated upstream:br/logger.py
 
 
+=======
+>>>>>>> Stashed changes:euimin/Project/br/logger_br.py
 class Pizza_logger:
     """
 
@@ -56,6 +59,7 @@ class Pizza_logger:
     - enter_log(user_name): 지정한 이름의 사용자가 성공적으로 로그인했음을 나타내는 메시지를 기록합니다.
     - create_working_file_log(user_name, working_file): 지정한 이름을 가진 사용자가 지정한 위치에 Maya 파일을 생성했음을 나타내는 메시지를 기록합니다.
     - load_output_file_log(user_name, output_file_path): 지정한 이름을 가진 사용자가 지정한 위치에서 출력 파일을 로드했음을 나타내는 메시지를 기록합니다.
+
     """
 
     def __init__(self, dir_path):

@@ -12,10 +12,10 @@ class KitsuThings:
         프레임 정보가 없으면 4자리로 생성한다.
 
         Args:
-            shot(dict): 선택한 테스크가 속한 시퀀스의 샷
+            shot(dict): 선택한 테스크가 속한 에셋에 캐스팅된 샷
         """
         padding_info = shot.get('nb_frames') - 1
-        if not padding_info:
+        if padding_info == False:
             padding_info = 3
         padding = '_' + ('0' * padding_info) + '1'
 
@@ -27,7 +27,7 @@ class KitsuThings:
         ouput type이 Undistortion_img인 output file을 찾는 매서드
 
         Args:
-            shot(dict): 선택한 테스크가 속한 시퀀스의 샷
+            shot(dict): 선택한 테스크가 속한 에셋에 캐스팅된 샷
         Returns:
             str: 첫번째 언디스토션 이미지의 path
         """
@@ -43,7 +43,7 @@ class KitsuThings:
         ouput type이 Camera인 output file을 찾는 매서드
 
         Args:
-            shot(dict): 선택한 테스크가 속한 시퀀스의 샷
+            shot(dict): 선택한 테스크가 속한 에셋에 캐스팅된 샷
         Returns:
             str: 카메라(fbx 등) 아웃풋 파일이 저장된 path
         """
@@ -55,10 +55,10 @@ class KitsuThings:
 
     def get_kitsu_path(self, casting):
         """
-        샷에 캐스팅된 에셋의 최신 output file들의 패스 리스트를 추출하는 매서드
+        task 에셋에 캐스팅된 에셋들의 최신 output file들의 패스 리스트를 추출하는 매서드
 
         Args:
-            casting(dict): 샷에 캐스팅된 에셋의 간략한 정보가 담긴 dict
+            casting(dict): task에 캐스팅된 에셋의 간략한 정보가 담긴 dict
 
         Returns:
             list: 아웃풋 파일들의 패스(확장자 포함), 개수, 확장자가 담긴 dict를 수집한 리스트

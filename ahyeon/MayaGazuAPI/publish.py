@@ -1,7 +1,6 @@
 #coding:utf8
 import os
 import gazu
-import fnmatch
 from usemaya import MayaThings
 
  
@@ -93,7 +92,7 @@ class PublishThings:
             path(str): 파일명을 제외한 폴더 경로
         """
 
-        if not os.path.exists(path):
+        if os.path.exists(path) == False:
             os.makedirs(path)
         else:
             raise SystemError("폴더가 이미 존재합니다.")
@@ -119,15 +118,16 @@ class PublishThings:
                 if '.mov' in filename:
                     mov_files.append(filename)
             # output 폴더에 저장된 mov 파일명을 모두 mov_files에 저장
-            for index in range(len(mov_files)):
+            for filename in mov_files:
                 # preview 파일(mov 파일) 모두 Kitsu에 업로드
-                full_path = path + '_preview' + str(index) + '.mov'
-                if not gazu.files.get_all_preview_files_for_task(task):
+                full_path = path + filename
+                if gazu.files.get_all_preview_files_for_task(task):
+                    preview = gazu.task.add_preview(task, comment, full_path)
+                else:
                     preview = gazu.task.create_preview(task, comment)
                     gazu.task.upload_preview_file(preview, full_path)
+                if 'main' in filename and task['entity_preview_file_id'] is None:
                     gazu.task.set_main_preview(preview)
-                else:
-                    gazu.task.add_preview(task, comment, full_path)
         else:
             raise ValueError("working 또는 output file의 경로를 입력해주세요.")
 
@@ -157,3 +157,4 @@ class PublishThings:
         comment_dict = gazu.task.get_last_comment_for_task(task)
         self._upload_files(task, working_path, working_file)
         self._upload_files(task, output_path, output_file, comment_dict)
+        ### 이렇게 하면 프리뷰 파일이 졸라 졸라 졸라 많아지지 않을까...??...

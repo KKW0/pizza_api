@@ -42,6 +42,7 @@ class SetThings(object):
             self.pub.publish_file_data(task, comment=comment)
             # Kitsu에 저장한 working, output file 데이터 퍼블리싱
             self.pub.save_publish_real_data(task, comment=comment)
+            self.pub.save_publish_previews(shot_list)
             # 폴더 트리에 working, output, preview 파일 저장하고 Kitsu에 업로드
 
 

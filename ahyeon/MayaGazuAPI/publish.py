@@ -149,12 +149,25 @@ class PublishThings:
         self._make_folder_tree(path_working)
         self._make_folder_tree(path_output)
 
-        # 마야에서 각 폴더에 working, output, preview file을 save
-        self.maya.save_working_file(working_path, self._software['file_extension'])
+        # 마야에서 각 폴더에 working, output, main preview를 save하고 kitsu에 업로드
+        self.maya.save_scene_file(working_path, self._software['file_extension'])
         self.maya.export_output_file(output_path)
-
-        # Kitsu에 working, preview file 업로드
-        comment_dict = gazu.task.get_last_comment_for_task(task)
         self._upload_files(task, working_path, working_file)
-        self._upload_files(task, output_path, output_file, comment_dict)
-        ### 이렇게 하면 프리뷰 파일이 졸라 졸라 졸라 많아지지 않을까...??...
+
+    def save_publish_previews(self, shot_list):
+        revision = 0
+        task_type = gazu.task.get_task_type_by_name('Layout')
+        output_type = gazu.files.get_output_type_by_name('Preview')
+        for shot in shot_list:
+            path = gazu.files.build_entity_output_file_path(shot, output_type, task_type, revision=revision)
+            while os.path.exists(path) is True:
+                revision += 1
+                path = gazu.files.build_entity_output_file_path(shot, output_type, task_type, revision=revision)
+            self.maya.export_previews(path, shot)
+
+            # Kitsu에 shot의 preview file 업로드
+            full_path = path + '_preview.mov'
+            task = gazu.task.get_task_by_entity(shot, task_type)
+            comment_dict = gazu.task.get_last_comment_for_task(task)
+            preview = gazu.task.create_preview(task, comment_dict)
+            gazu.task.upload_preview_file(preview, full_path)

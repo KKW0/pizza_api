@@ -15,14 +15,15 @@ class TestFilter(TestCase):
         self.seq = gazu.shot.get_sequence_by_name(self.project, 'seq1')
         self.shot = gazu.shot.get_shot_by_name(self.seq, 'shot02')
         task_type = gazu.task.all_task_types_for_shot(self.shot)
-        self.task_type = task_type[0]  # 레이아웃, 1은 매치무브
+        # self.task_type = task_type[0]  # 레이아웃, 1은 매치무브
         self.user = gazu.person.get_person_by_full_name('ahyeon jo')
         # self.user.append(gazu.client.get_current_user())
         self.task_status = gazu.task.get_task_status_by_name('Todo')
-        # gazu.task.new_task_type('Layout')
-        # gazu.task.new_task(self.asset, self.task_type, task_status=self.task_status, assignees=self.user)
+        # gazu.task.new_task_type('Layout_asset')
+        self.task_type = gazu.task.get_task_type_by_name('Layout_asset')
+        # gazu.task.new_task(self.asset, self.task_type, task_status=self.task_status)
         self.task = gazu.task.get_task_by_entity(self.asset, self.task_type)
-        self.assignee = gazu.task.assign_task(self.task, self.user['id'])
+        self.assignee = gazu.task.assign_task(self.task['id'], self.user['id'])
         self.comment = 'Unit Test'
         gazu.task.add_comment(self.task, self.task_status, self.comment)
         self.comment_dict = gazu.task.get_last_comment_for_task(self.task)
@@ -33,8 +34,8 @@ class TestFilter(TestCase):
         self.output_type = gazu.files.get_output_type_by_name('Layout_mb')
         working_file = gazu.files.get_working_files_for_task(self.task)
         self.working_file = working_file[0]
-        # gazu.files.new_entity_output_file(self.asset, self.output_type, self.task_type,
-        #                                   self.comment, self.working_file)
+        gazu.files.new_entity_output_file(self.asset, self.output_type, self.task_type,
+                                          self.comment, self.working_file)
         output_file = gazu.files.get_last_output_files_for_entity(self.asset, self.output_type, self.task_type)
         self.output_file = output_file[0]
         self.path = '/home/rapa/foldertree_test/a/b/c/d/e/f/g/working/working_file'

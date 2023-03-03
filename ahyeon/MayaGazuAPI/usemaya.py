@@ -109,7 +109,7 @@ class MayaThings:
             for file_dict in file_dict_list:
                 self._load_output(file_dict['path'])
 
-    def save_working_file(self, path, representation):
+    def save_scene_file(self, path, representation):
         """
         마야 내에서 저장 경로와 저장 형식을 선택해 작업한 씬 파일을 저장하는 매서드
 
@@ -185,11 +185,20 @@ class MayaThings:
             path(str): output file 시퀀스를 저장할 경로 + 이름
         """
         # output file 저장
-        self.save_working_file(path, 'mb')
+        self.save_scene_file(path, 'mb')
 
         # main preview file 저장
         self._make_main_preview_mov(path)
         
+    def export_previews(self, path, shot):
+        """
+
+        Args:
+            path: output file의 확장자를 뺀 전체 경로
+            shot:
+        Returns:
+
+        """
         # 디폴트 카메라 필터링 후 사용자가 커스텀한 카메라 목록을 추출
         startup_cameras = []
         all_cameras = mc.ls(type='camera', l=True)
@@ -198,16 +207,20 @@ class MayaThings:
                 startup_cameras.append(camera)
         custom_camera = list(set(all_cameras) - set(startup_cameras))
 
-        # 각 카메라에 대해 플레이블라스트 프리뷰 저장
-        for index, camera in enumerate(custom_camera):
-            mc.lookThru(camera)
-            mc.playblast(
-                format='movie',
-                filename=path+'_'+camera+'_preview',
-                sequenceTime=False,
-                clearCache=True, viewer=True,
-                showOrnaments=True,
-                percent=50,
-                compression="mov",
-                quality=50
-            )
+        # 샷에 해당하는 카메라의 플레이블라스트 프리뷰 저장
+        shot_name = shot['name']
+        for camera in custom_camera:
+            if shot_name not in camera:
+                continue
+            else:
+                mc.lookThru(camera)
+                mc.playblast(
+                    format='movie',
+                    filename=path+'_preview',
+                    sequenceTime=False,
+                    clearCache=True, viewer=True,
+                    showOrnaments=True,
+                    percent=50,
+                    compression="mov",
+                    quality=50
+                )

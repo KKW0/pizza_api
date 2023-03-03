@@ -126,7 +126,7 @@ class Pizza_logger:
 
         """
         if host_url:
-            self.log.debug("successful connection to {}".format(host_url))
+            self.log.debug("연결에 성공하였습니다. {}".format(host_url))
 
     def enter_log(self, user_name):
         """

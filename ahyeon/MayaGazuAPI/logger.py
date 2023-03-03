@@ -2,15 +2,13 @@
 import os
 import json
 import gazu
-import logging
-# from login_br import Auth_br
 
 """
 
-이 api는 인증 및 로깅 작업을 처리하는 Logger 클래스를 제공합니다.
+이 모듈은 인증 및 로깅 작업을 처리하는 Logger 클래스를 제공합니다.
 
 Logger 클래스를 사용하면 서버 호스트에 연결하고 사용자 ID와 암호로 로그인할 수 있습니다.
-이러한 설정을 로컬 디렉터리의 user.json 파일에 저장합니다.
+그리고 이러한 설정을 로컬 디렉토리의 user.json 파일에 저장합니다.
 또한 작업 파일 생성 및 출력 파일 로드와 같은 응용 프로그램의 다양한 이벤트를 기록합니다.
 
 gazu 라이브러리를 사용하여 인증 및 원격 서버와의 통신을 처리합니다. 
@@ -18,8 +16,8 @@ gazu 라이브러리를 사용하여 인증 및 원격 서버와의 통신을 �
 
 """
 
-
-class Pizza_logger:
+ 
+class PizzaLogger:
     """
 
     위 클래스는 피자 응용 프로그램에 대한 로깅을 처리합니다.
@@ -56,7 +54,6 @@ class Pizza_logger:
     - enter_log(user_name): 지정한 이름의 사용자가 성공적으로 로그인했음을 나타내는 메시지를 기록합니다.
     - create_working_file_log(user_name, working_file): 지정한 이름을 가진 사용자가 지정한 위치에 Maya 파일을 생성했음을 나타내는 메시지를 기록합니다.
     - load_output_file_log(user_name, output_file_path): 지정한 이름을 가진 사용자가 지정한 위치에서 출력 파일을 로드했음을 나타내는 메시지를 기록합니다.
-
     """
 
     def __init__(self, dir_path):
@@ -68,9 +65,10 @@ class Pizza_logger:
             dir_path (str): 사용자 정보가 저장될 디렉터리의 경로
 
         Raises:
-            ValueError: 디렉터리 생성이 실패할 경우
+            AuthFileIOError: 디렉터리 생성이 실패할 경우
 
         """
+
         self._host = None
         self._user = None
         self._user_id = None
@@ -78,25 +76,64 @@ class Pizza_logger:
         self._valid_host = False
         self._valid_user = False
         self.log = None
+        pizza = PizzaLogger()
 
-        self.dir_path = os.path.expanduser('~/.config/pizza/')
+        self.set_logger(dir_path)
+
+        self.dir_path = dir_path
         if not os.path.exists(self.dir_path):
             try:
                 os.makedirs(self.dir_path)
             except OSError:
-                raise ValueError("에러 메시지 : 디렉터리를 만들지 못했습니다.")
+                raise ValueError("Error: Failed to create the directory.")
 
         self.user_path = os.path.join(self.dir_path, 'user.json')
 
-        self.set_logger(dir_path)
-        # if self.access_setting():
-        #     self.load_setting()
+        if self.access_setting():
+            self.load_setting()
+
+    @property
+    def valid_host(self):
+        """
+
+        현재 호스트 연결의 유효성을 반환하는 속성입니다.
+
+        """
+        return self._valid_host
+
+    @property
+    def valid_user(self):
+        """
+
+        현재 사용자 로그인의 유효성을 반환하는 속성입니다.
+
+        """
+        return self._valid_user
+
+    @property
+    def host(self):
+        """
+
+        현재 호스트의 URL을 반환하는 속성입니다.
+
+        """
+        return self._host
+
+    @property
+    def user(self):
+        """
+
+        Returns:
+            현재 로그인한 사용자의 사용자 사전을 반환합니다.
+
+        """
+        return self._user
 
     def set_logger(self):
         """
 
-        logger instance에 stream handler 및 file handler를 추가하여 피자 응용 프로그램에 대한 로깅 구성을 설정합니다.
-        INFO level에서 10개의 테스트 메시지를 기록합니다.
+        로거 인스턴스에 스트림 핸들러 및 파일 핸들러를 추가하여 피자 응용 프로그램에 대한 로깅 구성을 설정합니다.
+        INFO 수준에서 10개의 테스트 메시지를 기록합니다.
 
         """
         self.log = logging.getLogger('pizza')
@@ -115,33 +152,31 @@ class Pizza_logger:
             file_handler.setLevel(logging.DEBUG)
             self.log.addHandler(file_handler)
 
-        # for i in range(10):
-            i = 1
+        for i in range(10):
             self.log.info('{}번째 방문입니다.'.format(i))
-            i += 1
 
     def connect_log(self, host_url):
         """
 
-        DEBUG level에서 지정된 'host_url'에 대한 성공적인 연결을 기록합니다.
+        DEBUG 수준에서 지정된 'host_url'에 대한 성공적인 연결을 기록합니다.
 
         """
         if host_url:
-            self.log.debug("{}와 성공적 연결".format(host_url))
+            self.log.debug("successful connection to {}".format(host_url))
 
     def enter_log(self, user_name):
         """
 
-        DEBUG level에서 지정된 'user_name'을 사용하여 사용자의 성공적인 로그인을 기록합니다.
+        DEBUG 수준에서 지정된 'user_name'을 사용하여 사용자의 성공적인 로그인을 기록합니다.
 
         """
         if user_name:
-            self.log.debug("{}: 로그인 성공".format(user_name))
+            self.log.debug("{}: log-in succeed".format(user_name))
 
     def create_working_file_log(self, user_name, working_file):
         """
 
-        파일을 만든 사용자의 이름 및 파일 경로와 함께 DEBUG level에서 Maya 파일을 생성한 것을 기록합니다.
+        파일을 만든 사용자의 이름 및 파일 경로와 함께 DEBUG 수준에서 Maya 파일을 생성한 것을 기록합니다.
         파일이 없으면 경고 메시지를 기록합니다.
 
         """
@@ -157,16 +192,3 @@ class Pizza_logger:
 
         """
         return self.log.debug("\"%s\" load output file from \"%s\"" % (user_name, output_file_path))
-
-
-def main():
-    test = Pizza_logger()
-    test.set_logger()
-    # test.connect_log
-    # test.enter_log
-    # test.create_working_file_log()
-    # test.load_output_file_log()
-
-
-if __name__ == "__main__":
-    main()

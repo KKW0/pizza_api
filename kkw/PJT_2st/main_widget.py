@@ -1,7 +1,11 @@
 
 import sys
+from PySide2.QtCore import QModelIndex
+from PySide2 import QtWidgets, QtCore, QtUiTools
+from PySide2.QtWidgets import QStyledItemDelegate, QStyleOptionViewItem
 from PySide2.QtWidgets import (QGridLayout, QHeaderView, QSizePolicy,
-                               QTableView, QWidget, QApplication)
+                               QTableView, QWidget, QApplication, QStyle)
+
 
 from table_model import CustomTableModel
 from table_model import CustomTableModel2
@@ -11,58 +15,46 @@ class Widget(QTableView):
         QTableView.__init__(self)
 
         self.model = CustomTableModel(data)
-
         self.setModel(self.model)
+
+        self.setFixedSize(700, 615)
 
         # QTableView Headers
         self.horizontal_header = self.horizontalHeader()
         self.vertical_header = self.verticalHeader()
 
-        self.setColumnWidth(3, 200)
-        # self.horizontal_header.setSectionResizeMode(
-        #     QHeaderView.ResizeToContents
-        # )
-        # self.vertical_header.setSectionResizeMode(
-        #     QHeaderView.ResizeToContents
-        # )
-        self.horizontal_header.setStretchLastSection(True)
-        #
-        # size = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        #
-        # size.setHorizontalStretch(1)
-        # self.setSizePolicy(size)
+        self.horizontalHeader().setMinimumSectionSize(100)
+        self.verticalHeader().setMinimumSectionSize(35)
 
-class Widget2(QWidget):
+        self.setColumnWidth(3, 200)
+
+        self.horizontal_header.setStretchLastSection(True)
+
+        self.setGeometry(QtCore.QRect(0, 0, 700, 615))  # Set the position and size of the Widget
+        self.setStyleSheet("background-color: #353535; selection-background-color: gray;")
+
+
+
+class Widget2(QTableView):
     def __init__(self, data):
-        QWidget.__init__(self)
+        QTableView.__init__(self)
 
         # Getting the Model
         self.model = CustomTableModel2(data)
+        self.setModel(self.model)
 
         # Creating a QTableView
         self.table_view = QTableView()
         self.table_view.setModel(self.model)
 
+        self.setFixedSize(320, 300)
+
         # QTableView Headers
-        self.horizontal_header = self.table_view.horizontalHeader()
-        self.vertical_header = self.table_view.verticalHeader()
-        self.horizontal_header.setSectionResizeMode(
-                               QHeaderView.ResizeToContents
-                               )
-        self.vertical_header.setSectionResizeMode(
-                             QHeaderView.ResizeToContents
-                             )
+        self.horizontal_header = self.horizontalHeader()
+        self.vertical_header = self.verticalHeader()
+
         self.horizontal_header.setStretchLastSection(True)
 
-        # QWidget Layout
-        self.main_layout = QGridLayout()
-        size = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-
-        ## Left layout
-        size.setHorizontalStretch(1)
-        self.table_view.setSizePolicy(size)
-        self.main_layout.addWidget(self.table_view)
-
-        # Set the layout to the QWidget
-        self.setLayout(self.main_layout)
+        self.setGeometry(QtCore.QRect(0, 0, 320, 300))  # Set the position and size of the Widget2
+        self.setStyleSheet("background-color: #353535; selection-background-color: gray;")
 

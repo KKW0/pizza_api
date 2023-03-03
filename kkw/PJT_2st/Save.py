@@ -3,8 +3,6 @@ import os
 import sys
 from PySide2 import QtWidgets, QtCore, QtUiTools
 
-
-
 class Save(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()

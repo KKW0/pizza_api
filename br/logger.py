@@ -2,6 +2,8 @@
 import os
 import json
 import gazu
+import logging
+# from login_br import Auth_br
 
 """
 
@@ -17,11 +19,6 @@ gazu 라이브러리를 사용하여 인증 및 원격 서버와의 통신을 �
 """
 
 
-<<<<<<< Updated upstream:br/logger.py
-
-
-=======
->>>>>>> Stashed changes:euimin/Project/br/logger_br.py
 class Pizza_logger:
     """
 
@@ -74,7 +71,6 @@ class Pizza_logger:
             ValueError: 디렉터리 생성이 실패할 경우
 
         """
-
         self._host = None
         self._user = None
         self._user_id = None
@@ -83,9 +79,7 @@ class Pizza_logger:
         self._valid_user = False
         self.log = None
 
-        self.set_logger(dir_path)
-
-        self.dir_path = dir_path
+        self.dir_path = os.path.expanduser('~/.config/pizza/')
         if not os.path.exists(self.dir_path):
             try:
                 os.makedirs(self.dir_path)
@@ -94,10 +88,9 @@ class Pizza_logger:
 
         self.user_path = os.path.join(self.dir_path, 'user.json')
 
-        if self.access_setting():
-            self.load_setting()
-
-
+        self.set_logger(dir_path)
+        # if self.access_setting():
+        #     self.load_setting()
 
     def set_logger(self):
         """
@@ -122,8 +115,10 @@ class Pizza_logger:
             file_handler.setLevel(logging.DEBUG)
             self.log.addHandler(file_handler)
 
-        for i in range(10):
+        # for i in range(10):
+            i = 1
             self.log.info('{}번째 방문입니다.'.format(i))
+            i += 1
 
     def connect_log(self, host_url):
         """
@@ -132,7 +127,7 @@ class Pizza_logger:
 
         """
         if host_url:
-            self.log.debug("successful connection to {}".format(host_url))
+            self.log.debug("{}와 성공적 연결".format(host_url))
 
     def enter_log(self, user_name):
         """
@@ -141,7 +136,7 @@ class Pizza_logger:
 
         """
         if user_name:
-            self.log.debug("{}: log-in succeed".format(user_name))
+            self.log.debug("{}: 로그인 성공".format(user_name))
 
     def create_working_file_log(self, user_name, working_file):
         """
@@ -162,3 +157,16 @@ class Pizza_logger:
 
         """
         return self.log.debug("\"%s\" load output file from \"%s\"" % (user_name, output_file_path))
+
+
+def main():
+    test = Pizza_logger()
+    test.set_logger()
+    # test.connect_log
+    # test.enter_log
+    # test.create_working_file_log()
+    # test.load_output_file_log()
+
+
+if __name__ == "__main__":
+    main()

@@ -46,24 +46,30 @@ color: white;</string>
      <item row="0" column="2">
       <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
        <property name="spacing">
-        <number>10</number>
+        <number>0</number>
        </property>
        <property name="leftMargin">
         <number>10</number>
        </property>
        <property name="topMargin">
-        <number>10</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>10</number>
+        <number>0</number>
        </property>
        <property name="bottomMargin">
-        <number>10</number>
+        <number>0</number>
        </property>
        <item>
         <widget class="QLabel" name="label">
          <property name="enabled">
           <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
          <property name="minimumSize">
           <size>
@@ -96,17 +102,17 @@ color: white;</string>
          <property name="minimumSize">
           <size>
            <width>300</width>
-           <height>150</height>
+           <height>145</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>300</width>
-           <height>150</height>
+           <height>145</height>
           </size>
          </property>
          <property name="layoutDirection">
-          <enum>Qt::RightToLeft</enum>
+          <enum>Qt::LeftToRight</enum>
          </property>
          <property name="styleSheet">
           <string notr="true">background-color: rgb(51, 51, 51);
@@ -142,6 +148,9 @@ Review 	Pending Review</string>
            <weight>75</weight>
            <bold>true</bold>
           </font>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
          </property>
          <property name="styleSheet">
           <string notr="true">background-color: rgb(51, 51, 51);

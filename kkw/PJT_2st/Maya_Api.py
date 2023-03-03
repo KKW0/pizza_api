@@ -2,21 +2,17 @@
 import os
 import sys
 
-from PySide2.QtWidgets import QApplication
-from PySide2.QtWidgets import QDialog, QVBoxLayout, QLineEdit, QTableWidget, QTableWidgetItem, QHeaderView
-
 from PySide2 import QtWidgets, QtCore, QtUiTools
-from PySide2.QtWidgets import QDialog, QHeaderView, QLineEdit, QTableView, QVBoxLayout, QMainWindow, QAction, QTableWidgetItem, QTableWidget
+from PySide2.QtWidgets import QDialog, QHeaderView, QLineEdit, QTableView, QVBoxLayout, QMainWindow, QAction, \
+    QTableWidgetItem, QTableWidget
 from PySide2.QtGui import QStandardItemModel, QStandardItem
-
-from PySide2.QtWidgets import QApplication, QTableWidget, QTableWidgetItem
 
 from Save import Save
 from Load import Load
 from main_widget import Widget
 from main_widget import Widget2
-
 from table_model import CustomTableModel
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -30,23 +26,14 @@ class MainWindow(QMainWindow):
         self.ui = loader.load(ui_file)
 
         self.widget = Widget(self.read_data())
-        self.widget.setFixedSize(700, 615)
-        self.widget.setGeometry(QtCore.QRect(0, 0, 700, 615))  # Set the position and size of the Widget
-
         self.ui.Main_QGrid.addWidget(self.widget, 0, 0)
 
-        # self.widget.horizontalHeader().setDefaultSectionSize(100)
-        self.widget.horizontalHeader().setMinimumSectionSize(100)
-        # self.widget.verticalHeader().setDefaultSectionSize(35)
-        self.widget.verticalHeader().setMinimumSectionSize(35)
-
         self.widget2 = Widget2(self.read_data2())
-        self.widget2.setFixedSize(320, 300)
-        self.widget2.setGeometry(QtCore.QRect(0, 0, 320, 300))  # Set the position and size of the Widget2
         self.ui.Main_QGrid.addWidget(self.widget2, 1, 2)
 
         ui_file.close()
 
+        # Event
         '''
         # Save 클릭시 Save ui로 전환
         '''
@@ -59,23 +46,20 @@ class MainWindow(QMainWindow):
         self.ui.Load_Button.clicked.connect(self.Load_Button)
         self.Load = Load()
 
-
-        # Event
         self.widget.clicked.connect(self.widget_clicked)
+
+        self.widget2.clicked.connect(self.widget_clicked2)
         # ----------------------------------------------------------------------------------------------
 
     def widget_clicked(self, event):
         selected_data = self.read_data()[event.row()]
         print(selected_data)
 
-    class Table_widget(QMainWindow):
-        def __init__(self, parent=None):
-            super().__init__(parent)
-
-
+    def widget_clicked2(self, event):
+        selected_data = self.read_data2()[event.row()]
+        print(selected_data)
 
     # ----------------------------------------------------------------------------------------------
-
 
     def Save_Button(self):
         self.hide()  # 메인 윈도우 숨김
@@ -84,7 +68,6 @@ class MainWindow(QMainWindow):
     def Load_Button(self):
         self.hide()  # 메인 윈도우 숨김
         self.Load.ui.show()
-
 
     @staticmethod
     def read_data():
@@ -112,10 +95,7 @@ class MainWindow(QMainWindow):
         ]
         return data
 
-# ----------------------------------------------------------------------------------------------
-
-# ----------------------------------------------------------------------------------------------
-
+    # ----------------------------------------------------------------------------------------------
     @staticmethod
     def read_data2():
         data = [
@@ -128,7 +108,6 @@ class MainWindow(QMainWindow):
         return data
 
 
-
 # ----------------------------------------------------------------------------------------------
 def main():
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
@@ -139,8 +118,6 @@ def main():
     myapp = MainWindow()
     myapp.ui.show()
     sys.exit(app.exec_())
-
-
 
 
 # ----------------------------------------------------------------------------------------------

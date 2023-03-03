@@ -21,11 +21,19 @@ class Login(QtWidgets.QMainWindow):
 
         self.ui.Login_Button.clicked.connect(self.login_button_clicked)
 
+        self.ui.Auto_Login_Check.stateChanged.connect(self.Auto_login_check)
 # ----------------------------------------------------------------------------------------------
 
     def login_button_clicked(self):
         self.ui.hide()
         self.main_window.ui.show()
+
+    @staticmethod
+    def Auto_login_check(state):
+        if state == QtCore.Qt.Checked:
+            print('체크박스 선택됨')
+        else:
+            print('체크박스 선택 안됨')
 
 # ----------------------------------------------------------------------------------------------
 def main():

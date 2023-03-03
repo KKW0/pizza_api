@@ -205,12 +205,12 @@ class Auth_br:
 
 def main():
     test = Auth_br()
-    # test.access_setting()
+    test.access_setting()
     # test.connect_host("http://192.168.3.116/api")
     # test.log_in("pipeline@rapa.org", "netflixacademy")
     # test.log_out()
     # test.load_setting()
-    test.reset_setting()
+    # test.reset_setting()
 
 
 if __name__ == "__main__":

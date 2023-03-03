@@ -70,12 +70,12 @@ class Pizza_logger:
 
         """
 
-        self._host = None
-        self._user = None
-        self._user_id = None
-        self._user_pw = None
-        self._valid_host = False
-        self._valid_user = False
+        # self._host = None
+        # self._user = None
+        # self._user_id = None
+        # self._user_pw = None
+        # self._valid_host = False
+        # self._valid_user = False
         self.log = None
 
         # dir_path = os.path.expanduser('~/.config/pizza/')
@@ -164,8 +164,8 @@ class Pizza_logger:
 def main():
     test = Pizza_logger()
     test.set_logger()
-    # test.connect_log
-    # test.enter_log
+    # test.connect_log()
+    # test.enter_log()
     # test.create_working_file_log()
     # test.load_output_file_log()
 

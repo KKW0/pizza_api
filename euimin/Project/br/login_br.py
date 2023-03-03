@@ -118,10 +118,10 @@ class Auth_br:
 
         """
 
-        gazu.log_out()
+        # gazu.log_out()
         self._user = None
         self.reset_setting()
-        return True
+        # return True
 
     def access_setting(self):
         """
@@ -159,7 +159,7 @@ class Auth_br:
             OSError : OS 오류로 인해 user.json 파일을 열 수 없는 경우
 
         """
-        user_dict = {}
+        # user_dict = {}
         with open(self.user_path, 'r') as json_file:
             user_dict = json.load(json_file)
 
@@ -200,19 +200,20 @@ class Auth_br:
         self._user_pw = ''
         self._valid_host = False
         self._valid_user = False
+        self.save_setting()
+
 
 def main():
     test = Auth_br()
+    # test.access_setting()
     # test.connect_host("http://192.168.3.116/api")
     # test.log_in("pipeline@rapa.org", "netflixacademy")
     # test.log_out()
-    # test.access_setting()
-    test.load_setting()
-    # test.save_setting()
-    # test.reset_setting()
+    # test.load_setting()
+    test.reset_setting()
 
 
 if __name__ == "__main__":
     main()
 
-# 출처 : Mola에 Molo의 SY
+# 출처 : Mola Molo SY

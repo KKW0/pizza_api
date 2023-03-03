@@ -105,6 +105,9 @@ color: white;</string>
            <height>150</height>
           </size>
          </property>
+         <property name="layoutDirection">
+          <enum>Qt::RightToLeft</enum>
+         </property>
          <property name="styleSheet">
           <string notr="true">background-color: rgb(51, 51, 51);
 color: white;</string>

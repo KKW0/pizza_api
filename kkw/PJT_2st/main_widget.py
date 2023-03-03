@@ -17,19 +17,20 @@ class Widget(QTableView):
         # QTableView Headers
         self.horizontal_header = self.horizontalHeader()
         self.vertical_header = self.verticalHeader()
-        self.horizontal_header.setSectionResizeMode(
-            QHeaderView.ResizeToContents
-        )
-        self.vertical_header.setSectionResizeMode(
-            QHeaderView.ResizeToContents
-        )
+
+        self.setColumnWidth(3, 200)
+        # self.horizontal_header.setSectionResizeMode(
+        #     QHeaderView.ResizeToContents
+        # )
+        # self.vertical_header.setSectionResizeMode(
+        #     QHeaderView.ResizeToContents
+        # )
         self.horizontal_header.setStretchLastSection(True)
-
-        size = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-
-        size.setHorizontalStretch(1)
-        self.setSizePolicy(size)
-
+        #
+        # size = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        #
+        # size.setHorizontalStretch(1)
+        # self.setSizePolicy(size)
 
 class Widget2(QWidget):
     def __init__(self, data):

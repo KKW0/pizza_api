@@ -9,7 +9,7 @@ from PySide2 import QtWidgets, QtCore, QtUiTools
 from PySide2.QtWidgets import QDialog, QHeaderView, QLineEdit, QTableView, QVBoxLayout, QMainWindow, QAction, QTableWidgetItem, QTableWidget
 from PySide2.QtGui import QStandardItemModel, QStandardItem
 
-from PySide2.QtWidgets import (QGridLayout, QSizePolicy, QWidget)
+from PySide2.QtWidgets import QApplication, QTableWidget, QTableWidgetItem
 
 from Save import Save
 from Load import Load
@@ -30,9 +30,15 @@ class MainWindow(QMainWindow):
         self.ui = loader.load(ui_file)
 
         self.widget = Widget(self.read_data())
-        self.widget.setFixedSize(600, 600)
-        self.widget.setGeometry(QtCore.QRect(0, 0, 600, 600))  # Set the position and size of the Widget
+        self.widget.setFixedSize(700, 615)
+        self.widget.setGeometry(QtCore.QRect(0, 0, 700, 615))  # Set the position and size of the Widget
+
         self.ui.Main_QGrid.addWidget(self.widget, 0, 0)
+
+        # self.widget.horizontalHeader().setDefaultSectionSize(100)
+        self.widget.horizontalHeader().setMinimumSectionSize(100)
+        # self.widget.verticalHeader().setDefaultSectionSize(35)
+        self.widget.verticalHeader().setMinimumSectionSize(35)
 
         self.widget2 = Widget2(self.read_data2())
         self.widget2.setFixedSize(320, 300)

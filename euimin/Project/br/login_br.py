@@ -4,6 +4,8 @@ import os
 import json
 import gazu
 
+# 출처 : Mola Molo SY
+
 
 class Auth_br:
     def __init__(self):
@@ -215,5 +217,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# 출처 : Mola Molo SY

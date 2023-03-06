@@ -15,7 +15,7 @@ class KitsuThings:
             shot(dict): 선택한 테스크가 속한 에셋에 캐스팅된 샷
         """
         padding_info = shot.get('nb_frames') - 1
-        if padding_info == False:
+        if padding_info is False:
             padding_info = 3
         padding = '_' + ('0' * padding_info) + '1'
 

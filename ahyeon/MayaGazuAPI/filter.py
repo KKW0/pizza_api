@@ -5,9 +5,6 @@ from thumbnail import thumbnail_control
 
 class Filter:
     def __init__(self):
-        gazu.client.set_host("http://192.168.3.116/api")
-        gazu.log_in("pipeline@rapa.org", "netflixacademy")
-
         self._task_type = gazu.task.get_task_type_by_name('Matchmove')
 
     def _get_information_dict(self, task):
@@ -67,7 +64,7 @@ class Filter:
             output_type(dict): 아웃풋 파일이 속한 아웃풋 타입
 
         Returns:
-
+            list: output file의 모델에서 필요한 정보들만 담은 리스트의 집합
         """
         info_list = []
         output_list = gazu.files.get_last_output_files_for_entity(shot, output_type, self._task_type)
@@ -86,6 +83,7 @@ class Filter:
 
         Args:
             task(dict): 선택한 task의 딕셔너리
+
         Returns:
             list(casting_info_list): 캐스팅된 에셋들의 정보를 담은 리스트의 집합
                                      (asset name, description, asset type name, nb_occurences)
@@ -115,7 +113,7 @@ class Filter:
 
     def _filter_info(self, proj_num=0, seq_num=0):
         """
-        유저가 필터링을 했는지 판별하여 해당하는 task들만 노출g하는 매서드
+        유저가 필터링을 했는지 판별하여 해당하는 task들만 노출하는 매서드
         유저가 클릭한 테스크의 dict를 task에 저장한다
 
         Args:
@@ -133,6 +131,7 @@ class Filter:
         double_filtered_task_info_list = []
         filtered_seq_set = []
 
+        # 프로젝트 이름 필터링
         if proj_num is 0:
             proj = proj_set
             return task_list, task_info_list
@@ -143,24 +142,25 @@ class Filter:
                     filtered_task_list.append(task)
                     filtered_task_info_list.append(task_info_list[index])
             for seq_name in seq_set:
-                if gazu.shot.get_sequence_by_name(proj, seq_name):
-                    filtered_seq_set.append(seq_name)
-                else:
+                try:
+                    gazu.shot.get_sequence_by_name(proj, seq_name)
+                except Exception as exc:
                     continue
+                filtered_seq_set.append(seq_name)
             seq_set = filtered_seq_set
 
+        # 프로젝트를 필터링할 시 시퀀스 이름으로도 필터링 가능
         if seq_num is 0:
             seq = seq_set
             return filtered_task_list, filtered_task_info_list
-        else:
-            seq = seq_set[seq_num-1]
-            for index, task in enumerate(filtered_task_list):
-                if filtered_task_info_list[index]['sequence_name'] is seq:
-                    double_filtered_task_list.append(task)
-                    double_filtered_task_info_list.append(filtered_task_info_list[index])
-                    return double_filtered_task_list, double_filtered_task_info_list
-                else:
-                    continue
+        seq = seq_set[seq_num-1]
+        for index, task in enumerate(filtered_task_list):
+            if filtered_task_info_list[index]['sequence_name'] is not seq:
+                continue
+            else:
+                double_filtered_task_list.append(task)
+                double_filtered_task_info_list.append(filtered_task_info_list[index])
+                return double_filtered_task_list, double_filtered_task_info_list
 
     def select_task(self, proj_num=0, seq_num=0, task_num=0):
         """
@@ -172,7 +172,7 @@ class Filter:
             task_num: 선택한 테스크의 인덱스 번호. 0은 All을 뜻한다
 
         Returns:
-
+            dict: 선택한 task의 딕셔너리
         """
         casting_info_list = None
         undi_info_list = None
@@ -194,8 +194,6 @@ class Filter:
         print('cam', camera_info_list)
 
         return task
-
-
 
 
 f = Filter()

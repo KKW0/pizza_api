@@ -6,7 +6,7 @@ from usemaya import MayaThings
 from publish import PublishThings
 
  
-class SetThings(object):
+class SetThings:
     def __init__(self):
         LogIn()
         self.filter = Filter()
@@ -46,11 +46,5 @@ class SetThings(object):
             # 폴더 트리에 working, output, preview 파일 저장하고 Kitsu에 업로드
 
 
-# def main():
-#     mm = SetThings()
-#     mm.project = "jeongtae"
-#     mm.run_program("This is like commit")
-#
-#
-# main()
-
+pr = SetThings()
+pr.run_program('my first test commit', 1, 1, 1)

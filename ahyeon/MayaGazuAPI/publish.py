@@ -92,7 +92,7 @@ class PublishThings:
             path(str): 파일명을 제외한 폴더 경로
         """
 
-        if os.path.exists(path) == False:
+        if os.path.exists(path) is False:
             os.makedirs(path)
         else:
             raise SystemError("폴더가 이미 존재합니다.")

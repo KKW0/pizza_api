@@ -1,7 +1,6 @@
 #coding:utf8
 
 import gazu
-# from PySide2 import QtGui, QtWidgets
 
 """
 Kitsu에 로그인 후 task entity의 메인 프리뷰의 url을 구하고,
@@ -10,6 +9,15 @@ Kitsu에 로그인 후 task entity의 메인 프리뷰의 url을 구하고,
 
 
 def _get_thumbnail(preview):
+    """
+    Kitsu에서 썸네일 데이터를 받아오는 매서드
+
+    Args:
+        preview:
+
+    Returns:
+
+    """
     # Load image from URL
     url = gazu.files.get_preview_file_url(preview)
     data = gazu.client.get_file_data_from_url(url)

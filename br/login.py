@@ -1,22 +1,44 @@
 #coding:utf-8
-from logger_br import Pizza_logger
 import os
 import json
 import gazu
+from logger import PizzaLogger
 
 
-class Auth_br:
+class PizzaLogin:
     def __init__(self):
+        """
+
+        Attributes:
+            - _host (str): 사용자가 연결된 호스트의 URL입니다.
+            - _user (dict): 로그인한 사용자에 대한 정보가 들어 있는 사전입니다.
+            - _user_id (str): 로그인한 사용자의 ID입니다.
+            - _user_pw (str): 로그인한 사용자의 암호입니다.
+            - _valid_host (bool): 호스트에 대한 연결이 유효한지 여부를 나타내는 플래그입니다.
+            - _valid_user (bool): 로그인 자격 증명이 유효한지 여부를 나타내는 플래그입니다.
+            - dir_path (str): 로그 파일이 저장될 디렉터리의 경로입니다.
+            - user_path (str): 사용자의 인증 정보가 저장된 JSON 파일의 경로입니다.
+
+        Methods:
+            - __init__(): Login 개체를 초기화합니다.
+            - connect_host(try_host): 지정한 호스트에 연결하고 그에 따라 _host 및 _valid_host 특성을 설정합니다.
+            - log_in(try_id, try_pw): 지정된 사용자 ID와 암호를 사용하여 현재 연결된 호스트에 로그인하고, 그에 따라 _user, _user_id, _user_pw 및 _valid_user 특성을 설정합니다.
+            - log_out(): 현재 로그인한 사용자를 로그아웃합니다.
+            - access_setting(): 사용자 구성 디렉터리 및 user.json 파일이 있는지 확인하고 없으면 생성합니다.
+            - load_setting(): user.json 파일에서 사용자 설정을 로드하고 그에 따라 _host, _user, _user_id 및 _user_pw 특성을 설정합니다.
+            - save_setting(): 현재 사용자 설정을 user.json 파일에 저장합니다.
+            - reset_setting(): 현재 사용자 설정을 기본값으로 재설정합니다.
+
+        """
         self._host = None
         self._user = None
         self._user_id = None
         self._user_pw = None
         self._valid_host = False
         self._valid_user = False
-        self.logging = Pizza_logger()
+        self.logging = PizzaLogger()
         self.dir_path = os.path.expanduser('~/.config/pizza/')
         self.user_path = os.path.join(self.dir_path, 'user.json')
-
 
     @property
     def valid_host(self):
@@ -27,7 +49,6 @@ class Auth_br:
         """
         return self._valid_host
 
-
     @property
     def valid_user(self):
         """
@@ -36,7 +57,6 @@ class Auth_br:
 
         """
         return self._valid_user
-
 
     @property
     def host(self):
@@ -47,7 +67,6 @@ class Auth_br:
         """
         return self._host
 
-
     @property
     def user(self):
         """
@@ -57,7 +76,6 @@ class Auth_br:
 
         """
         return self._user
-
 
     def connect_host(self, try_host):
         """
@@ -72,8 +90,10 @@ class Auth_br:
             ValueError: 호스트 URL이 잘못된 경우.
 
         """
+        # kw ui text box 가져오기
         gazu.set_host(try_host)
         if not gazu.client.host_is_valid():
+            self.logging.failed_log()
             raise ValueError('에러 메시지 : 호스트 URL이 잘못되었습니다.')
         self._host = gazu.get_host()
         self._valid_host = True
@@ -96,9 +116,7 @@ class Auth_br:
             ValueError: 호스트가 연결되어 있지 않은 경우
 
         """
-        # if not self._valid_host:
-        #     raise SystemError('에러 메시지 : 로그인할 호스트가 연결되어 있지 않습니다.')
-
+        # kw ui id, pw box 가져오기
         try:
             log_in = gazu.log_in(try_id, try_pw)
         except gazu.AuthFailedException:
@@ -121,9 +139,13 @@ class Auth_br:
             None
 
         """
-        gazu.log_out()
-        self._user = None
-        self.reset_setting()
+        if self._valid_user == True:
+            gazu.log_out()
+            self._user = None
+            self.reset_setting()
+        else:
+            raise ValueError("로그인부터 실행해 주세요.")
+        # return True
 
     def access_setting(self):
         """
@@ -160,14 +182,21 @@ class Auth_br:
             OSError : OS 오류로 인해 user.json 파일을 열 수 없는 경우
 
         """
-        user_dict = {}
+        # user_dict = {}
         with open(self.user_path, 'r') as json_file:
             user_dict = json.load(json_file)
 
         if user_dict.get('valid_host'):
             self.connect_host(user_dict.get('host'))
+        else:
+            self.logging.failed_log()
+            raise ValueError("에러입니다.")
         if user_dict.get('valid_user'):
             self.log_in(user_dict.get('user_id'), user_dict.get('user_pw'))
+        # raise 를 통해서 false 값일 경우 추가
+        else:
+            self.logging.failed_log()
+            raise ValueError("에러입니다.")
 
     def save_setting(self):
         """
@@ -199,5 +228,20 @@ class Auth_br:
         self._user_pw = ''
         self._valid_host = False
         self._valid_user = False
+        self.save_setting()
 
 
+def main():
+    test = PizzaLogin()
+    # test.access_setting()
+    # test.connect_host('http://192.168.3.116/api')
+    # test.log_in('pipeline@rapa.org', 'netflixacademy')
+    # test.load_setting()
+    # test.reset_setting()
+
+
+if __name__ == "__main__":
+    main()
+
+
+# 출처 : Mola Molo SY

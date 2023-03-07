@@ -1,56 +1,21 @@
 #coding:utf-8
 import os
-import json
-import gazu
 import logging
-# from login_br import Auth_br
-
-"""
-
-이 api는 인증 및 로깅 작업을 처리하는 Logger 클래스를 제공합니다.
-
-Logger 클래스를 사용하면 서버 호스트에 연결하고 사용자 ID와 암호로 로그인할 수 있습니다.
-이러한 설정을 로컬 디렉터리의 user.json 파일에 저장합니다.
-또한 작업 파일 생성 및 출력 파일 로드와 같은 응용 프로그램의 다양한 이벤트를 기록합니다.
-
-gazu 라이브러리를 사용하여 인증 및 원격 서버와의 통신을 처리합니다. 
-로깅 모듈을 사용하여 로그 메시지를 생성하고 파일에 기록합니다.
-
-"""
 
 
-class Pizza_logger:
+class PizzaLogger:
     """
 
-    위 클래스는 피자 응용 프로그램에 대한 로깅을 처리합니다.
+    class PizzaLogger는 로깅을 설정하고 관리하는 방법을 제공합니다.
+    호스트에 대한 성공적인 연결, 로그인 시도, 파일 생성 및 로드와 같은 응용 프로그램에서 사용할 수 있습니다.
+
 
     Attributes:
-    - dir_path (str): 로그 파일이 저장될 디렉터리의 경로입니다.
-    - user_path (str): 사용자의 인증 정보가 저장된 JSON 파일의 경로입니다.
     - logger (Logger): 인증 이벤트를 기록하는 Logger 클래스의 인스턴스.
-    - _host (str): 사용자가 연결된 호스트의 URL입니다.
-    - _user (dict): 로그인한 사용자에 대한 정보가 들어 있는 사전입니다.
-    - _user_id (str): 로그인한 사용자의 ID입니다.
-    - _user_pw (str): 로그인한 사용자의 암호입니다.
-    - _valid_host (bool): 호스트에 대한 연결이 유효한지 여부를 나타내는 플래그입니다.
-    - _valid_user (bool): 로그인 자격 증명이 유효한지 여부를 나타내는 플래그입니다.
     - log (logging.Logger): 메시지를 로깅하는 데 사용되는 로거 개체입니다.
-
-
 
     Methods:
     - __init__(): Logger 개체를 초기화합니다.
-    - valid_host(): _valid_host 특성의 값을 반환합니다.
-    - valid_user(): _valid_user 특성의 값을 반환합니다.
-    - host(): _host 특성의 값을 반환합니다.
-    - user(): _user 특성의 값을 반환합니다.
-    - connect_host(try_host): 지정한 호스트에 연결하고 그에 따라 _host 및 _valid_host 특성을 설정합니다.
-    - log_in(try_id, try_pw): 지정된 사용자 ID와 암호를 사용하여 현재 연결된 호스트에 로그인하고 그에 따라 _user, _user_id, _user_pw 및 _valid_user 특성을 설정합니다.
-    - log_out(): 현재 로그인한 사용자를 로그아웃합니다.
-    - access_setting(): 사용자 구성 디렉터리 및 user.json 파일이 있는지 확인하고 없으면 생성합니다.
-    - load_setting(): user.json 파일에서 사용자 설정을 로드하고 그에 따라 _host, _user, _user_id 및 _user_pw 특성을 설정합니다.
-    - save_setting(): 현재 사용자 설정을 user.json 파일에 저장합니다.
-    - reset_setting(): 현재 사용자 설정을 기본값으로 재설정합니다.
     - set_logger(): 로거 개체를 설정하고 여기에 핸들러를 추가합니다.
     - connect_log(host_url): 지정한 호스트에 대한 연결이 성공했음을 나타내는 메시지를 기록합니다.
     - enter_log(user_name): 지정한 이름의 사용자가 성공적으로 로그인했음을 나타내는 메시지를 기록합니다.
@@ -59,7 +24,7 @@ class Pizza_logger:
 
     """
 
-    def __init__(self, dir_path):
+    def __init__(self):
         """
 
         Logger 개체를 초기화합니다.
@@ -71,26 +36,15 @@ class Pizza_logger:
             ValueError: 디렉터리 생성이 실패할 경우
 
         """
-        self._host = None
-        self._user = None
-        self._user_id = None
-        self._user_pw = None
-        self._valid_host = False
-        self._valid_user = False
         self.log = None
-
         self.dir_path = os.path.expanduser('~/.config/pizza/')
         if not os.path.exists(self.dir_path):
             try:
                 os.makedirs(self.dir_path)
             except OSError:
-                raise ValueError("에러 메시지 : 디렉터리를 만들지 못했습니다.")
+                raise ValueError("에러 메시지: 디렉터리를 만들지 못했습니다.")
 
-        self.user_path = os.path.join(self.dir_path, 'user.json')
-
-        self.set_logger(dir_path)
-        # if self.access_setting():
-        #     self.load_setting()
+        self.set_logger()
 
     def set_logger(self):
         """
@@ -102,7 +56,7 @@ class Pizza_logger:
         self.log = logging.getLogger('pizza')
 
         if len(self.log.handlers) == 0:
-            formatter = logging.Formatter('%(asctime)s - %(levelname)s : %(message)s')
+            formatter = logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')
             self.log.setLevel(logging.DEBUG)
 
             stream_handler = logging.StreamHandler()
@@ -116,9 +70,9 @@ class Pizza_logger:
             self.log.addHandler(file_handler)
 
         # for i in range(10):
-            i = 1
-            self.log.info('{}번째 방문입니다.'.format(i))
-            i += 1
+        #     i = 1
+        #     self.log.info('{}번째 방문입니다.'.format(i))
+        #     i += 1
 
     def connect_log(self, host_url):
         """
@@ -127,7 +81,7 @@ class Pizza_logger:
 
         """
         if host_url:
-            self.log.debug("{}와 성공적 연결".format(host_url))
+            self.log.debug("{} 연결에 성공하였습니다.".format(host_url))
 
     def enter_log(self, user_name):
         """
@@ -136,7 +90,10 @@ class Pizza_logger:
 
         """
         if user_name:
-            self.log.debug("{}: 로그인 성공".format(user_name))
+            self.log.debug("{}: 로그인에 성공하였습니다.".format(user_name))
+
+    def failed_log(self):
+        self.log.debug("연결에 실패하였습니다.")
 
     def create_working_file_log(self, user_name, working_file):
         """
@@ -146,9 +103,9 @@ class Pizza_logger:
 
         """
         if os.path.exists(working_file):
-            self.log.debug("\"%s\" create maya file in \"%s\"" % (user_name, working_file))
+            self.log.debug("\"{}\" create maya file in \"{}\"".format(user_name, working_file))
         else:
-            self.log.warning("\"%s\" failed to create Maya file" % user_name)
+            self.log.warning("\"{}\" failed to create Maya file".format(user_name))
 
     def load_output_file_log(self, user_name, output_file_path):
         """
@@ -156,11 +113,11 @@ class Pizza_logger:
         파일을 로드한 사용자의 이름과 파일 경로와 함께 DEBUG 수준의 출력 파일 로드를 기록합니다.
 
         """
-        return self.log.debug("\"%s\" load output file from \"%s\"" % (user_name, output_file_path))
+        return self.log.debug("\"{}\" load output file from \"{}\"".format(user_name, output_file_path))
 
 
 def main():
-    test = Pizza_logger()
+    test = PizzaLogger()
     test.set_logger()
     # test.connect_log
     # test.enter_log

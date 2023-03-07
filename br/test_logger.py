@@ -1,21 +1,21 @@
-from unittest import TestCase
 import os
 import logging
-from logger import Pizza_logger
-from login import Auth_br
+from unittest import TestCase
+from logger import PizzaLogger
+from login import PizzaLogin
 
 
-class TestPizza_logger(TestCase):
+class TestPizzaLogger(TestCase):
     def setUp(self):
-        self.logger = Pizza_logger()
+        self.logger = PizzaLogger()
         self.user_path = './test_logs'
-        self.login = Auth_br()
+        self.login = PizzaLogin()
         self.login.connect_host('http://192.168.3.116/api')
         self.login.log_in('pipeline@rapa.org', 'netflixacademy')
 
     # def test_set_logger(self):
     #     self.dir_path = './test_logs'
-    #     self.logger = Pizza_logger(self.dir_path)
+    #     self.logger = PizzaLogger(self.dir_path)
     #     self.assertIsNotNone(self.logger.log.handlers)
     #
     # def test_connect_log(self):

@@ -1,11 +1,11 @@
 #coding:utf8
-from unittest import TestCase
-from login_br import Auth_br
-import json
 import os
+import json
+from unittest import TestCase
+from login import PizzaLogin
 
 
-class Testlogin_br(TestCase):
+class Testlogin(TestCase):
     def setUp(self):
         self.valid_url = 'http://192.168.3.116/api'
         self.valid_id = 'pipeline@rapa.org'
@@ -13,7 +13,7 @@ class Testlogin_br(TestCase):
         self.invalid_url = 'http://192.168.3.116'
         self.invalid_id = 'pipeline@rapa.or'
         self.invalid_pw = 'netflixacadem'
-        self.login = Auth_br()
+        self.login = PizzaLogin()
 
     def test_valid_host(self):
         self.assertEqual(self.login.valid_host, self.login._valid_host)

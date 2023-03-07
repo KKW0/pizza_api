@@ -1,7 +1,7 @@
 #coding:utf-8
 import os
-import json
-import gazu
+# import json
+# import gazu
 import logging
 
 """
@@ -70,15 +70,7 @@ class Pizza_logger:
 
         """
 
-        # self._host = None
-        # self._user = None
-        # self._user_id = None
-        # self._user_pw = None
-        # self._valid_host = False
-        # self._valid_user = False
         self.log = None
-
-        # dir_path = os.path.expanduser('~/.config/pizza/')
 
         self.dir_path = os.path.expanduser('~/.config/pizza/')
         if not os.path.exists(self.dir_path):
@@ -89,10 +81,6 @@ class Pizza_logger:
 
         self.set_logger()
 
-        # self.login = Auth_br()
-        # if self.login.access_setting():
-        #     self.login.load_setting()
-
     def set_logger(self):
         """
 
@@ -101,6 +89,7 @@ class Pizza_logger:
 
         """
         self.log = logging.getLogger('pizza')
+        # self.log.setLevel(logging.DEBUG)
 
         if len(self.log.handlers) == 0:
             formatter = logging.Formatter('%(asctime)s - %(levelname)s : %(message)s')

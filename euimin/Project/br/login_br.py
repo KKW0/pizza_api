@@ -120,9 +120,12 @@ class Auth_br:
 
         """
 
-        # gazu.log_out()
-        self._user = None
-        self.reset_setting()
+        if self._valid_user == True:
+            gazu.log_out()
+            self._user = None
+            self.reset_setting()
+        else:
+            raise ValueError("로그인 부터 실행해")
         # return True
 
     def access_setting(self):
@@ -167,8 +170,17 @@ class Auth_br:
 
         if user_dict.get('valid_host'):
             self.connect_host(user_dict.get('host'))
+        else:
+            self.logging.failed_log()
+            raise ValueError("에러에용")
+
         if user_dict.get('valid_user'):
             self.log_in(user_dict.get('user_id'), user_dict.get('user_pw'))
+        else:
+            self.logging.failed_log()
+            raise ValueError("Error")
+
+    # 레이즈를 통해서 false 값일 경우 추가
 
     def save_setting(self):
         """
@@ -207,9 +219,9 @@ class Auth_br:
 
 def main():
     test = Auth_br()
-    test.access_setting()
-    # test.connect_host("http://192.168.3.116/api")
-    # test.log_in("pipeline@rapa.org", "netflixacademy")
+    # test.access_setting()
+    test.connect_host("http://192.168.3.116/api")
+    test.log_in("pipeline@rapa.org", "netflixacademy")
     # test.log_out()
     # test.load_setting()
     # test.reset_setting()

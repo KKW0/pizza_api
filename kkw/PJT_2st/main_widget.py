@@ -1,5 +1,9 @@
-
+# coding=utf-8
 import sys
+
+from PySide2.QtGui import QFont, QColor, QBrush, QPen
+from PySide2.QtCore import Qt
+
 from PySide2.QtCore import QModelIndex
 from PySide2 import QtWidgets, QtCore, QtUiTools
 from PySide2.QtWidgets import QStyledItemDelegate, QStyleOptionViewItem
@@ -13,6 +17,23 @@ from table_model import CustomTableModel2
 class Widget(QTableView):
     def __init__(self, data):
         QTableView.__init__(self)
+
+        # myapp = Login.Login()
+        # myapp.ui.show()
+
+        font = QFont()
+        font.setFamily("Arial")
+        font.setPointSize(12)
+
+        self.setFont(font)
+
+        color = QColor(255, 255, 255)
+        # myapp.ui.setStyleSheet("color: {}".format(color.name()))
+
+        font.setBold(True)
+
+        self.horizontalHeader().setDefaultAlignment(Qt.AlignHCenter)
+        self.verticalHeader().setDefaultAlignment(Qt.AlignVCenter)
 
         self.model = CustomTableModel(data)
         self.setModel(self.model)
@@ -43,9 +64,15 @@ class Widget2(QTableView):
         self.model = CustomTableModel2(data)
         self.setModel(self.model)
 
+        font = QFont()
+        font.setFamily("Arial")
+        font.setPointSize(12)
+
+        self.setFont(font)
+
         # Creating a QTableView
-        self.table_view = QTableView()
-        self.table_view.setModel(self.model)
+        # self.table_view = QTableView()
+        # self.setModel(self.model)
 
         self.setFixedSize(320, 300)
 

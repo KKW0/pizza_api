@@ -1,11 +1,11 @@
-
+# coding=utf-8
 import os
 import sys
 from PySide2 import QtWidgets, QtCore, QtUiTools
 
 class Save(QtWidgets.QMainWindow):
     def __init__(self):
-        super().__init__()
+        super(Save, self).__init__()
 
         self.save = None
         self.user_list_start = None

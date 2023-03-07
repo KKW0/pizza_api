@@ -1,4 +1,4 @@
-
+# coding=utf-8
 import os
 import sys
 from PySide2 import QtWidgets, QtCore, QtUiTools
@@ -7,7 +7,7 @@ from Maya_Api import MainWindow
 
 class Login(QtWidgets.QMainWindow):
     def __init__(self):
-        super().__init__()
+        super(Login, self).__init__()
         # 2.7 버전 슈퍼 사용방법 super(Login, self).__init__()
         self.main_window = MainWindow()
         self.Login = None

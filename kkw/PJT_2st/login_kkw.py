@@ -6,105 +6,106 @@ import os
 import json
 import gazu
 
+
 class Auth_br(object):
     def __init__(self):
-        # self._host = None
-        # self._user = None
-        # self._user_id = None
-        # self._user_pw = None
-        # self._valid_host = False
-        # self._valid_user = False
-        # self._auto_login = False
-        self.host = None
-        self.user = None
-        self.user_id = None
-        self.user_pw = None
-        self.valid_host = False
-        self.valid_user = False
-        self.auto_login = False
+        self._host = None
+        self._user = None
+        self._user_id = None
+        self._user_pw = None
+        self._valid_host = False
+        self._valid_user = False
+        self._auto_login = False
+        # self.host = None
+        # self.user = None
+        # self.user_id = None
+        # self.user_pw = None
+        # self.valid_host = False
+        # self.valid_user = False
+        # self.auto_login = False
 
         self.logging = Pizza_logger()
         self.dir_path = os.path.expanduser('~/.config/pizza/')
         self.user_path = os.path.join(self.dir_path, 'user.json')
 
-    # @property
-    # def valid_host(self):
-    #     """
-    #
-    #     현재 호스트 연결의 유효성을 반환하는 속성입니다.
-    #
-    #     """
-    #     return self._valid_host
-    #
-    # @valid_host.setter
-    # def valid_host(self, value):
-    #     self._valid_host = value
-    #
-    # @property
-    # def valid_user(self):
-    #     """
-    #
-    #     현재 사용자 로그인의 유효성을 반환하는 속성입니다.
-    #
-    #     """
-    #     return self._valid_user
-    #
-    # @valid_user.setter
-    # def valid_user(self, value):
-    #     self._valid_user = value
-    #
-    # @property
-    # def host(self):
-    #     """
-    #
-    #     현재 호스트의 URL을 반환하는 속성입니다.
-    #
-    #     """
-    #     return self._host
-    #
-    # @host.setter
-    # def host(self, value):
-    #     self._host = value
-    #
-    # @property
-    # def user(self):
-    #     """
-    #
-    #     Returns:
-    #         현재 로그인한 사용자의 사용자 사전을 반환합니다.
-    #
-    #     """
-    #     return self._user
-    #
-    # @user.setter
-    # def user(self, value):
-    #     self._user = value
-    #
-    # @property
-    # def user_id(self):
-    #     return self._user_id
-    #
-    # @user_id.setter
-    # def user_id(self, value):
-    #     self._user_id = value
-    #
-    # @property
-    # def user_pw(self):
-    #     return self._user_pw
-    #
-    # @user_pw.setter
-    # def user_pw(self, value):
-    #     self._user_pw = value
-    #
-    # @property
-    # def auto_login(self):
-    #     return self._auto_login
-    #
-    # @auto_login.setter
-    # def auto_login(self, value):
-    #     self._auto_login = value
+    @property
+    def valid_host(self):
+        """
 
-    def connect_host(self, host):
+        현재 호스트 연결의 유효성을 반환하는 속성입니다.
+
+        """
+        return self._valid_host
+
+    @valid_host.setter
+    def valid_host(self, value):
+        self._valid_host = value
+
+    @property
+    def valid_user(self):
+        """
+
+        현재 사용자 로그인의 유효성을 반환하는 속성입니다.
+
+        """
+        return self._valid_user
+
+    @valid_user.setter
+    def valid_user(self, value):
+        self._valid_user = value
+
+    @property
+    def host(self):
+        """
+
+        현재 호스트의 URL을 반환하는 속성입니다.
+
+        """
+        return self._host
+
+    @host.setter
+    def host(self, value):
+        self._host = value
+
+    @property
+    def user(self):
+        """
+
+        Returns:
+            현재 로그인한 사용자의 사용자 사전을 반환합니다.
+
+        """
+        return self._user
+
+    @user.setter
+    def user(self, value):
+        self._user = value
+
+    @property
+    def user_id(self):
+        return self._user_id
+
+    @user_id.setter
+    def user_id(self, value):
+        self._user_id = value
+
+    @property
+    def user_pw(self):
+        return self._user_pw
+
+    @user_pw.setter
+    def user_pw(self, value):
+        self._user_pw = value
+
+    @property
+    def auto_login(self):
+        return self._auto_login
+
+    @auto_login.setter
+    def auto_login(self, value):
+        self._auto_login = value
+
+    def connect_host(self):
         """
 
         지정된 호스트 URL에 연결을 시도하고 인증 설정에 저장합니다.
@@ -119,17 +120,17 @@ class Auth_br(object):
         """
 
         # self.ui.text = self.text_edit.toPlainText()
-        gazu.set_host(host)
+        gazu.set_host(self.host)
         if not gazu.client.host_is_valid():
             self.logging.failed_log()
             raise ValueError('에러 메시지 : 호스트 URL이 잘못되었습니다.')
         # self._host = gazu.get_host()
         self.valid_host = True
         # self.save_setting()
-        self.logging.connect_log(host)
+        self.logging.connect_log(self.host)
         return True
 
-    def log_in(self, host, user_id, user_pw, auto_login):
+    def log_in(self):
         """
 
         제공된 사용자 ID와 암호로 사용자를 로그인합니다.
@@ -148,14 +149,17 @@ class Auth_br(object):
         # self.ui.id = self.text_edit.toPlainText()
         # self.ui.pw = self.text_edit.toPlainText()
 
+        print(self.user_id, self.user_pw)
+
         try:
-            log_in = gazu.log_in(user_id, user_pw)
+            log_in = gazu.log_in(self.user_id, self.user_pw)
         except gazu.AuthFailedException:
             self.logging.failed_log()
             raise ValueError('에러 메시지 : 사용자 ID 또는 암호가 잘못 입력되었습니다.')
 
-        self._user = log_in['user']
-        self.save_setting(host, user_id, user_pw, True, True, auto_login)
+        # self._user = log_in['user']
+        self.valid_user = True
+        self.save_setting()
         # self.logging.enter_log(self.user["full_name"])
         return True
 
@@ -168,9 +172,9 @@ class Auth_br(object):
             None
 
         """
-        if self._valid_user == True:
+        if self.valid_user == True:
             gazu.log_out()
-            self._user = None
+            self.user = None # 사용하지 않는 듯, 확인 필요!!
             self.reset_setting()
         else:
             raise ValueError("로그인 부터 실행해")
@@ -213,8 +217,9 @@ class Auth_br(object):
 
         """
         user_dict = {}
-        with open(self.user_path, 'r') as json_file:
-            user_dict = json.load(json_file)
+        if os.path.exists(self.user_path):
+            with open(self.user_path, 'r') as json_file:
+                user_dict = json.load(json_file)
         return user_dict
         # if user_dict['valid_host']:
         #     self.connect_host()
@@ -231,7 +236,7 @@ class Auth_br(object):
     # 레이즈를 통해서 false 값일 경우 추가
 
 
-    def save_setting(self, host, user_id, user_pw, valid_host, valid_user, auto_login):
+    def save_setting(self):
         """
 
         현재 인증 설정을 user.json 파일에 저장합니다.
@@ -242,12 +247,12 @@ class Auth_br(object):
         """
 
         user_dict = {
-            'host': host,
-            'user_id': user_id,
-            'user_pw': user_pw,
-            'valid_host': valid_host,
-            'valid_user': valid_user,
-            'auto_login': auto_login
+            'host': self.host,
+            'user_id': self.user_id,
+            'user_pw': self.user_pw,
+            'valid_host': self.valid_host,
+            'valid_user': self.valid_user,
+            'auto_login': self.auto_login
         }
         with open(self.user_path, 'w') as json_file:
             json.dump(user_dict, json_file)
@@ -259,18 +264,18 @@ class Auth_br(object):
 
         """
 
-        self._host = ''
-        self._user_id = ''
-        self._user_pw = ''
-        self._valid_host = False
-        self._valid_user = False
-        self._auto_login = False
+        self.host = ''
+        self.user_id = ''
+        self.user_pw = ''
+        self.valid_host = False
+        self.valid_user = False
+        self.auto_login = False
 
-        # self.save_setting()
+        self.save_setting()
 
 
 def main():
-    test = Auth_br()
+    auth = Auth_br()
     # test.access_setting()
     # test.connect_host("http://192.168.3.116/api")
     # test.log_in("pipeline@rapa.org", "netflixacademy")

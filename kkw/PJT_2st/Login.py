@@ -34,11 +34,11 @@ class Login(QtWidgets.QMainWindow):
 
     def login_button_clicked(self):
         self.login.host = self.Host_Box.text()
-        self.login.id = self.ID_Box.text()
-        self.login.pw = self.PW_Box.text()
+        self.login.user_id = self.ID_Box.text()
+        self.login.user_pw = self.PW_Box.text()
         self.login.auto_login = self.ui.Auto_Login_Check.isChecked()
 
-        if self.login.connect_host(self.login.host) and self.login.log_in(self.login.host, self.login.id, self.login.pw, self.login.auto_login):
+        if self.login.connect_host() and self.login.log_in():
             self.ui.hide()
             self.main_window.ui.show()
 

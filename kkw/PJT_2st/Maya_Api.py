@@ -3,15 +3,19 @@
 import os
 import sys
 
+
 from Save import Save
 from Load import Load
 from main_widget import Widget
 from main_widget import Widget2
 from table_model import CustomTableModel
+from table_model import CustomTableModel2
 from PySide2 import QtWidgets, QtCore, QtUiTools
 from PySide2.QtGui import QStandardItemModel, QStandardItem
 from PySide2.QtWidgets import QDialog, QHeaderView, QLineEdit, QTableView, QVBoxLayout, QMainWindow, QAction, \
     QTableWidgetItem, QTableWidget
+
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -25,7 +29,7 @@ class MainWindow(QMainWindow):
         self.ui = loader.load(ui_file)
 
         self.widget = Widget(self.read_data())
-        self.ui.Main_QGrid.addWidget(self.widget, 0, 0)
+        self.ui.Main_QGrid.addWidget(self.widget, 1, 0)
 
         self.widget2 = Widget2(self.read_data2())
         self.ui.Main_QGrid.addWidget(self.widget2, 1, 2)
@@ -45,18 +49,12 @@ class MainWindow(QMainWindow):
         self.ui.Load_Button.clicked.connect(self.Load_Button)
         self.Load = Load()
 
+        # self.ui.LogOut_Button.clicked.connect(self.LogOut_Button)
+
         self.widget.clicked.connect(self.widget_clicked)
 
         self.widget2.clicked.connect(self.widget_clicked2)
-        # ----------------------------------------------------------------------------------------------
 
-    def widget_clicked(self, event):
-        selected_data = self.read_data()[event.row()]
-        print(selected_data)
-
-    def widget_clicked2(self, event):
-        selected_data = self.read_data2()[event.row()]
-        print(selected_data)
 
     # ----------------------------------------------------------------------------------------------
 
@@ -67,6 +65,19 @@ class MainWindow(QMainWindow):
     def Load_Button(self):
         self.hide()  # 메인 윈도우 숨김
         self.Load.ui.show()
+
+    # def LogOut_Button(self):
+    #     self.hide()
+    #     self.Login.ui.show()
+    # ----------------------------------------------------------------------------------------------
+
+    def widget_clicked(self, event):
+        selected_data = self.read_data()[event.row()]
+        print(selected_data)
+
+    def widget_clicked2(self, event):
+        selected_data = self.read_data2()[event.row()]
+        print(selected_data)
 
     @staticmethod
     def read_data():

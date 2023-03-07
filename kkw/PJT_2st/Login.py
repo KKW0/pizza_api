@@ -10,6 +10,7 @@ from PySide2 import QtWidgets, QtCore, QtUiTools
 class Login(QtWidgets.QMainWindow):
     def __init__(self):
         super(Login, self).__init__()
+
         self.main_window = MainWindow()
         self.Login = None
         self.user_list_start = None
@@ -31,6 +32,7 @@ class Login(QtWidgets.QMainWindow):
         if value and value['auto_login'] and value['valid_host'] and value['valid_user']:
             self.ui.hide()
             self.main_window.ui.show()
+
 
     def login_button_clicked(self):
         self.login.host = self.Host_Box.text()

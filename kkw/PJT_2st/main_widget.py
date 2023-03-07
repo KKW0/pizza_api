@@ -18,7 +18,7 @@ class Widget(QTableView):
 
         font = QFont()
         font.setFamily("Arial")
-        font.setPointSize(12)
+        font.setPointSize(10)
 
         self.setFont(font)
 
@@ -33,20 +33,20 @@ class Widget(QTableView):
         self.model = CustomTableModel(data)
         self.setModel(self.model)
 
-        self.setFixedSize(400, 400)
+        self.setFixedSize(400, 500)
 
         # QTableView Headers
         self.horizontal_header = self.horizontalHeader()
         self.vertical_header = self.verticalHeader()
 
-        self.horizontalHeader().setMinimumSectionSize(50)
+        self.horizontalHeader().setMinimumSectionSize(35)
         self.verticalHeader().setMinimumSectionSize(35)
 
         # self.setColumnWidth(3, 200)
 
         self.horizontal_header.setStretchLastSection(True)
 
-        self.setGeometry(QtCore.QRect(0, 0, 400, 400))  # Set the position and size of the Widget
+        self.setGeometry(QtCore.QRect(0, 0, 400, 500))  # Set the position and size of the Widget
         self.setStyleSheet("background-color: #353535; selection-background-color: gray;")
 
 class Widget2(QTableView):
@@ -63,14 +63,19 @@ class Widget2(QTableView):
 
         self.setFont(font)
 
-        self.setFixedSize(600, 300)
+        self.setFixedSize(650, 760)
 
         # QTableView Headers
         self.horizontal_header = self.horizontalHeader()
         self.vertical_header = self.verticalHeader()
 
+        self.horizontalHeader().setMinimumSectionSize(100)
+        self.verticalHeader().setMinimumSectionSize(100)
+
+        # self.setColumnWidth(3, 200)
+
         self.horizontal_header.setStretchLastSection(True)
 
-        self.setGeometry(QtCore.QRect(0, 0, 600, 300))  # Set the position and size of the Widget2
+        self.setGeometry(QtCore.QRect(0, 2, 650, 760))  # Set the position and size of the Widget2
         self.setStyleSheet("background-color: #353535; selection-background-color: gray;")
 

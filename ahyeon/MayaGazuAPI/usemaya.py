@@ -2,7 +2,6 @@
 import os
 import gazu
 import maya.cmds as mc
-import pymel.core as pm
 from usekitsu import KitsuThings
 
 
@@ -149,7 +148,7 @@ class MayaThings:
         # 시퀀스 프리뷰 카메라 생성
         mc.setAttr("%s.rotateX" % cam[0], -35)
         mc.lookThru(cam[0])
-        pm.viewFit(cam[1], all=True)
+        mc.viewFit(cam[1], all=True)
         # 35도 all frame view 만들기
         group_name = '%s_GRP' % cam[0]
         cam_group = mc.group(em=1, n=group_name)

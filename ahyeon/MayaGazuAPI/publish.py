@@ -5,32 +5,39 @@ from usemaya import MayaThings
 
  
 class PublishThings:
+    """
+    작업한 결과물을 실제 폴더에 저장하고, Kitsu에 퍼블리시하는 클래스
+    """
     def __init__(self):
+        """
+        모듈의 인스턴스를 생성하고, 전역변수를 정의한다.
+        """
         self.maya = MayaThings()
         self._software = None
 
     def publish_file_data(self, task, comment):
         """
         Kitsu에 task에 대한 working file, output file 모델을 생성하는 매서드
-        Kitsu에 워킹 파일과 아웃풋 파일에 대한 정보를 먼저 기록한 뒤,
-        폴더를 생성하기 위한 path를 build 한다.
-        Layout 팀에서는 working file이 하나, output file도 하나 나오기 때문에,
-        파일은 revision만 올라가고 여러개가 나오지 않는다.
+
+        Kitsu에 워킹 파일과 아웃풋 파일에 대한 모델을 생성하고,
+        작업 결과물을 저장할 폴더 path를 build 한다. 이 path는 return으로 넘겨 실제 폴더 생성까지 이어진다.
+        Layout 팀에서는 working file이 하나(.ma), output file도 하나(.mb) 나오기 때문에,
+        각 파일은 revision만 올라가며, 여러 모델이 나오지 않는다.
 
         Args:
             task(dict): 선택한 테스크의 딕셔너리
-            comment(str): working file, output file에 대한 comment
+            comment(str): 퍼블리시할 working file, output file에 대한 comment
 
         Returns:
-            dict(output_file): Kitsu에 퍼블리싱한 output file의 딕셔너리
+            dict(output_file): Kitsu에 퍼블리시한 output file의 딕셔너리
             str(output_path): output file이 저장된 경로(확장자 제외)
-            dict(working_file): Kitsu에 퍼블리싱한 working file의 딕셔너리
+            dict(working_file): Kitsu에 퍼블리시한 working file의 딕셔너리
             str(working_path): working file이 저장된 경로(확장자 제외)
         """
-        # working file 생성
+        # working file 모델 생성
         working_file_list = gazu.files.get_working_files_for_task(task['id'])
         if working_file_list is []:
-            # working file 없으면 새로 생성
+            # task가 주어진 에셋에 working file 모델이 없으면 새로 생성
             self._software = gazu.files.get_software_by_name('Maya')
             working_file = gazu.files.new_working_file(task['id'],
                                                        software=self._software['id'],
@@ -46,13 +53,13 @@ class PublishThings:
                                                        comment=comment,
                                                        person=gazu.client.get_current_user())
 
-        # output file 생성
+        # output file 모델 생성
         output_type = gazu.files.get_output_type_by_name('Layout_mb')
         output_file_list = gazu.files.get_last_output_files_for_entity(task['entity_id'],
                                                                        output_type=output_type,
                                                                        task_type=task['task_type_id'])
         if output_file_list is []:
-            # 샷에 Layout_mb 타입의 output file이 없으면 새로 생성
+            # task가 주어진 에셋에 Layout_mb 타입의 output file이 없으면 새로 생성
             output_file = gazu.files.new_entity_output_file(task['entity_id'],
                                                             output_type['id'],
                                                             task['task_type_id'],
@@ -61,7 +68,7 @@ class PublishThings:
                                                             person=gazu.client.get_current_user(),
                                                             representation='mb')
         else:
-            # 샷에 Layout_mb 타입의 output file이 이미 있으면 정보 계승함
+            # Layout_mb 타입의 output file이 이미 있으면 정보 계승함
             old_output = output_file_list[0]
             output_type = old_output['output_type_id']
             output_file = gazu.files.new_entity_output_file(task['entity_id'],
@@ -72,7 +79,7 @@ class PublishThings:
                                                             person=gazu.client.get_current_user(),
                                                             representation=old_output['representation'])
 
-        # 마야에서 작업한 시퀀스를 저장하기 위해 폴더 패스 build
+        # 마야에서 작업한 에셋을 저장하기 위한 폴더 패스 build
         working_path = gazu.files.build_working_file_path(task['id'], revision=working_file['revision'])
         output_path = gazu.files.build_entity_output_file_path(task['entity_id'],
                                                                output_type,
@@ -84,8 +91,8 @@ class PublishThings:
 
     def _make_folder_tree(self, path):
         """
-        working file, output file을 save/export 하기 위한 실제 폴더를
-        생성하는 매서드
+        working file, output file을 save/export 하기 위한 실제 폴더를 생성하는 매서드
+
         폴더가 이미 있으면 생성하지 않는다.
 
         Args:
@@ -100,7 +107,11 @@ class PublishThings:
     def _upload_files(self, task, path, file_type, comment=None):
         """
         작업한 working file과 task에 대한 preview file을 Kitsu에 업로드하는 매서드
-        output 파일에 대한 preview 모델을 생성한 뒤, 저장해둔 .mov 형식의 preview 파일을 업로드한다.
+
+        저장할 파일이 working file인지, preview file인지 먼저 판단한다.
+        path에 working 이라는 폴더명이 포함되어 있으면 working file,
+        output 이라는 폴더명이 포함되어 있으면 preview file이다.
+        output 파일에 대한 preview 모델을 생성한 뒤, 저장한 .mov 형식의 preview를 Kitsu에 업로드한다.
 
         Args:
             task(dict): 선택한 task의 딕셔너리

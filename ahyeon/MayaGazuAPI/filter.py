@@ -195,8 +195,31 @@ class Filter:
 
         return task
 
+    def select_shot(self, shot_list, shot_num):
+        """
+        에셋 목록 중 선택한 샷에 캐스팅된 에셋, 언디스토션 이미지, 카메라만 노출하도록 하는 매서드
 
-f = Filter()
-f.select_task()
+        Args:
+            shot_list: 시퀀스에 속한 모든 샷 딕셔너리의 집합
+            shot_num: 작업할 샷의 인덱스 번호
 
+        Returns:
+            dict: 선택한 task의 딕셔너리
+        """
+        undi_info_list = []
+        camera_info_list = []
+        casting_info_list = []
+        shot = shot_list[shot_num]
+        all_casts = gazu.casting.get_shot_casting(shot)
+        all_casting_list = all_casts.values()
+        for casting_list in all_casting_list:
+            for cast in casting_list:
+                asset = gazu.asset.get_asset(cast['asset_id'])
+                casting_info_list.append([cast['asset_name'], asset['description'],
+                                          cast['asset_type_name'], cast['nb_occurences']])
+        undi_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Undistortion_img')))
+        camera_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Camera')))
 
+        print('cast', casting_info_list)
+        print('undi', undi_info_list)
+        print('cam', camera_info_list)

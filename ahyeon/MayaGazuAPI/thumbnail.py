@@ -44,19 +44,3 @@ def thumbnail_control(task, task_num, task_type, casting_info_list, undi_info_li
             task_for_shot = gazu.task.get_task_by_entity(shot, task_type)
             preview = gazu.files.get_preview_file(task_for_shot['entity_preview_file_id'])
             undi_thumbnail_list.append(_get_thumbnail(preview))
-
-
-# # Create application
-# app = QtWidgets.QApplication.instance(sys.argv)
-#
-# # Create pixmap from image data
-# pixmap = QtGui.QPixmap()
-# pixmap.loadFromData(data)
-#
-# # Create label to display image
-# label = QtWidgets.QLabel()
-# label.setPixmap(pixmap)
-# label.show()
-#
-# # Run application event loop
-# sys.exit(app.exec_())

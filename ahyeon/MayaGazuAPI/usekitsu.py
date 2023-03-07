@@ -57,6 +57,8 @@ class KitsuThings:
         """
         task 에셋에 캐스팅된 에셋들의 최신 output file들의 패스 리스트를 추출하는 매서드
 
+        캐스팅된 에셋 하나에 아웃풋 파일이 여러개일 경우를 가정한다.
+
         Args:
             casting(dict): task에 캐스팅된 에셋의 간략한 정보가 담긴 dict
 

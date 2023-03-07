@@ -105,7 +105,7 @@ color: white;</string>
 color: white;</string>
       </property>
       <property name="text">
-       <string>Host :</string>
+       <string>Host</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -152,7 +152,7 @@ color: white;</string>
      </widget>
     </item>
     <item row="3" column="3" colspan="2">
-     <widget class="QLineEdit" name="Name_Box">
+     <widget class="QLineEdit" name="Host_Box">
       <property name="maximumSize">
        <size>
         <width>300</width>
@@ -195,7 +195,7 @@ color: white;</string>
 color: white;</string>
       </property>
       <property name="text">
-       <string>kang5349@gmail.com</string>
+       <string>pipeline@rapa.org</string>
       </property>
      </widget>
     </item>
@@ -273,7 +273,7 @@ color: white;</string>
 color: white;</string>
       </property>
       <property name="text">
-       <string>***********</string>
+       <string>netflixacademy</string>
       </property>
      </widget>
     </item>

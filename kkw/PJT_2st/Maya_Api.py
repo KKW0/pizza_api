@@ -1,18 +1,17 @@
 # coding=utf-8
+
 import os
 import sys
-
-from PySide2 import QtWidgets, QtCore, QtUiTools
-from PySide2.QtWidgets import QDialog, QHeaderView, QLineEdit, QTableView, QVBoxLayout, QMainWindow, QAction, \
-    QTableWidgetItem, QTableWidget
-from PySide2.QtGui import QStandardItemModel, QStandardItem
 
 from Save import Save
 from Load import Load
 from main_widget import Widget
 from main_widget import Widget2
 from table_model import CustomTableModel
-
+from PySide2 import QtWidgets, QtCore, QtUiTools
+from PySide2.QtGui import QStandardItemModel, QStandardItem
+from PySide2.QtWidgets import QDialog, QHeaderView, QLineEdit, QTableView, QVBoxLayout, QMainWindow, QAction, \
+    QTableWidgetItem, QTableWidget
 
 class MainWindow(QMainWindow):
     def __init__(self):

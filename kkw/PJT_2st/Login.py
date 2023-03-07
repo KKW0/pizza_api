@@ -1,23 +1,19 @@
 # coding=utf-8
+
 import os
 import sys
-from PySide2 import QtWidgets, QtCore, QtUiTools
+
 from login_kkw import Auth_br
-
 from Maya_Api import MainWindow
-
+from PySide2 import QtWidgets, QtCore, QtUiTools
 
 class Login(QtWidgets.QMainWindow):
     def __init__(self):
         super(Login, self).__init__()
-        # 2.7 버전 슈퍼 사용방법 super(Login, self).__init__()
-
-
         self.main_window = MainWindow()
         self.Login = None
         self.user_list_start = None
         ui_path = os.path.expanduser('/home/rapa/git/pizza/kkw/PJT_2st/Login.ui')
-        # ui_path2 = os.path.expanduser('/home/rapa/git/pizza/kkw/PJT_2st/Maya_Api.ui')
         ui_file = QtCore.QFile(ui_path)
         ui_file.open(QtCore.QFile.ReadOnly)
         loader = QtUiTools.QUiLoader()
@@ -36,11 +32,6 @@ class Login(QtWidgets.QMainWindow):
             self.ui.hide()
             self.main_window.ui.show()
 
-        # if self.Auto_login_check() == True:
-        #     ui_path = ui_path2
-
-# ----------------------------------------------------------------------------------------------
-
     def login_button_clicked(self):
         self.login.host = self.Host_Box.text()
         self.login.id = self.ID_Box.text()
@@ -51,9 +42,6 @@ class Login(QtWidgets.QMainWindow):
             self.ui.hide()
             self.main_window.ui.show()
 
-
-
-# ----------------------------------------------------------------------------------------------
 def main():
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
     try:
@@ -61,18 +49,9 @@ def main():
     except TypeError:
         app = QtWidgets.QApplication(sys.argv)
     myapp = Login()
-
-    # json 체크해서, 체크박스 디폴트가 True인지 False인지 체크
-
-    # if self.login._auto_login == True:
-    #     self.login_button_clicked()
-    # else:
     myapp.ui.show()
     sys.exit(app.exec_())
 
 
-
-
-# ----------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     main()

@@ -1,11 +1,10 @@
 # coding=utf-8
+
 from logger_kkw import Pizza_logger
+
 import os
 import json
 import gazu
-
-# 출처 : Mola Molo SY
-
 
 class Auth_br(object):
     def __init__(self):

@@ -12,7 +12,7 @@ class CustomTableModel(QAbstractTableModel):
         self.load_data(data)
 
     def load_data(self, data):
-        self.column_count = 5
+        self.column_count = 3
 
         self.input_data = data
         self.row_count = len(data)
@@ -27,7 +27,7 @@ class CustomTableModel(QAbstractTableModel):
         if role != Qt.DisplayRole:
             return None
         if orientation == Qt.Horizontal:
-            return ("Project", "Seq", "DueDate", "Comment", "Description")[section]
+            return ("Project", "Seq", "DueDate")[section]
         else:
             return str(section)
 
@@ -88,7 +88,7 @@ class CustomTableModel2(QAbstractTableModel):
         elif role == Qt.DecorationRole:
             if column == 0:
                 image_path = self.input_data[row][0]
-                pixmap = QPixmap(image_path).scaled(50, 50)  # scale image to 50x50 pixels
+                pixmap = QPixmap(image_path).scaled(100, 100)  # scale image to 50x50 pixels
                 return pixmap
 
         elif role == Qt.TextAlignmentRole:

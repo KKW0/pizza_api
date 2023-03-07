@@ -2,38 +2,56 @@
 import os
 import sys
 from PySide2 import QtWidgets, QtCore, QtUiTools
+from login_kkw import Auth_br
 
 from Maya_Api import MainWindow
+
 
 class Login(QtWidgets.QMainWindow):
     def __init__(self):
         super(Login, self).__init__()
         # 2.7 버전 슈퍼 사용방법 super(Login, self).__init__()
+
+
         self.main_window = MainWindow()
         self.Login = None
         self.user_list_start = None
         ui_path = os.path.expanduser('/home/rapa/git/pizza/kkw/PJT_2st/Login.ui')
+        # ui_path2 = os.path.expanduser('/home/rapa/git/pizza/kkw/PJT_2st/Maya_Api.ui')
         ui_file = QtCore.QFile(ui_path)
         ui_file.open(QtCore.QFile.ReadOnly)
         loader = QtUiTools.QUiLoader()
         self.ui = loader.load(ui_file)
         ui_file.close()
-
+        self.ui.show()
         self.ui.Login_Button.clicked.connect(self.login_button_clicked)
+        self.Host_Box = self.ui.findChild(QtWidgets.QLineEdit, "Host_Box")
 
-        self.ui.Auto_Login_Check.stateChanged.connect(self.Auto_login_check)
+        self.ID_Box = self.ui.findChild(QtWidgets.QLineEdit, "ID_Box")
+        self.PW_Box = self.ui.findChild(QtWidgets.QLineEdit, "PW_Box")
+
+        self.login = Auth_br()
+        value = self.login.load_setting()
+        if value and value['auto_login'] and value['valid_host'] and value['valid_user']:
+            self.ui.hide()
+            self.main_window.ui.show()
+
+        # if self.Auto_login_check() == True:
+        #     ui_path = ui_path2
+
 # ----------------------------------------------------------------------------------------------
 
     def login_button_clicked(self):
-        self.ui.hide()
-        self.main_window.ui.show()
+        self.login.host = self.Host_Box.text()
+        self.login.id = self.ID_Box.text()
+        self.login.pw = self.PW_Box.text()
+        self.login.auto_login = self.ui.Auto_Login_Check.isChecked()
 
-    @staticmethod
-    def Auto_login_check(state):
-        if state == QtCore.Qt.Checked:
-            print('체크박스 선택됨')
-        else:
-            print('체크박스 선택 안됨')
+        if self.login.connect_host(self.login.host) and self.login.log_in(self.login.host, self.login.id, self.login.pw, self.login.auto_login):
+            self.ui.hide()
+            self.main_window.ui.show()
+
+
 
 # ----------------------------------------------------------------------------------------------
 def main():
@@ -43,8 +61,16 @@ def main():
     except TypeError:
         app = QtWidgets.QApplication(sys.argv)
     myapp = Login()
+
+    # json 체크해서, 체크박스 디폴트가 True인지 False인지 체크
+
+    # if self.login._auto_login == True:
+    #     self.login_button_clicked()
+    # else:
     myapp.ui.show()
     sys.exit(app.exec_())
+
+
 
 
 # ----------------------------------------------------------------------------------------------

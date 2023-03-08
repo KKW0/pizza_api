@@ -14,6 +14,7 @@ class PublishThings:
         """
         self.maya = MayaThings()
         self._software = None
+        self._task_status = gazu.task.get_task_status_by_name('Todo')
         self._preview_type = None
 
     def _publish_file_data(self, task, comment):
@@ -39,12 +40,18 @@ class PublishThings:
             str(working_path): working file이 저장될 경로(확장자 제외)
             str(preview_path): preview file이 저장될 경로(확장자 제외)
         """
+        casted_list = gazu.casting.get_asset_cast_in(task['entity_id'])
+        for cast in casted_list:
+            if 'SEQ' in cast['name']:
+                seq = cast
+
         # working file 모델 생성
         working_file_list = gazu.files.get_working_files_for_task(task['id'])
         if working_file_list is []:
             # task가 주어진 에셋에 working file 모델이 없으면 새로 생성
             self._software = gazu.files.get_software_by_name('Maya')
             working_file = gazu.files.new_working_file(task['id'],
+                                                       name=seq['name']+'_layout_working',
                                                        software=self._software['id'],
                                                        comment=comment,
                                                        person=gazu.client.get_current_user())
@@ -71,6 +78,7 @@ class PublishThings:
                                                             comment=comment,
                                                             working_file=working_file,
                                                             person=gazu.client.get_current_user(),
+                                                            name=seq['name'] + '_layout_output',
                                                             representation='mb')
         else:
             # Layout_mb 타입의 output file이 이미 있으면 정보 계승함
@@ -82,6 +90,7 @@ class PublishThings:
                                                             comment=comment,
                                                             working_file=working_file,
                                                             person=gazu.client.get_current_user(),
+                                                            name=old_output['name'],
                                                             representation=old_output['representation'])
 
         # 마야에서 작업한 에셋을 저장하기 위한 폴더 패스 build
@@ -116,7 +125,7 @@ class PublishThings:
         else:
             raise SystemError("폴더가 이미 존재합니다.")
 
-    def _upload_files(self, task, path, file_type=None):
+    def _upload_files(self, task, path, file_type=None, comment=None):
         """
         작업한 working file과 task에 대한 preview file을 Kitsu에 업로드하는 매서드
 
@@ -138,7 +147,7 @@ class PublishThings:
             gazu.files.upload_working_file(file_type, full_path)
         elif 'output' in path:
             # main preview file 업로드
-            comment = gazu.task.get_last_comment_for_task(task)
+            comment = gazu.task.add_comment(task, self._task_status, comment)
             filenames = os.listdir(os.path.dirname(path))
             for filename in filenames:
                 if '.mov' in filename:
@@ -180,9 +189,9 @@ class PublishThings:
         self.maya.save_scene_file(working_path, self._software['file_extension'])
         self.maya.export_output_n_main_preview_file(output_path, preview_path)
         self._upload_files(task, working_path, working_file)
-        self._upload_files(task, preview_path)
+        self._upload_files(task, preview_path, comment=comment)
 
-    def save_publish_previews(self, shot_list):
+    def save_publish_previews(self, shot_list, comment):
         """
         각 샷에 해당하는 레이아웃의 preview file을 업로드하는 매서드
 
@@ -193,6 +202,7 @@ class PublishThings:
 
         Args:
             shot_list(list): 에셋이 캐스팅된 시퀀스 아래에 있는 모든 샷 딕셔너리들의 집합
+            comment(str): 프리뷰를 올릴 때 첨부할 코멘트
         """
         revision = 0
         task_type = gazu.task.get_task_type_by_name('Layout')
@@ -208,6 +218,5 @@ class PublishThings:
             # Kitsu에 shot의 preview file 업로드
             full_path = path + '.mov'
             task = gazu.task.get_task_by_entity(shot, task_type)
-            comment_dict = gazu.task.get_last_comment_for_task(task)
-            preview = gazu.task.add_preview(task, comment_dict)
-            gazu.task.upload_preview_file(preview, full_path)
+            comment_dict = gazu.task.add_comment(task, self._task_status, comment)
+            gazu.task.add_preview(task, comment_dict, full_path)

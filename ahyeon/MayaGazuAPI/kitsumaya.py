@@ -48,8 +48,7 @@ class SetThings:
             return
         else:
             # 레이아웃 테스크가 주어진 에셋과 그 에셋이 캐스팅된 시퀀스를 구하고, 시퀀스의 샷 리스트를 추출한다.
-            asset = gazu.casting.get_asset_cast_in(task['entity_id'])
-            casted_list = gazu.casting.get_asset_cast_in(asset)
+            casted_list = gazu.casting.get_asset_cast_in(task['entity_id'])
             for cast in casted_list:
                 if 'SEQ' in cast['name']:
                     seq = cast
@@ -74,8 +73,8 @@ class SetThings:
                     self.maya.import_cam_seq(shot)
                     # 각 샷의 카메라와 언디스토션 이미지를 마야에 import하고 둘을 연결
         elif do is 'Save':
-            self.pub.save_publish_real_data(task, comment=comment)
-            self.pub.save_publish_previews(shot_list)
+            self.pub.save_publish_real_data(task, comment)
+            self.pub.save_publish_previews(shot_list, comment)
             # Kitsu에 퍼블리싱하기 위해 모델 생성 후
             # 폴더 트리에 working, output, preview 파일 저장하고 Kitsu에 업로드
         else:

@@ -137,23 +137,24 @@ class MayaThings:
         """
         마야 내에서 저장 경로와 저장 형식을 선택해 작업한 씬 파일을 저장하는 매서드
 
+        working file은 .ma, output file은 .mb 형태로 저장하며,
+        path의 파일 이름에 확장자를 붙인 형태로 저장된다.
+
         Args:
-            path(str): 저장할 경로 + 이름
-            representation(str): "ma"또는 "mb"
+            path(str): 씬파일을 저장할 확장자를 제외한 이름까지의 경로
+            representation(str): "ma"또는 "mb" 확장자
         """
-        if representation == "ma":
-            mc.file(rename=path + ".ma")
-        elif representation == "mb":
-            mc.file(rename=path + ".mb")
+        mc.file(rename=path+'.'+representation)
         mc.file(save=True, type=representation)
 
     def _make_main_preview_mov(self, path):
         """
         레이아웃의 main preview용 파일을 만드는 매서드
 
-        카메라 그룹을 생성하고, 동일한 파일명이 있는지 확인한다.
+        먼저 카메라 그룹을 생성하고, 동일한 파일명이 있는지 확인하여 존재한다면 suffix의 숫자를 하나 올린다.
         그리고 다른 카메라와 언디스토션 이미지를 모두 보이지 않게 설정한 뒤,
-        플레이블라스트를 지정된 path에 저장하고
+        main preview용 영상(플레이블라스트)을 지정된 path에 저장하고,
+        프리뷰를 만들기 위해 생성한 카메라 그룹을 삭제한다.
 
         Args:
             path: mov파일을 저장할 확장자를 제외한 이름까지의 경로
@@ -220,8 +221,8 @@ class MayaThings:
 
     def export_output_n_main_preview_file(self, path, preview_path):
         """
-        작업한 파일을 output file로 저장하는 매서드(.mb)
-        각 카메라 별 저용량 preview 파일도 mov로 저장한다.
+        작업한 파일을 mb 형태의 output file로 저장하고(save_scene_file),
+        레이아웃 작업의 main preview 파일도 mov로 저장하는(make_main_preview_mov) 매서드
 
         Args:
             path(str): output file을 저장할 확장자를 제외한 경로
@@ -236,6 +237,9 @@ class MayaThings:
     def export_shot_previews(self, path, shot):
         """
         각 샷에 해당하는 preview 영상을 저장하는 매서드
+
+        현재 작업중인 씬에 존재하는 모든 카메라(샷)에 대한 프리뷰 영상을 프레임레인지에 맞게 저장한다.
+        그리고 저장을 하기 전에 방해가 되는 다른 카메라, 언디스토션 이미지를 모두 보이지 않게 한다.
 
         Args:
             path(str): preview 파일의 확장자를 뺀 전체 경로

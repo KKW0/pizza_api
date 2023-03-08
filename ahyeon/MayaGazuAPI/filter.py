@@ -5,7 +5,7 @@ from thumbnail import thumbnail_control
 
 class Filter:
     def __init__(self):
-        self._task_type = gazu.task.get_task_type_by_name('Matchmove')
+        pass
 
     def _get_information_dict(self, task):
         """
@@ -67,7 +67,8 @@ class Filter:
             list: output file의 모델에서 필요한 정보들만 담은 리스트의 집합
         """
         info_list = []
-        output_list = gazu.files.get_last_output_files_for_entity(shot, output_type, self._task_type)
+        task_type = gazu.task.get_task_type_by_name('Matchmove')
+        output_list = gazu.files.get_last_output_files_for_entity(shot, output_type, task_type)
         for output in output_list:
             if output is None:
                 raise ValueError("해당하는 output file이 존재하지 않습니다.")
@@ -185,7 +186,7 @@ class Filter:
             task = final_task_list[task_num]
             task_info = final_task_info_list[task_num]
             casting_info_list, undi_info_list, camera_info_list = self._collect_info_casting(task)
-            thumbnail_control(task, task_num, self._task_type, casting_info_list, undi_info_list)
+            thumbnail_control(task, task_num, casting_info_list, undi_info_list)
 
         print('task', task)
         print('task info', task_info)

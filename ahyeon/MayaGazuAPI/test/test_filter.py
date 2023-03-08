@@ -25,7 +25,7 @@ class TestFilter(TestCase):
         self.task = gazu.task.get_task_by_entity(self.asset, self.task_type)
         self.assignee = gazu.task.assign_task(self.task['id'], self.user['id'])
         self.comment = 'Unit Test'
-        gazu.task.add_comment(self.task, self.task_status, self.comment)
+        # gazu.task.add_comment(self.task, self.task_status, self.comment)
         self.comment_dict = gazu.task.get_last_comment_for_task(self.task)
         software = gazu.files.all_softwares()
         self.software = software[2]  # 마야

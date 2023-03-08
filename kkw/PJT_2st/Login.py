@@ -4,14 +4,14 @@ import os
 import sys
 
 from login_kkw import Auth_br
-from Maya_Api import MainWindow
+# from Maya_Api import MainWindow
 from PySide2 import QtWidgets, QtCore, QtUiTools
 
-class Login(QtWidgets.QMainWindow):
+class MainLogin(QtWidgets.QMainWindow):
     def __init__(self):
-        super(Login, self).__init__()
+        super(MainLogin, self).__init__()
 
-        self.main_window = MainWindow()
+        # self.main_window = MainWindow()
         self.Login = None
         self.user_list_start = None
         ui_path = os.path.expanduser('/home/rapa/git/pizza/kkw/PJT_2st/Login.ui')
@@ -19,30 +19,26 @@ class Login(QtWidgets.QMainWindow):
         ui_file.open(QtCore.QFile.ReadOnly)
         loader = QtUiTools.QUiLoader()
         self.ui = loader.load(ui_file)
+
         ui_file.close()
-        self.ui.show()
-        self.ui.Login_Button.clicked.connect(self.login_button_clicked)
+
+        # self.ui.show()
+
+
+        # self.ui.Login_Button.clicked.connect(self.login_button_clicked)
         self.Host_Box = self.ui.findChild(QtWidgets.QLineEdit, "Host_Box")
 
         self.ID_Box = self.ui.findChild(QtWidgets.QLineEdit, "ID_Box")
         self.PW_Box = self.ui.findChild(QtWidgets.QLineEdit, "PW_Box")
 
         self.login = Auth_br()
-        value = self.login.load_setting()
-        if value and value['auto_login'] and value['valid_host'] and value['valid_user']:
-            self.ui.hide()
-            self.main_window.ui.show()
+        # value = self.login.load_setting()
+        # if value and value['auto_login'] and value['valid_host'] and value['valid_user']:
+        #     self.ui.hide()
+            # self.main_window.ui.show()
 
 
-    def login_button_clicked(self):
-        self.login.host = self.Host_Box.text()
-        self.login.user_id = self.ID_Box.text()
-        self.login.user_pw = self.PW_Box.text()
-        self.login.auto_login = self.ui.Auto_Login_Check.isChecked()
 
-        if self.login.connect_host() and self.login.log_in():
-            self.ui.hide()
-            self.main_window.ui.show()
 
 def main():
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
@@ -50,7 +46,7 @@ def main():
         app = QtWidgets.QApplication().instance()
     except TypeError:
         app = QtWidgets.QApplication(sys.argv)
-    myapp = Login()
+    myapp = MainLogin()
     myapp.ui.show()
     sys.exit(app.exec_())
 

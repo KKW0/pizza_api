@@ -172,13 +172,13 @@ class Auth_br(object):
             None
 
         """
-        if self.valid_user == True:
-            gazu.log_out()
-            self.user = None # 사용하지 않는 듯, 확인 필요!!
-            self.reset_setting()
-        else:
-            raise ValueError("로그인 부터 실행해")
-        # return True
+        # if self._valid_user == True and self._valid_host == True:
+        # gazu.log_out()
+        self.user = None
+        self.reset_setting()
+        # else:
+        #     raise ValueError("로그인 부터 실행해")
+        return True
 
     def access_setting(self):
         """

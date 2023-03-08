@@ -6,6 +6,7 @@ import sys
 
 from Save import Save
 from Load import Load
+from login_kkw import Auth_br
 from main_widget import Widget
 from main_widget import Widget2
 from table_model import CustomTableModel
@@ -14,12 +15,13 @@ from PySide2 import QtWidgets, QtCore, QtUiTools
 from PySide2.QtGui import QStandardItemModel, QStandardItem
 from PySide2.QtWidgets import QDialog, QHeaderView, QLineEdit, QTableView, QVBoxLayout, QMainWindow, QAction, \
     QTableWidgetItem, QTableWidget
-
+from Login import MainLogin
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
+
         self.save = None
         self.user_list_start = None
         ui_path = os.path.expanduser('/home/rapa/git/pizza/kkw/PJT_2st/Maya_Api.ui')
@@ -36,6 +38,16 @@ class MainWindow(QMainWindow):
 
         ui_file.close()
 
+        # Login
+        self.Login = MainLogin()
+        self.login = Auth_br()
+        value = self.login.load_setting()
+        if value and value['auto_login'] and value['valid_host'] and value['valid_user']:
+            self.ui.show()
+        else:
+            self.Login.ui.show()
+
+
         # Event
         '''
         # Save 클릭시 Save ui로 전환
@@ -49,27 +61,49 @@ class MainWindow(QMainWindow):
         self.ui.Load_Button.clicked.connect(self.Load_Button)
         self.Load = Load()
 
-        # self.ui.LogOut_Button.clicked.connect(self.LogOut_Button)
+        self.ui.LogOut_Button.clicked.connect(self.LogOut_Button)
+        # self.Login = MainLogin()
+
+
 
         self.widget.clicked.connect(self.widget_clicked)
 
         self.widget2.clicked.connect(self.widget_clicked2)
 
+        self.Login.ui.Login_Button.clicked.connect(self.login_button_clicked)
+
 
     # ----------------------------------------------------------------------------------------------
 
+
     def Save_Button(self):
-        self.hide()  # 메인 윈도우 숨김
+        # self.ui.hide()  # 메인 윈도우 숨김
         self.Save.ui.show()
 
     def Load_Button(self):
-        self.hide()  # 메인 윈도우 숨김
+        # self.ui.hide()  # 메인 윈도우 숨김
         self.Load.ui.show()
 
-    # def LogOut_Button(self):
-    #     self.hide()
-    #     self.Login.ui.show()
+    def LogOut_Button(self):
+        self.login.log_out()
+        self.ui.hide()
+        self.Login.ui.show()
     # ----------------------------------------------------------------------------------------------
+
+    def login_button_clicked(self):
+        Host_Box = self.Login.ui.Host_Box
+        ID_Box = self.Login.ui.ID_Box
+        PW_Box = self.Login.ui.PW_Box
+
+        self.login.host = Host_Box.text()
+        self.login.user_id = ID_Box.text()
+        self.login.user_pw = PW_Box.text()
+        self.login.auto_login = self.Login.ui.Auto_Login_Check.isChecked()
+
+        if self.login.connect_host() and self.login.log_in():
+            self.Login.ui.hide()
+            self.ui.show()
+
 
     def widget_clicked(self, event):
         selected_data = self.read_data()[event.row()]

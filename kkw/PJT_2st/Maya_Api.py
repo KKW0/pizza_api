@@ -47,6 +47,7 @@ class MainWindow(QMainWindow):
         else:
             self.Login.ui.show()
 
+        # ----------------------------------------------------------------------------------------------
 
         # Event
         '''
@@ -61,33 +62,23 @@ class MainWindow(QMainWindow):
         self.ui.Load_Button.clicked.connect(self.Load_Button)
         self.Load = Load()
 
+        self.Login.ui.Login_Button.clicked.connect(self.login_button_clicked)
+
         self.ui.LogOut_Button.clicked.connect(self.LogOut_Button)
-        # self.Login = MainLogin()
-
-
 
         self.widget.clicked.connect(self.widget_clicked)
 
         self.widget2.clicked.connect(self.widget_clicked2)
 
-        self.Login.ui.Login_Button.clicked.connect(self.login_button_clicked)
-
-
     # ----------------------------------------------------------------------------------------------
-
-
     def Save_Button(self):
-        # self.ui.hide()  # 메인 윈도우 숨김
+        self.ui.hide()  # 메인 윈도우 숨김
         self.Save.ui.show()
 
     def Load_Button(self):
-        # self.ui.hide()  # 메인 윈도우 숨김
+        self.ui.hide()  # 메인 윈도우 숨김
         self.Load.ui.show()
 
-    def LogOut_Button(self):
-        self.login.log_out()
-        self.ui.hide()
-        self.Login.ui.show()
     # ----------------------------------------------------------------------------------------------
 
     def login_button_clicked(self):
@@ -104,6 +95,12 @@ class MainWindow(QMainWindow):
             self.Login.ui.hide()
             self.ui.show()
 
+    def LogOut_Button(self):
+        self.login.log_out()
+        self.ui.hide()
+        self.Login.ui.show()
+
+    # ----------------------------------------------------------------------------------------------
 
     def widget_clicked(self, event):
         selected_data = self.read_data()[event.row()]
@@ -112,6 +109,8 @@ class MainWindow(QMainWindow):
     def widget_clicked2(self, event):
         selected_data = self.read_data2()[event.row()]
         print(selected_data)
+
+    # ----------------------------------------------------------------------------------------------
 
     @staticmethod
     def read_data():

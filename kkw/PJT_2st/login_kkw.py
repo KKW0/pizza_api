@@ -146,8 +146,6 @@ class Auth_br(object):
 
         """
 
-        # self.ui.id = self.text_edit.toPlainText()
-        # self.ui.pw = self.text_edit.toPlainText()
 
         print(self.user_id, self.user_pw)
 
@@ -172,12 +170,9 @@ class Auth_br(object):
             None
 
         """
-        # if self._valid_user == True and self._valid_host == True:
-        # gazu.log_out()
+
         self.user = None
         self.reset_setting()
-        # else:
-        #     raise ValueError("로그인 부터 실행해")
         return True
 
     def access_setting(self):

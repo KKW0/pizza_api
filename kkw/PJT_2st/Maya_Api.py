@@ -2,7 +2,7 @@
 
 import os
 import sys
-
+import gazu
 
 from Save import Save
 from Load import Load
@@ -16,6 +16,9 @@ from PySide2.QtGui import QStandardItemModel, QStandardItem
 from PySide2.QtWidgets import QDialog, QHeaderView, QLineEdit, QTableView, QVBoxLayout, QMainWindow, QAction, \
     QTableWidgetItem, QTableWidget
 from Login import MainLogin
+
+
+from tumbtumb import thumbnail_control
 
 
 class MainWindow(QMainWindow):
@@ -141,12 +144,18 @@ class MainWindow(QMainWindow):
     # ----------------------------------------------------------------------------------------------
     @staticmethod
     def read_data2():
+        project = gazu.project.get_project_by_name('jeongtae')
+        asset = gazu.asset.get_asset_by_name(project, 'chair')
+        task_type = gazu.task.get_task_type_by_name('Layout_asset')
+        task_ = gazu.task.get_task_by_entity(asset, task_type)
+        png = thumbnail_control([task_])
+        # print(png)
         data = [
-            ['/home/rapa/다운로드/1111.jpeg', 'Avata', '2023-03-02'],
-            ['/home/rapa/다운로드/2222.jpeg', 'TopGun', '2023-03-03'],
-            ['/home/rapa/다운로드/3333.jpeg', 'DontLookUp', '2023-03-04'],
-            ['/home/rapa/다운로드/4444.jpeg', 'Flash', '2023-03-05'],
-            ['/home/rapa/다운로드/1111.jpeg', 'DDong', '2023-03-06']
+            [png, 'Avata', '2023-03-02']
+        #     # ['/home/rapa/다운로드/2222.png', 'TopGun', '2023-03-03']
+        #     # ['/home/rapa/다운로드/3333.jpeg', 'DontLookUp', '2023-03-04'],
+        #     # ['/home/rapa/다운로드/4444.jpeg', 'Flash', '2023-03-05'],
+        #     # ['/home/rapa/다운로드/1111.jpeg', 'DDong', '2023-03-06']
         ]
         return data
 

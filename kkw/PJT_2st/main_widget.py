@@ -55,8 +55,8 @@ class Widget2(QTableView):
         QTableView.__init__(self)
 
         # Getting the Model
-        self.model = CustomTableModel2(data)
-        self.setModel(self.model)
+        self.model_ = CustomTableModel2(data)
+        self.setModel(self.model_)
 
         font = QFont()
         font.setFamily("Arial")
@@ -80,4 +80,3 @@ class Widget2(QTableView):
         # self.setGeometry(QtCore.QRect(0, 2, 650, 760))  # Set the position and size of the Widget2
         self.setStyleSheet("background-color: #353535; selection-background-color: gray;")
         self.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
-

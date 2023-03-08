@@ -3,6 +3,8 @@
 from PySide2.QtGui import QImage, QPixmap, QPainter, QColor
 from PySide2.QtCore import Qt, QAbstractTableModel, QModelIndex
 
+
+
 class CustomTableModel(QAbstractTableModel):
     def __init__(self, data=None):
         QAbstractTableModel.__init__(self)
@@ -87,8 +89,11 @@ class CustomTableModel2(QAbstractTableModel):
 
         elif role == Qt.DecorationRole:
             if column == 0:
-                image_path = self.input_data[row][0]
-                pixmap = QPixmap(image_path).scaled(100, 100)  # scale image to 50x50 pixels
+                # image_path = self.input_data[row][0]
+                # pixmap = QPixmap(image_path).scaled(100, 100)  # scale image to 50x50 pixels
+                pixmap = QPixmap()
+                pixmap.loadFromData(self.input_data[0][0])
+                pixmap = pixmap.scaled(100, 100)
                 return pixmap
 
         elif role == Qt.TextAlignmentRole:

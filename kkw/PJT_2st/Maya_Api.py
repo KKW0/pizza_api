@@ -34,7 +34,7 @@ class MainWindow(QMainWindow):
         self.ui.Main_QGrid.addWidget(self.widget, 1, 0)
 
         self.widget2 = Widget2(self.read_data2())
-        self.ui.Main_QGrid.addWidget(self.widget2, 1, 2)
+        self.ui.verticalLayout.addWidget(self.widget2, 0)
 
         ui_file.close()
 

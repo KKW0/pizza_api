@@ -33,7 +33,7 @@ class Widget(QTableView):
         self.model = CustomTableModel(data)
         self.setModel(self.model)
 
-        self.setFixedSize(400, 500)
+        # self.setFixedSize(400, 500)
 
         # QTableView Headers
         self.horizontal_header = self.horizontalHeader()
@@ -46,8 +46,9 @@ class Widget(QTableView):
 
         self.horizontal_header.setStretchLastSection(True)
 
-        self.setGeometry(QtCore.QRect(0, 0, 400, 500))  # Set the position and size of the Widget
+        # self.setGeometry(QtCore.QRect(0, 0, 400, 500))  # Set the position and size of the Widget
         self.setStyleSheet("background-color: #353535; selection-background-color: gray;")
+        self.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
 
 class Widget2(QTableView):
     def __init__(self, data):
@@ -63,7 +64,7 @@ class Widget2(QTableView):
 
         self.setFont(font)
 
-        self.setFixedSize(650, 760)
+        # self.setFixedSize(650, 760)
 
         # QTableView Headers
         self.horizontal_header = self.horizontalHeader()
@@ -76,6 +77,7 @@ class Widget2(QTableView):
 
         self.horizontal_header.setStretchLastSection(True)
 
-        self.setGeometry(QtCore.QRect(0, 2, 650, 760))  # Set the position and size of the Widget2
+        # self.setGeometry(QtCore.QRect(0, 2, 650, 760))  # Set the position and size of the Widget2
         self.setStyleSheet("background-color: #353535; selection-background-color: gray;")
+        self.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
 

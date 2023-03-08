@@ -6,6 +6,7 @@ import sys
 from login_kkw import Auth_br
 from PySide2 import QtWidgets, QtCore, QtUiTools
 
+
 class MainLogin(QtWidgets.QMainWindow):
     def __init__(self):
         super(MainLogin, self).__init__()

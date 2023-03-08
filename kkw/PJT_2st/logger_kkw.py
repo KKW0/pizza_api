@@ -89,7 +89,6 @@ class Pizza_logger:
 
         """
         self.log = logging.getLogger('pizza')
-        # self.log.setLevel(logging.DEBUG)
 
         if len(self.log.handlers) == 0:
             formatter = logging.Formatter('%(asctime)s - %(levelname)s : %(message)s')
@@ -105,8 +104,7 @@ class Pizza_logger:
             file_handler.setLevel(logging.DEBUG)
             self.log.addHandler(file_handler)
 
-        # for i in range(10):
-        #     self.log.info('{}번째 방문입니다.'.format(i))
+
 
     def connect_log(self, host_url):
         """
@@ -128,6 +126,9 @@ class Pizza_logger:
 
     def failed_log(self):
         self.log.debug("Failed Connection")
+
+    def logout_log(self):
+        self.log.debug("Logout Succeed")
 
     def create_working_file_log(self, user_name, working_file):
         """

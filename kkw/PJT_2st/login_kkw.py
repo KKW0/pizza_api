@@ -16,13 +16,6 @@ class Auth_br(object):
         self._valid_host = False
         self._valid_user = False
         self._auto_login = False
-        # self.host = None
-        # self.user = None
-        # self.user_id = None
-        # self.user_pw = None
-        # self.valid_host = False
-        # self.valid_user = False
-        # self.auto_login = False
 
         self.logging = Pizza_logger()
         self.dir_path = os.path.expanduser('~/.config/pizza/')
@@ -118,15 +111,12 @@ class Auth_br(object):
             ValueError: 호스트 URL이 잘못된 경우.
 
         """
-
-        # self.ui.text = self.text_edit.toPlainText()
+        self.logging.set_logger()
         gazu.set_host(self.host)
         if not gazu.client.host_is_valid():
             self.logging.failed_log()
             raise ValueError('에러 메시지 : 호스트 URL이 잘못되었습니다.')
-        # self._host = gazu.get_host()
         self.valid_host = True
-        # self.save_setting()
         self.logging.connect_log(self.host)
         return True
 
@@ -146,19 +136,16 @@ class Auth_br(object):
 
         """
 
-
-        print(self.user_id, self.user_pw)
-
         try:
             log_in = gazu.log_in(self.user_id, self.user_pw)
         except gazu.AuthFailedException:
             self.logging.failed_log()
             raise ValueError('에러 메시지 : 사용자 ID 또는 암호가 잘못 입력되었습니다.')
 
-        # self._user = log_in['user']
+        self._user = log_in['user']
         self.valid_user = True
         self.save_setting()
-        # self.logging.enter_log(self.user["full_name"])
+        self.logging.enter_log(self.user["full_name"])
         return True
 
     def log_out(self):
@@ -173,6 +160,7 @@ class Auth_br(object):
 
         self.user = None
         self.reset_setting()
+        self.logging.logout_log()
         return True
 
     def access_setting(self):

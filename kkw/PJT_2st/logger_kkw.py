@@ -1,9 +1,8 @@
 #coding:utf-8
 import os
-import json
-import gazu
+# import json
+# import gazu
 import logging
-# from login_br import Auth_br
 
 """
 
@@ -56,27 +55,21 @@ class Pizza_logger:
     - enter_log(user_name): 지정한 이름의 사용자가 성공적으로 로그인했음을 나타내는 메시지를 기록합니다.
     - create_working_file_log(user_name, working_file): 지정한 이름을 가진 사용자가 지정한 위치에 Maya 파일을 생성했음을 나타내는 메시지를 기록합니다.
     - load_output_file_log(user_name, output_file_path): 지정한 이름을 가진 사용자가 지정한 위치에서 출력 파일을 로드했음을 나타내는 메시지를 기록합니다.
-
     """
 
-    def __init__(self, dir_path):
+    def __init__(self):
         """
 
         Logger 개체를 초기화합니다.
 
         Args:
-            dir_path (str): 사용자 정보가 저장될 디렉터리의 경로
+            self.dir_path (str): 사용자 정보가 저장될 디렉터리의 경로
 
         Raises:
             ValueError: 디렉터리 생성이 실패할 경우
 
         """
-        self._host = None
-        self._user = None
-        self._user_id = None
-        self._user_pw = None
-        self._valid_host = False
-        self._valid_user = False
+
         self.log = None
 
         self.dir_path = os.path.expanduser('~/.config/pizza/')
@@ -86,11 +79,7 @@ class Pizza_logger:
             except OSError:
                 raise ValueError("에러 메시지 : 디렉터리를 만들지 못했습니다.")
 
-        self.user_path = os.path.join(self.dir_path, 'user.json')
-
-        self.set_logger(dir_path)
-        # if self.access_setting():
-        #     self.load_setting()
+        self.set_logger()
 
     def set_logger(self):
         """
@@ -100,6 +89,7 @@ class Pizza_logger:
 
         """
         self.log = logging.getLogger('pizza')
+        # self.log.setLevel(logging.DEBUG)
 
         if len(self.log.handlers) == 0:
             formatter = logging.Formatter('%(asctime)s - %(levelname)s : %(message)s')
@@ -116,18 +106,16 @@ class Pizza_logger:
             self.log.addHandler(file_handler)
 
         # for i in range(10):
-            i = 1
-            self.log.info('{}번째 방문입니다.'.format(i))
-            i += 1
+        #     self.log.info('{}번째 방문입니다.'.format(i))
 
     def connect_log(self, host_url):
         """
 
-        DEBUG level에서 지정된 'host_url'에 대한 성공적인 연결을 기록합니다.
+        DEBUG level에서 지정된 'host_url'에 대한 성공적인 연결 및 실패를 기록합니다.
 
         """
         if host_url:
-            self.log.debug("{}와 성공적 연결".format(host_url))
+            self.log.debug("연결에 성공하였습니다. {}".format(host_url))
 
     def enter_log(self, user_name):
         """
@@ -136,7 +124,10 @@ class Pizza_logger:
 
         """
         if user_name:
-            self.log.debug("{}: 로그인 성공".format(user_name))
+            self.log.debug("{}: log-in succeed".format(user_name))
+
+    def failed_log(self):
+        self.log.debug("Failed Connection")
 
     def create_working_file_log(self, user_name, working_file):
         """
@@ -162,8 +153,8 @@ class Pizza_logger:
 def main():
     test = Pizza_logger()
     test.set_logger()
-    # test.connect_log
-    # test.enter_log
+    # test.connect_log()
+    # test.enter_log()
     # test.create_working_file_log()
     # test.load_output_file_log()
 

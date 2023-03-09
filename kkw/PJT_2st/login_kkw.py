@@ -1,11 +1,13 @@
-#coding:utf-8
-from logger_br import Pizza_logger
+# coding=utf-8
+
+from logger_kkw import Pizza_logger
+
 import os
 import json
 import gazu
 
 
-class Auth_br:
+class Auth_br(object):
     def __init__(self):
         self._host = None
         self._user = None
@@ -13,10 +15,18 @@ class Auth_br:
         self._user_pw = None
         self._valid_host = False
         self._valid_user = False
+        self._auto_login = False
+        # self.host = None
+        # self.user = None
+        # self.user_id = None
+        # self.user_pw = None
+        # self.valid_host = False
+        # self.valid_user = False
+        # self.auto_login = False
+
         self.logging = Pizza_logger()
         self.dir_path = os.path.expanduser('~/.config/pizza/')
         self.user_path = os.path.join(self.dir_path, 'user.json')
-
 
     @property
     def valid_host(self):
@@ -27,6 +37,9 @@ class Auth_br:
         """
         return self._valid_host
 
+    @valid_host.setter
+    def valid_host(self, value):
+        self._valid_host = value
 
     @property
     def valid_user(self):
@@ -37,6 +50,9 @@ class Auth_br:
         """
         return self._valid_user
 
+    @valid_user.setter
+    def valid_user(self, value):
+        self._valid_user = value
 
     @property
     def host(self):
@@ -47,6 +63,9 @@ class Auth_br:
         """
         return self._host
 
+    @host.setter
+    def host(self, value):
+        self._host = value
 
     @property
     def user(self):
@@ -58,8 +77,35 @@ class Auth_br:
         """
         return self._user
 
+    @user.setter
+    def user(self, value):
+        self._user = value
 
-    def connect_host(self, try_host):
+    @property
+    def user_id(self):
+        return self._user_id
+
+    @user_id.setter
+    def user_id(self, value):
+        self._user_id = value
+
+    @property
+    def user_pw(self):
+        return self._user_pw
+
+    @user_pw.setter
+    def user_pw(self, value):
+        self._user_pw = value
+
+    @property
+    def auto_login(self):
+        return self._auto_login
+
+    @auto_login.setter
+    def auto_login(self, value):
+        self._auto_login = value
+
+    def connect_host(self):
         """
 
         지정된 호스트 URL에 연결을 시도하고 인증 설정에 저장합니다.
@@ -72,16 +118,19 @@ class Auth_br:
             ValueError: 호스트 URL이 잘못된 경우.
 
         """
-        gazu.set_host(try_host)
+
+        # self.ui.text = self.text_edit.toPlainText()
+        gazu.set_host(self.host)
         if not gazu.client.host_is_valid():
+            self.logging.failed_log()
             raise ValueError('에러 메시지 : 호스트 URL이 잘못되었습니다.')
-        self._host = gazu.get_host()
-        self._valid_host = True
-        self.save_setting()
+        # self._host = gazu.get_host()
+        self.valid_host = True
+        # self.save_setting()
         self.logging.connect_log(self.host)
         return True
 
-    def log_in(self, try_id, try_pw):
+    def log_in(self):
         """
 
         제공된 사용자 ID와 암호로 사용자를 로그인합니다.
@@ -96,20 +145,20 @@ class Auth_br:
             ValueError: 호스트가 연결되어 있지 않은 경우
 
         """
-        # if not self._valid_host:
-        #     raise SystemError('에러 메시지 : 로그인할 호스트가 연결되어 있지 않습니다.')
+
+
+        print(self.user_id, self.user_pw)
 
         try:
-            log_in = gazu.log_in(try_id, try_pw)
+            log_in = gazu.log_in(self.user_id, self.user_pw)
         except gazu.AuthFailedException:
+            self.logging.failed_log()
             raise ValueError('에러 메시지 : 사용자 ID 또는 암호가 잘못 입력되었습니다.')
 
-        self._user = log_in['user']
-        self._user_id = try_id
-        self._user_pw = try_pw
-        self._valid_user = True
+        # self._user = log_in['user']
+        self.valid_user = True
         self.save_setting()
-        self.logging.enter_log(self.user.get("full_name"))
+        # self.logging.enter_log(self.user["full_name"])
         return True
 
     def log_out(self):
@@ -121,9 +170,10 @@ class Auth_br:
             None
 
         """
-        gazu.log_out()
-        self._user = None
+
+        self.user = None
         self.reset_setting()
+        return True
 
     def access_setting(self):
         """
@@ -136,6 +186,7 @@ class Auth_br:
             ValueError: OS 오류로 인해 dir_path에서 지정한 디렉토리를 생성할 수 없거나 user.json 파일을 생성할 수 없는 경우.
 
         """
+
         if not os.path.exists(self.dir_path):
             try:
                 os.makedirs(self.dir_path)
@@ -161,13 +212,24 @@ class Auth_br:
 
         """
         user_dict = {}
-        with open(self.user_path, 'r') as json_file:
-            user_dict = json.load(json_file)
+        if os.path.exists(self.user_path):
+            with open(self.user_path, 'r') as json_file:
+                user_dict = json.load(json_file)
+        return user_dict
+        # if user_dict['valid_host']:
+        #     self.connect_host()
+        # else:
+        #     self.logging.failed_log()
+        #     raise ValueError("에러에용")
+        #
+        # if user_dict['valid_user']:
+        #     self.log_in(user_dict['user_id'], user_dict['user_pw'])
+        # else:
+        #     self.logging.failed_log()
+        #     raise ValueError("Error")
 
-        if user_dict.get('valid_host'):
-            self.connect_host(user_dict.get('host'))
-        if user_dict.get('valid_user'):
-            self.log_in(user_dict.get('user_id'), user_dict.get('user_pw'))
+    # 레이즈를 통해서 false 값일 경우 추가
+
 
     def save_setting(self):
         """
@@ -178,12 +240,14 @@ class Auth_br:
             OSError : OS 오류로 인해 user.json 파일을 쓸 수 없는 경우
 
         """
+
         user_dict = {
             'host': self.host,
-            'user_id': self._user_id,
-            'user_pw': self._user_pw,
+            'user_id': self.user_id,
+            'user_pw': self.user_pw,
             'valid_host': self.valid_host,
             'valid_user': self.valid_user,
+            'auto_login': self.auto_login
         }
         with open(self.user_path, 'w') as json_file:
             json.dump(user_dict, json_file)
@@ -194,10 +258,26 @@ class Auth_br:
         인증 설정을 기본값으로 재설정합니다.
 
         """
-        self._host = ''
-        self._user_id = ''
-        self._user_pw = ''
-        self._valid_host = False
-        self._valid_user = False
+
+        self.host = ''
+        self.user_id = ''
+        self.user_pw = ''
+        self.valid_host = False
+        self.valid_user = False
+        self.auto_login = False
+
+        self.save_setting()
 
 
+def main():
+    auth = Auth_br()
+    # test.access_setting()
+    # test.connect_host("http://192.168.3.116/api")
+    # test.log_in("pipeline@rapa.org", "netflixacademy")
+    # test.log_out()
+    # test.load_setting()
+    # test.reset_setting()
+
+
+if __name__ == "__main__":
+    main()

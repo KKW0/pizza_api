@@ -1,13 +1,13 @@
+# coding=utf-8
 
 import os
 import sys
-from PySide2 import QtWidgets, QtCore, QtUiTools
 
-# from task_windows import App2
+from PySide2 import QtWidgets, QtCore, QtUiTools
 
 class Load(QtWidgets.QMainWindow):
     def __init__(self):
-        super().__init__()
+        super(Load, self).__init__()
 
         self.save = None
         self.user_list_start = None

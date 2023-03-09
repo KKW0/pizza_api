@@ -21,7 +21,8 @@ class SetThings:
         self.maya = MayaThings()
         self.pub = PublishThings()
 
-    def run_program(self, comment, proj_num=0, seq_num=0, task_num=0, shot_num=0, asset_index_list=None, do="Load"):
+    def run_program(self, comment, proj_num=0, seq_num=0, task_num=None, shot_num=None,
+                    asset_index_list=None, do="Load"):
         """
         프로그램을 구동하는 매서드
 
@@ -34,14 +35,14 @@ class SetThings:
             comment(str): working/output/preview file에 대한 커밋 내용
             proj_num(int): 선택할 프로젝트의 인덱스 번호. 0은 All을 의미한다.
             seq_num(int): 선택할 시퀀스의 인덱스 번호. 0은 All을 의미한다.
-            task_num(int): 선택할 테스크의 인덱스 번호. 0은 All을 의미한다.
-            shot_num(int): 작업할 샷의 인덱스 번호. 0은 All을 의미한다.
-            asset_index_list(list): 사용자가 선택한 에셋의 인덱스 리스트. None은 [0]이며, All을 의미한다.
+            task_num(int): 선택할 테스크의 인덱스 번호. task 선택 전에는 None
+            shot_num(int): 작업할 샷의 인덱스 번호. shot 선택 전에는 None
+            asset_index_list(list): 사용자가 import 하길 선택한 에셋의 인덱스 리스트. None은 [0]이며, All을 의미한다.
             do(str): 사용자가 동작시킬 기능. Save 또는 Load
         """
         task = self.filter.select_task(proj_num=proj_num, seq_num=seq_num, task_num=task_num)
         # 테스크 선택하고 테스크 에셋에 캐스팅된 샷으로부터 테스크 에셋이 사용되는 시퀀스, 프로젝트 정보 추출
-        # 파라미터를 통해 필터 적용할 수 있다.
+
 
         if type(task) is list:
             # 테스크를 선택하기 전에는 아무 일도 하지 않는다.
@@ -59,7 +60,7 @@ class SetThings:
         if asset_index_list is None:
             asset_index_list = [0]
         if do is 'Load':
-            if shot_num is not 0:
+            if shot_num is not None:
                 # 샷을 선택하고 그 안에서 에셋을 선택하거나, 샷 선택 없이 에셋만 선택할 수 있다.
                 shot = self.filter.select_shot(shot_list, shot_num)
                 self.maya.import_casting_asset(shot, asset_index_list)

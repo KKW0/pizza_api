@@ -12,14 +12,6 @@ class WrapDelegate(QStyledItemDelegate):
         painter.translate(option.rect.x(), option.rect.y())
         document.drawContents(painter)
 
-    # def sizeHint(self, option, index):
-    #     text = index.data(QtCore.Qt.DisplayRole)
-    #     document = QtGui.QTextDocument()
-    #     document.setHtml(text)
-    #     document.setTextWidth(option.rect.width())
-    #
-    #     return QtCore.QSize(document.idealWidth(), document.size().height())
-
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -28,6 +20,8 @@ class MainWindow(QMainWindow):
         self.table_view = QTableView(self)
         self.table_view.move(10, 50)
         self.table_view.resize(300, 200)
+        self.table_view.setFont("Ariel")
+        self.table_view.setSortingEnabled(True)
 
         self.combo_box = QComboBox(self.table_view.horizontalHeader())
         self.combo_box.setGeometry(0, 0, 100, 30)
@@ -40,13 +34,13 @@ class MainWindow(QMainWindow):
         self.combo_box2.currentIndexChanged.connect(self.filter_list)
 
         self.model = QtGui.QStandardItemModel()
-        self.model.appendRow([QtGui.QStandardItem('Option 1'), QtGui.QStandardItem('Option A')])
-        self.model.appendRow([QtGui.QStandardItem('Option 1'), QtGui.QStandardItem('Option B')])
-        self.model.appendRow([QtGui.QStandardItem('Option 2'), QtGui.QStandardItem('Option A')])
-        self.model.appendRow([QtGui.QStandardItem('Option 1'), QtGui.QStandardItem('Option A')])
+        self.model.appendRow([QtGui.QStandardItem('Option 1'), QtGui.QStandardItem('Option A'), QtGui.QStandardItem('2023-03-08')])
+        self.model.appendRow([QtGui.QStandardItem('Option 1'), QtGui.QStandardItem('Option B'), QtGui.QStandardItem('2023-03-15')])
+        self.model.appendRow([QtGui.QStandardItem('Option 2'), QtGui.QStandardItem('Option A'), QtGui.QStandardItem('2023-03-10')])
+        self.model.appendRow([QtGui.QStandardItem('Option 1'), QtGui.QStandardItem('Option A'), QtGui.QStandardItem('2023-03-28')])
 
-        self.model.setHorizontalHeaderLabels(['Column 1', 'Column 2'])
-        # self.table_view.verticalHeader().hide()
+        self.model.setHorizontalHeaderLabels(['Column 1', 'Column 2', 'due_date'])
+        self.table_view.verticalHeader().hide()
 
         self.table_view.setModel(self.model)
         self.table_view.setAlternatingRowColors(True)
@@ -57,6 +51,7 @@ class MainWindow(QMainWindow):
 
         delegate2 = WrapDelegate(self.combo_box2)
         self.table_view.horizontalHeader().setItemDelegateForColumn(1, delegate2)
+
 
     def filter_list(self, index):
         option = self.combo_box.currentText()
@@ -82,6 +77,7 @@ class MainWindow(QMainWindow):
             self.table_view.setModel(proxy_model2)
         else:
             self.table_view.setModel(proxy_model)
+
 
 
 if __name__ == '__main__':

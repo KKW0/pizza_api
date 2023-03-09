@@ -163,14 +163,14 @@ class Filter:
                 double_filtered_task_info_list.append(filtered_task_info_list[index])
                 return double_filtered_task_list, double_filtered_task_info_list
 
-    def select_task(self, proj_num=0, seq_num=0, task_num=0):
+    def select_task(self, proj_num=0, seq_num=0, task_num=None):
         """
         필터링을 마친 뒤 선택한 테스크에 대한 정보를 노출하는 매서드
 
         Args:
             proj_num: 선택한 프로젝트의 인덱스 번호. 0은 All을 뜻한다
             seq_num: 선택한 시퀀스의 인덱스 번호. 0은 All을 뜻한다
-            task_num: 선택한 테스크의 인덱스 번호. 0은 All을 뜻한다
+            task_num: 선택한 테스크의 인덱스 번호. 테스크 선택 전에는 None
 
         Returns:
             dict: 선택한 task의 딕셔너리
@@ -179,14 +179,14 @@ class Filter:
         undi_info_list = None
         camera_info_list = None
         final_task_list, final_task_info_list = self._filter_info(proj_num, seq_num)
-        if task_num is 0:
+        if task_num is None:
             task = final_task_list
             task_info = final_task_info_list
         else:
             task = final_task_list[task_num]
             task_info = final_task_info_list[task_num]
             casting_info_list, undi_info_list, camera_info_list = self._collect_info_casting(task)
-            thumbnail_control(task, task_num, casting_info_list, undi_info_list)
+        thumbnail_control(task, task_num, casting_info_list, undi_info_list)
 
         print('task', task)
         print('task info', task_info)

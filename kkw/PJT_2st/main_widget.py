@@ -16,37 +16,31 @@ class Widget(QTableView):
     def __init__(self, data):
         QTableView.__init__(self)
 
+        self.model = CustomTableModel(data)
+        self.setModel(self.model)
+
         font = QFont()
         font.setFamily("Arial")
         font.setPointSize(10)
 
-        self.setFont(font)
-
-        color = QColor(255, 255, 255)
-        # myapp.ui.setStyleSheet("color: {}".format(color.name()))
-
         font.setBold(True)
+
+        self.setFont(font)
 
         self.horizontalHeader().setDefaultAlignment(Qt.AlignHCenter)
         self.verticalHeader().setDefaultAlignment(Qt.AlignVCenter)
-
-        self.model = CustomTableModel(data)
-        self.setModel(self.model)
-
-        # self.setFixedSize(400, 500)
 
         # QTableView Headers
         self.horizontal_header = self.horizontalHeader()
         self.vertical_header = self.verticalHeader()
 
-        self.horizontalHeader().setMinimumSectionSize(35)
-        self.verticalHeader().setMinimumSectionSize(35)
+        self.horizontalHeader().setMinimumSectionSize(50)
+        self.verticalHeader().setMinimumSectionSize(50)
 
         # self.setColumnWidth(3, 200)
 
         self.horizontal_header.setStretchLastSection(True)
 
-        # self.setGeometry(QtCore.QRect(0, 0, 400, 500))  # Set the position and size of the Widget
         self.setStyleSheet("background-color: #353535; selection-background-color: gray;")
         self.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
 
@@ -60,11 +54,11 @@ class Widget2(QTableView):
 
         font = QFont()
         font.setFamily("Arial")
-        font.setPointSize(12)
+        font.setPointSize(10)
+
+        font.setBold(True)
 
         self.setFont(font)
-
-        # self.setFixedSize(650, 760)
 
         # QTableView Headers
         self.horizontal_header = self.horizontalHeader()
@@ -77,6 +71,5 @@ class Widget2(QTableView):
 
         self.horizontal_header.setStretchLastSection(True)
 
-        # self.setGeometry(QtCore.QRect(0, 2, 650, 760))  # Set the position and size of the Widget2
         self.setStyleSheet("background-color: #353535; selection-background-color: gray;")
         self.setSelectionBehavior(QtWidgets.QTableView.SelectRows)

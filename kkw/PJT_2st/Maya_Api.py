@@ -6,19 +6,17 @@ import gazu
 
 from Save import Save
 from Load import Load
+from Login import MainLogin
 from login_kkw import Auth_br
 from main_widget import Widget
 from main_widget import Widget2
+from tumbtumb import thumbnail_control
 from table_model import CustomTableModel
 from table_model import CustomTableModel2
 from PySide2 import QtWidgets, QtCore, QtUiTools
 from PySide2.QtGui import QStandardItemModel, QStandardItem
 from PySide2.QtWidgets import QDialog, QHeaderView, QLineEdit, QTableView, QVBoxLayout, QMainWindow, QAction, \
     QTableWidgetItem, QTableWidget
-from Login import MainLogin
-
-
-from tumbtumb import thumbnail_control
 
 
 class MainWindow(QMainWindow):
@@ -34,7 +32,7 @@ class MainWindow(QMainWindow):
         self.ui = loader.load(ui_file)
 
         self.widget = Widget(self.read_data())
-        self.ui.Main_QGrid.addWidget(self.widget, 1, 0)
+        self.ui.verticalLayout2.addWidget(self.widget, 0)
 
         self.widget2 = Widget2(self.read_data2())
         self.ui.verticalLayout.addWidget(self.widget2, 0)

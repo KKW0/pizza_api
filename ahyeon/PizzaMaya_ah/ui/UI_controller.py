@@ -6,7 +6,7 @@ import gazu
 
 from PizzaMaya_ah.code import filter
 from PizzaMaya_ah.code import thumbnail
-from PizzaMaya_ah.code import login_kkw
+from PizzaMaya_ah.code import login
 from UI_view_save import Save
 from UI_view_load import Load
 from UI_view_table import Table
@@ -36,7 +36,7 @@ class MainWindow(QMainWindow):
 
         # 프로그램 시작 시 auto login이 체크되어 있는지 확인하며, 체크되어 있으면 바로 main window 띄움
         self.login_window = LoginWindow()
-        self.login = login_kkw.LogIn()
+        self.login = login.LogIn()
         value = self.login.load_setting()
         if value and value['auto_login'] and value['valid_host'] and value['valid_user'] is True:
             self.ui.show()

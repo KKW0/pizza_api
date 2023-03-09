@@ -1,14 +1,36 @@
 # coding=utf-8
 
-from logger_kkw import Logger
-
 import os
 import json
 import gazu
-
+from logger import Logger
 
 class LogIn(object):
     def __init__(self):
+        """
+
+        Attributes:
+            - _host (str): 사용자가 연결된 호스트의 URL입니다.
+            - _user (dict): 로그인한 사용자에 대한 정보가 들어 있는 사전입니다.
+            - _user_id (str): 로그인한 사용자의 ID입니다.
+            - _user_pw (str): 로그인한 사용자의 암호입니다.
+            - _valid_host (bool): 호스트에 대한 연결이 유효한지 여부를 나타내는 플래그입니다.
+            - _valid_user (bool): 로그인 자격 증명이 유효한지 여부를 나타내는 플래그입니다.
+            - dir_path (str): 로그 파일이 저장될 디렉터리의 경로입니다.
+            - user_path (str): 사용자의 인증 정보가 저장된 JSON 파일의 경로입니다.
+
+        Methods:
+            - __init__(): Login 개체를 초기화합니다.
+            - connect_host(try_host): 지정한 호스트에 연결하고 그에 따라 _host 및 _valid_host 특성을 설정합니다.
+            - log_in(try_id, try_pw): 지정된 사용자 ID와 암호를 사용하여 현재 연결된 호스트에 로그인하고, 그에 따라 _user, _user_id, _user_pw 및 _valid_user 특성을 설정합니다.
+            - log_out(): 현재 로그인한 사용자를 로그아웃합니다.
+            - access_setting(): 사용자 구성 디렉터리 및 user.json 파일이 있는지 확인하고 없으면 생성합니다.
+            - load_setting(): user.json 파일에서 사용자 설정을 로드하고 그에 따라 _host, _user, _user_id 및 _user_pw 특성을 설정합니다.
+            - save_setting(): 현재 사용자 설정을 user.json 파일에 저장합니다.
+            - reset_setting(): 현재 사용자 설정을 기본값으로 재설정합니다.
+
+        """
+
         self._host = None
         self._user = None
         self._user_id = None
@@ -103,8 +125,6 @@ class LogIn(object):
 
         지정된 호스트 URL에 연결을 시도하고 인증 설정에 저장합니다.
 
-        Args:
-            try_host(str) : 연결할 호스트의 URL입니다.
         Returns:
             bool : 연결이 성공하면 True이고, 그렇지 않으면 False입니다.
         Raises:
@@ -125,9 +145,6 @@ class LogIn(object):
 
         제공된 사용자 ID와 암호로 사용자를 로그인합니다.
 
-        Args:
-            try_id(str): 로그인할 사용자 ID입니다.
-            try_pw(str): 로그인할 때 사용할 암호입니다.
         Returns:
             bool : 로그인이 성공하면 True이고, 그렇지 않으면 False입니다.
         Raises:
@@ -204,20 +221,6 @@ class LogIn(object):
             with open(self.user_path, 'r') as json_file:
                 user_dict = json.load(json_file)
         return user_dict
-        # if user_dict['valid_host']:
-        #     self.connect_host()
-        # else:
-        #     self.logging.failed_log()
-        #     raise ValueError("에러에용")
-        #
-        # if user_dict['valid_user']:
-        #     self.log_in(user_dict['user_id'], user_dict['user_pw'])
-        # else:
-        #     self.logging.failed_log()
-        #     raise ValueError("Error")
-
-    # 레이즈를 통해서 false 값일 경우 추가
-
 
     def save_setting(self):
         """

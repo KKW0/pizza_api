@@ -2,7 +2,7 @@
 
 import os
 import sys
-from PizzaMaya_ah.code import login_kkw
+from PizzaMaya_ah.code import login
 from PySide2 import QtWidgets, QtCore, QtUiTools
 
 
@@ -19,7 +19,7 @@ class LoginWindow(QtWidgets.QMainWindow):
 
         ui_file.close()
 
-        self.login = login_kkw.LogIn()
+        self.login = login.LogIn()
     # ----------------------------------------------------------------------------------------------
 
         self.host_box = self.ui.findChild(QtWidgets.QLineEdit, "Host_Box")

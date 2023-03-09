@@ -152,10 +152,6 @@ class MainWindow(QMainWindow):
         # print(png)
         data = [
             [png, 'Avata', '2023-03-02']
-        #     # ['/home/rapa/다운로드/2222.png', 'TopGun', '2023-03-03']
-        #     # ['/home/rapa/다운로드/3333.jpeg', 'DontLookUp', '2023-03-04'],
-        #     # ['/home/rapa/다운로드/4444.jpeg', 'Flash', '2023-03-05'],
-        #     # ['/home/rapa/다운로드/1111.jpeg', 'DDong', '2023-03-06']
         ]
         return data
 

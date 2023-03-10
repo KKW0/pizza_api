@@ -132,7 +132,10 @@ class MainWindow(QMainWindow):
 
         """
         ft = Filter()
-        _, data, _, _, _ = ft.select_task()
+        _, task_info, _, _, _ = ft.select_task()
+        data = []
+        for index in range(len(task_info)):
+            data.append([task_info[index]['project_name'], task_info[index]['sequence_name'], task_info[index]['due_date']])
         # data = [
         #     ['Avata', '1', '2023-03-02', '123', 'abcd']
         # ]

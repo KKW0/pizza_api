@@ -197,14 +197,12 @@ class Filter:
         thumbnail_control(task, task_num, casting_info_list, undi_info_list)
 
         pp.pprint(task)
-        print('###################################task_info')
         pp.pprint(task_info)
         print('cast', casting_info_list)
         print('undi', undi_info_list)
         print('cam', camera_info_list)
 
-        # return task, task_info, casting_info_list, undi_info_list, camera_info_list
-        return None
+        return task, task_info, casting_info_list, undi_info_list, camera_info_list
 
     def select_shot(self, shot_list, shot_num):
         """

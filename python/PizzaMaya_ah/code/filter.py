@@ -1,5 +1,6 @@
 #coding:utf8
 import gazu
+import pprint as pp
 from thumbnail import thumbnail_control
 
 
@@ -25,10 +26,17 @@ class Filter:
         task_info['last_comment'] = task['last_comment']
         # task asset이 사용되는 seq 구하기
         task_asset = gazu.asset.get_asset(task['entity_id'])
-        seq = gazu.casting.get_asset_casting(task_asset)
-        task_info['sequence_name'] = seq['name']
+        casted_list = gazu.casting.get_asset_cast_in(task_asset)
+        seq = dict
+        for cast in casted_list:
+            if cast['shot_name'] is not None:
+                shot = gazu.shot.get_shot(cast['shot_id'])
+                seq = gazu.shot.get_sequence_from_shot(shot)
+                task_info['sequence_name'] = seq['name']
+                return task_info, seq['name']
+            else:
+                continue
 
-        return task_info, seq['name']
 
     def _collect_info_task(self):
         """
@@ -188,13 +196,15 @@ class Filter:
             casting_info_list, undi_info_list, camera_info_list = self._collect_info_casting(task)
         thumbnail_control(task, task_num, casting_info_list, undi_info_list)
 
-        print('task', task)
-        print('task info', task_info)
+        pp.pprint(task)
+        print('###################################task_info')
+        pp.pprint(task_info)
         print('cast', casting_info_list)
         print('undi', undi_info_list)
         print('cam', camera_info_list)
 
-        return task
+        # return task, task_info, casting_info_list, undi_info_list, camera_info_list
+        return None
 
     def select_shot(self, shot_list, shot_num):
         """
@@ -224,3 +234,9 @@ class Filter:
         print('cast', casting_info_list)
         print('undi', undi_info_list)
         print('cam', camera_info_list)
+
+
+gazu.client.set_host("http://192.168.3.116/api")
+gazu.log_in("keiel0326@gmail.com", "tmvpdltm")
+ft = Filter()
+ft.select_task()

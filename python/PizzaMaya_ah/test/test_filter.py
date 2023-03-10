@@ -34,15 +34,18 @@ class TestFilter(TestCase):
         self.output_type = gazu.files.get_output_type_by_name('Layout_mb')
         working_file = gazu.files.get_working_files_for_task(self.task)
         self.working_file = working_file[0]
-        gazu.files.new_entity_output_file(self.asset, self.output_type, self.task_type,
-                                          self.comment, self.working_file)
+        # gazu.files.new_entity_output_file(self.asset, self.output_type, self.task_type,
+        #                                   self.comment, self.working_file)
         output_file = gazu.files.get_last_output_files_for_entity(self.asset, self.output_type, self.task_type)
         self.output_file = output_file[0]
         self.path = '/home/rapa/foldertree_test/a/b/c/d/e/f/g/working/working_file'
         self.path2 = '/home/rapa/foldertree_test/a/b/c/d/e/f/g/output/output_file'
-        # new = {"asset_id": self.asset['id'], "nb_occurences": 55}
-        # new2 = {"shot_id": self.shot['id'], "nb_occurences": None}
+        new_asset = gazu.asset.get_asset_by_name(self.project, 'thomas')
+        new = {"asset_id": new_asset['id'], "nb_occurences": 55}
+        new1 = {"asset_id": self.asset['id'], "nb_occurences": 55}
+        new2 = {"shot_id": self.shot['id'], "nb_occurences": None}
         # gazu.casting.update_sequence_casting(self.project, self.seq, new)
+        # gazu.casting.update_asset_casting(self.project, self.asset, new)
         # gazu.casting.update_asset_casting(self.project, self.asset, new2)
 
     # def test__get_information_dict(self):

@@ -5,3 +5,5 @@
 2023-03-09 19:09:38,532 - DEBUG : pipeline API: log-in succeed
 2023-03-09 19:09:44,118 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
 2023-03-09 19:09:44,309 - DEBUG : pipeline API: log-in succeed
+2023-03-10 13:47:04,655 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-10 13:47:04,858 - DEBUG : ahyeon jo: log-in succeed

@@ -201,11 +201,11 @@ class Filter:
         에셋 목록 중 선택한 샷에 캐스팅된 에셋, 언디스토션 이미지, 카메라만 노출하도록 하는 매서드
 
         Args:
-            shot_list: 시퀀스에 속한 모든 샷 딕셔너리의 집합
-            shot_num: 작업할 샷의 인덱스 번호
+            shot_list(list): 시퀀스에 속한 모든 샷 딕셔너리의 집합
+            shot_num(int): 작업할 샷의 인덱스 번호
 
         Returns:
-            dict: 선택한 task의 딕셔너리
+            dict: 선택한 샷의 딕셔너리가 들어있는 리스트
         """
         undi_info_list = []
         camera_info_list = []

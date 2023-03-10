@@ -43,7 +43,7 @@ class MayaThings:
 
         Args:
             path(str): 확장자를 포함한 아웃풋 파일의 패스
-            asset(dict): 로드하고자 하는 에셋의 nb_elements, path 정보가 담긴 딕셔너리
+            asset(dict): 로드하고자 하는 에셋 아웃풋 파일의 nb_elements, path 정보가 담긴 딕셔너리
         """
         # 시퀀스 길이(씬의 프레임레인지) 를 가장 길게 설정
         if 'Undistortion_img' in path:
@@ -91,7 +91,7 @@ class MayaThings:
 
     def import_cam_seq(self, shot):
         """
-        샷에 소속된 언디스토션 시퀀스를 찾고(kit.get_undistort_img)
+        선택한 샷에 소속된 언디스토션 시퀀스를 찾고(kit.get_undistort_img)
         샷에 소속된 카메라 output file도 찾아서(kit.get_camera)
         모두 import한 뒤(load_output), 언디스토션 시퀀스를 카메라와 연결시키는(connect_image) 매서드
 
@@ -104,34 +104,33 @@ class MayaThings:
         self._load_output(camera_path)
         self._connect_image(undi_seq_path, camera_path)
 
-    def import_casting_asset(self, shot, num=None):
+    def import_casting_asset(self, asset, num_list=None):
         """
-        샷에 캐스팅된 에셋의 저장위치를 추출하여 마야에 import 하는 매서드
+        task asset에 캐스팅된 에셋들 중 선택한 것의 output file들의 저장위치를 추출하여 마야에 import 하는 매서드
 
-        shot에 캐스팅된 에셋의 중 import 할 파일을 고른 뒤,
+        task asset에 캐스팅된 에셋들 중 import 할 파일을 고른 뒤,
         각각의 확장자 포함된 패스를 추출하고(kit.get_kitsu_path),
         추출한 패스를 기반으로 마야에 import 한다.(load_output)
 
-        file_dict_list: 에셋에 있는 각 output file들(최신버전)의
+        file_dict_list: 캐스팅된 모든 에셋에 있는 각 output file들(최신버전)의
                         path, nb_elements가 기록된 dict를 모은 리스트
-        casting_list: 캐스팅된 에셋의 asset_id와 nb_elements가 기록된 dict가 모인 리스트
+        asset_output_list: 에셋 하나에 대한 output file들(최신버전)의 path, nb_elements가 기록된 dict를 모은 리스트
 
         Args:
-            shot(dict): 선택한 테스크가 속한 에셋이 캐스팅된 샷
-            num(list): import 하기를 선택한 에셋의 인덱스 번호의 집합
+            asset(dict): 선택한 task가 속한 레이아웃 에셋
+            num_list(list): import 하기를 선택한 에셋의 인덱스 번호의 집합
         """
         file_dict_list = []
-        casting_list = gazu.casting.get_shot_casting(shot)
-        layout_id = gazu.files.get_output_type_by_name('Layout_mb')['id']
-        for casting in casting_list:
-            if casting['output_type_id'] is not layout_id:
-                # shot에 레이아웃팀이 작업하는 에셋도 캐스팅되어있기 때문에, 해당 파일을 제외한다.
-                file_dict_list = self.kit.get_kitsu_path(casting)
-        if num is [0]:
-            num = range(len(casting_list))
-        for index in num:
-            file_dict = file_dict_list[index]
-            self._load_output(file_dict['path'], file_dict)
+        casted_asset_list = gazu.casting.get_asset_casting(asset)
+        for casting in casted_asset_list:
+            file_dict_list.append(self.kit.get_kitsu_path(casting))
+        if num_list is [0]:
+            # 캐스팅된 것들의 전체 선택인 경우
+            num_list = range(len(casted_asset_list))
+        for index in num_list:
+            asset_output_list = file_dict_list[index]
+            for item in asset_output_list:
+                self._load_output(item['path'], item)
 
     def save_scene_file(self, path, representation):
         """

@@ -75,7 +75,7 @@ class KitsuThings:
             casting(dict): task에 캐스팅된 에셋의 간략한 정보가 담긴 dict
 
         Returns:
-            list: 아웃풋 파일들의 패스(확장자 포함), 개수, 확장자가 담긴 dict를 수집한 리스트
+            list: 아웃풋 파일들의 패스(확장자 포함), 개수가 담긴 dict를 수집한 리스트
         """
         file_list = []
         file_dict = {

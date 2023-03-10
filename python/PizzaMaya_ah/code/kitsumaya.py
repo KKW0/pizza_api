@@ -41,14 +41,13 @@ class SetThings:
             do(str): 사용자가 동작시킬 기능. Save 또는 Load
         """
         task = self.filter.select_task(proj_num=proj_num, seq_num=seq_num, task_num=task_num)
-        # 테스크 선택하고 테스크 에셋에 캐스팅된 샷으로부터 테스크 에셋이 사용되는 시퀀스, 프로젝트 정보 추출
-
+        # 필터링해서 수행할 테스크 선택
 
         if type(task) is list:
             # 테스크를 선택하기 전에는 아무 일도 하지 않는다.
             return
         else:
-            # 레이아웃 테스크가 주어진 에셋과 그 에셋이 캐스팅된 시퀀스를 구하고, 시퀀스의 샷 리스트를 추출한다.
+            # 테스크가 주어진 에셋과 그 에셋이 캐스팅된 시퀀스를 구하고, 시퀀스의 샷 리스트를 추출한다.
             casted_list = gazu.casting.get_asset_cast_in(task['entity_id'])
             for cast in casted_list:
                 if 'SEQ' in cast['name']:
@@ -56,21 +55,26 @@ class SetThings:
                 else:
                     continue
             shot_list = gazu.shot.all_shots_for_sequence(seq)
+            asset = gazu.entity.get_entity(task['entity_id'])
 
         if asset_index_list is None:
+            # UI에서 인덱스를 받아와야 함
             asset_index_list = [0]
         if do is 'Load':
+            # 샷을 선택하고 그 안에서 에셋을 선택하거나, 샷 선택 없이 에셋만 선택할 수 있다.
             if shot_num is not None:
-                # 샷을 선택하고 그 안에서 에셋을 선택하거나, 샷 선택 없이 에셋만 선택할 수 있다.
+                # 샷을 선택한 경우
                 shot = self.filter.select_shot(shot_list, shot_num)
-                self.maya.import_casting_asset(shot, asset_index_list)
-                # 선택한 샷에 캐스팅된 에셋 중 index를 선택한 것을 마야에 모두 import
                 self.maya.import_cam_seq(shot)
                 # 선택한 샷의 카메라와 언디스토션 이미지를 마야에 import하고 둘을 연결
+
+                self.maya.import_casting_asset(asset, asset_index_list)
+                # 선택한 에셋들의 output file들을 마야에 import
             else:
+                # 전체 에셋 선택(None)
                 for shot in shot_list:
-                    self.maya.import_casting_asset(shot, asset_index_list)
-                    # 시퀀스에 속한 각 샷에 캐스팅된 에셋을 마야에 모두 import
+                    self.maya.import_casting_asset(asset, asset_index_list)
+                    # task asset에 캐스팅된 에셋을 마야에 모두 import
                     self.maya.import_cam_seq(shot)
                     # 각 샷의 카메라와 언디스토션 이미지를 마야에 import하고 둘을 연결
         elif do is 'Save':

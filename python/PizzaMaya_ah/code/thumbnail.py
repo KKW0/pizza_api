@@ -9,8 +9,8 @@ Kitsu에 로그인한 상태에서 task entity(레이아웃 에셋)의 메인 �
 구한 url에서부터 데이터를 받아오는 모듈
 """
 
-gazu.client.set_host("http://192.168.3.116/api")
-gazu.log_in("pipeline@rapa.org", "netflixacademy")
+# gazu.client.set_host("http://192.168.3.116/api")
+# gazu.log_in("pipeline@rapa.org", "netflixacademy")
 
 
 def _get_thumbnail(preview):
@@ -57,22 +57,22 @@ def thumbnail_control(task_list_or_dict, task_num=None, casting_info_list=None, 
         # 테스크 선택 시 선택한 테스크의 메인 썸네일과 캐스팅 목록의 썸네일들을 return 한다.
         asset_thumbnail_list = []
         undi_png = None
-        layout_asset = gazu.entity.get_entity(task_list_or_dict['entity_id'])
+        layout_asset = gazu.entity.get_entity(task_list_or_dict[0]['entity_id'])
         preview = gazu.files.get_preview_file(layout_asset['preview_file_id'])
         png = _get_thumbnail(preview)
 
-        for info in casting_info_list:
-            # 캐스팅된 에셋들의 썸네일
-            proj = gazu.project.get_project(task_list_or_dict[task_num]['project_id'])
-            asset = gazu.asset.get_asset_by_name(proj, info[0])
-            preview = gazu.files.get_preview_file(asset['preview_file_id'])
-            asset_thumbnail_list.append(_get_thumbnail(preview))
-
-        for info in undi_info_list:
-            # 언디스토션 이미지의 썸네일
-            shot = gazu.shot.get_shot(info['entity_id'])
-            preview = gazu.files.get_preview_file(shot['preview_file_id'])
-            undi_png = _get_thumbnail(preview)
+        # for info in casting_info_list:
+        #     # 캐스팅된 에셋들의 썸네일
+        #     proj = gazu.project.get_project(task_list_or_dict[task_num]['project_id'])
+        #     asset = gazu.asset.get_asset_by_name(proj, info[0])
+        #     preview = gazu.files.get_preview_file(asset['preview_file_id'])
+        #     asset_thumbnail_list.append(_get_thumbnail(preview))
+        #
+        # for info in undi_info_list:
+        #     # 언디스토션 이미지의 썸네일
+        #     shot = gazu.shot.get_shot(info['entity_id'])
+        #     preview = gazu.files.get_preview_file(shot['preview_file_id'])
+        #     undi_png = _get_thumbnail(preview)
 
         return png, asset_thumbnail_list, undi_png
 

@@ -16,15 +16,18 @@ from PizzaMaya_ah.ui.UI_view_table import Table2
 from PizzaMaya_ah.ui.UI_view_login import LoginWindow
 
 from PySide2 import QtWidgets, QtCore, QtUiTools
-from PySide2.QtWidgets import QMainWindow
+from PySide2.QtWidgets import QMainWindow, QLabel
+from PySide2.QtGui import QPixmap
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         # Load main window UI
         QMainWindow.__init__(self)
-
         # 현재 작업 디렉토리 경로를 가져옴
+        self.task = None
+        self.task_num = None
+        self.task_info = None
         cwd = os.path.dirname(os.path.abspath(__file__))
         # ui 파일 경로 생성
         ui_path = os.path.join(cwd, 'UI_design', 'Main.ui')
@@ -39,6 +42,20 @@ class MainWindow(QMainWindow):
         self.ui = loader.load(ui_file)
         ui_file.close()
 
+        # # 프로그램 시작 시 auto login이 체크되어 있는지 확인하며, 체크되어 있으면 바로 main window 띄움
+        # self.login_window = LoginWindow()
+        # self.login = LogIn()
+        # value = self.login.load_setting()
+        # if value and value['auto_login'] and value['valid_host'] and value['valid_user'] is True:
+        #     self.login.log_in()
+        #     self.ui.show()
+        # else:
+        #     self.login_window.ui.show()
+
+        gazu.client.set_host("http://192.168.3.116/api")
+        gazu.log_in("keiel0326@gmail.com", "tmvpdltm")
+        self.ui.show()
+
         # 메인 윈도우의 레이아웃에 TableView 2개 추가
         self.table = Table(self.read_data())
         self.ui.verticalLayout2.addWidget(self.table, 0)
@@ -46,20 +63,11 @@ class MainWindow(QMainWindow):
         self.table2 = Table2(self.read_data2())
         self.ui.verticalLayout.addWidget(self.table2, 0)
 
-        # 프로그램 시작 시 auto login이 체크되어 있는지 확인하며, 체크되어 있으면 바로 main window 띄움
-        self.login_window = LoginWindow()
-        self.login = LogIn()
-        value = self.login.load_setting()
-        if value and value['auto_login'] and value['valid_host'] and value['valid_user'] is True:
-            self.ui.show()
-        else:
-            self.login_window.ui.show()
-
         # ----------------------------------------------------------------------------------------------
 
-        # Login 버튼, Logout 버튼 연결
-        self.login_window.ui.Login_Button.clicked.connect(self.login_button)
-        self.ui.Logout_Button.clicked.connect(self.logout_button)
+        # # Login 버튼, Logout 버튼 연결
+        # self.login_window.ui.Login_Button.clicked.connect(self.login_button)
+        # self.ui.Logout_Button.clicked.connect(self.logout_button)
 
         # TableView 2개 연결
         self.table.clicked.connect(self.table_clicked)
@@ -88,31 +96,48 @@ class MainWindow(QMainWindow):
     # 정보 입력 후 로그인 버튼을 클릭하면 Kitsu에 로그인을 하고, 오토로그인이 체크되어있는지 판별
     # 로그아웃 버튼 클릭 시 Kitsu에서 로그아웃을 하고, 메인 윈도우 hide한 뒤 로그인 윈도우 띄움
 
-    def login_button(self):
-        host_box = self.login_window.ui.Host_Box
-        id_box = self.login_window.ui.ID_Box
-        pw_box = self.login_window.ui.PW_Box
-
-        self.login.host = host_box.text()
-        self.login.user_id = id_box.text()
-        self.login.user_pw = pw_box.text()
-        self.login.auto_login = self.login_window.ui.Auto_Login_Check.isChecked()
-
-        if self.login.connect_host() and self.login.log_in():
-            self.login_window.ui.hide()     ###### close가 아니라 hide 해야 하는지?
-            self.ui.show()
-
-    def logout_button(self):
-        self.login.log_out()
-        self.ui.hide()
-        self.login_window.ui.show()
+    # def login_button(self):
+    #     host_box = self.login_window.ui.Host_Box
+    #     id_box = self.login_window.ui.ID_Box
+    #     pw_box = self.login_window.ui.PW_Box
+    #
+    #     self.login.host = host_box.text()
+    #     self.login.user_id = id_box.text()
+    #     self.login.user_pw = pw_box.text()
+    #     self.login.auto_login = self.login_window.ui.Auto_Login_Check.isChecked()
+    #
+    #     if self.login.connect_host() and self.login.log_in():
+    #         self.login_window.ui.hide()     ###### close가 아니라 hide 해야 하는지?
+    #         self.ui.show()
+    #
+    # def logout_button(self):
+    #     self.login.log_out()
+    #     self.ui.hide()
+    #     self.login_window.ui.show()
 
     # ----------------------------------------------------------------------------------------------
     # TableView의 항목을 클릭하면 항목의 정보를 프린트 해줌
 
     def table_clicked(self, event):
-        selected_data = self.read_data()[event.row()]
-        print(selected_data)
+        # selected_data = self.read_data()[event.row()]
+        # print(selected_data)
+        png = thumbnail_control(self.task, event.row())
+
+        ft = Filter()
+        task, _, _, _, _ = ft.select_task()
+        tup = thumbnail_control(task, 0)
+        png = bytes(tup[0])
+
+        pixmap = QPixmap()
+        if pixmap.loadFromData(png) is False:
+            print("Error")
+        pixmap = pixmap.scaled(300, 350)
+
+        label = self.ui.Main_Preview
+        label.setPixmap(pixmap)
+        label.setFixedSize(pixmap.width(), pixmap.height())
+
+        # return pixmap
 
     def table_clicked2(self, event):
         selected_data = self.read_data2()[event.row()]
@@ -121,8 +146,7 @@ class MainWindow(QMainWindow):
     # ----------------------------------------------------------------------------------------------
     # TableView 두개에 띄울 각각의 정보를 넣어둠
 
-    @staticmethod
-    def read_data():
+    def read_data(self):
         """
         task 선택하는 TableView의 데이터
 
@@ -132,13 +156,11 @@ class MainWindow(QMainWindow):
 
         """
         ft = Filter()
-        _, task_info, _, _, _ = ft.select_task()
+        self.task, task_info, _, _, _ = ft.select_task()
         data = []
         for index in range(len(task_info)):
-            data.append([task_info[index]['project_name'], task_info[index]['sequence_name'], task_info[index]['due_date']])
-        # data = [
-        #     ['Avata', '1', '2023-03-02', '123', 'abcd']
-        # ]
+            data.append([task_info[index]['project_name'], task_info[index]['sequence_name'],
+                         task_info[index]['due_date']])
 
         return data
 
@@ -180,4 +202,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    

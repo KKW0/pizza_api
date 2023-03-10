@@ -1,7 +1,7 @@
 # coding=utf-8
 
-from PizzaMaya_ah.ui.UI_model import CustomTableModel
-from PizzaMaya_ah.ui.UI_model import CustomTableModel2
+from UI_model import CustomTableModel
+from UI_model import CustomTableModel2
 from PySide2 import QtWidgets
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QFont

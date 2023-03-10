@@ -28,7 +28,6 @@ class LoginWindow(QtWidgets.QMainWindow):
 
         ui_file.close()
 
-        self.login = LogIn()
     # ----------------------------------------------------------------------------------------------
 
         self.host_box = self.ui.findChild(QtWidgets.QLineEdit, "Host_Box")

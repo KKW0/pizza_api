@@ -5,6 +5,7 @@ import json
 import gazu
 from logger import Logger
 
+
 class LogIn(object):
     def __init__(self):
         """
@@ -152,7 +153,10 @@ class LogIn(object):
             ValueError: 호스트가 연결되어 있지 않은 경우
 
         """
-
+        user_dict = self.load_setting()
+        if user_dict['auto_login'] is True:
+            self.user_id = user_dict['user_id']
+            self.user_pw = user_dict['user_pw']
         try:
             log_in = gazu.log_in(self.user_id, self.user_pw)
         except gazu.AuthFailedException:
@@ -174,7 +178,6 @@ class LogIn(object):
             None
 
         """
-
         self.user = None
         self.reset_setting()
         self.logging.logout_log()

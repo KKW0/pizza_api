@@ -1,12 +1,16 @@
 #coding:utf8
+import pprint
+
 import gazu
-import pprint as pp
 from thumbnail import thumbnail_control
 
 
 class Filter:
     def __init__(self):
+        # gazu.client.set_host("http://192.168.3.116/api")
+        # gazu.log_in("keiel0326@gmail.com", "tmvpdltm")
         pass
+
 
     def _get_information_dict(self, task):
         """
@@ -181,7 +185,12 @@ class Filter:
             task_num: 선택한 테스크의 인덱스 번호. 테스크 선택 전에는 None
 
         Returns:
-            dict: 선택한 task의 딕셔너리
+            dict or list: 선택한 task의 딕셔너리 또는 task의 집합(선택 전)
+            list: 선택한 task의 정제된 정보를 담은 리스트
+            list: 캐스팅된 에셋의 리스트
+            list: 언디스토션 이미지의 리스트
+            list: 카메라의 리스트
+
         """
         casting_info_list = None
         undi_info_list = None
@@ -196,11 +205,11 @@ class Filter:
             casting_info_list, undi_info_list, camera_info_list = self._collect_info_casting(task)
         thumbnail_control(task, task_num, casting_info_list, undi_info_list)
 
-        pp.pprint(task)
-        pp.pprint(task_info)
-        print('cast', casting_info_list)
-        print('undi', undi_info_list)
-        print('cam', camera_info_list)
+        # pp.pprint(task)
+        # pp.pprint(task_info)
+        # print('cast', casting_info_list)
+        # print('undi', undi_info_list)
+        # print('cam', camera_info_list)
 
         return task, task_info, casting_info_list, undi_info_list, camera_info_list
 
@@ -232,9 +241,3 @@ class Filter:
         print('cast', casting_info_list)
         print('undi', undi_info_list)
         print('cam', camera_info_list)
-
-
-gazu.client.set_host("http://192.168.3.116/api")
-gazu.log_in("keiel0326@gmail.com", "tmvpdltm")
-ft = Filter()
-ft.select_task()

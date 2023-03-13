@@ -19,8 +19,8 @@ class TestFilter(TestCase):
         self.user = gazu.person.get_person_by_full_name('ahyeon jo')
         # self.user.append(gazu.client.get_current_user())
         self.task_status = gazu.task.get_task_status_by_name('Todo')
-        # gazu.task.new_task_type('Layout_asset')
-        self.task_type = gazu.task.get_task_type_by_name('Layout_asset')
+        # gazu.task.new_task_type('Layout_asset')           ####task type 이름 바꿔야 함
+        self.task_type = gazu.task.get_task_type_by_name('Layout_asset')            ####task type 이름 바꿔야 함
         # gazu.task.new_task(self.asset, self.task_type, task_status=self.task_status)
         self.task = gazu.task.get_task_by_entity(self.asset, self.task_type)
         self.assignee = gazu.task.assign_task(self.task['id'], self.user['id'])
@@ -30,8 +30,8 @@ class TestFilter(TestCase):
         software = gazu.files.all_softwares()
         self.software = software[2]  # 마야
         # gazu.files.new_working_file(self.task, software=self.software, comment=self.comment)
-        # gazu.files.new_output_type('Layout_mb', 'mb')
-        self.output_type = gazu.files.get_output_type_by_name('Layout_mb')
+        # gazu.files.new_output_type('Layout_mb', 'mb')         ####output type 이름 바꿔야 함
+        self.output_type = gazu.files.get_output_type_by_name('Layout_mb')          ####output type 이름 바꿔야 함
         working_file = gazu.files.get_working_files_for_task(self.task)
         self.working_file = working_file[0]
         # gazu.files.new_entity_output_file(self.asset, self.output_type, self.task_type,

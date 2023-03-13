@@ -48,19 +48,22 @@ class MainWindow(QMainWindow):
         self.ui = loader.load(ui_file)
         ui_file.close()
 
-        # # 프로그램 시작 시 auto login이 체크되어 있는지 확인하며, 체크되어 있으면 바로 main window 띄움
-        # self.login_window = LoginWindow()
-        # self.login = LogIn()
-        # value = self.login.load_setting()
-        # if value and value['auto_login'] and value['valid_host'] and value['valid_user'] is True:
-        #     self.login.log_in()
-        #     self.ui.show()
-        # else:
-        #     self.login_window.ui.show()
+        # 프로그램 시작 시 auto login이 체크되어 있는지 확인하며, 체크되어 있으면 바로 main window 띄움
+        self.login_window = LoginWindow()
+        self.login = LogIn()
+        value = self.login.load_setting()
+        if value and value['auto_login'] and value['valid_host'] and value['valid_user'] is True:
+            self.login.log_in()
+            # Set table1 data
+            self.table1_model.load_data(self.read_data())
+            self.table1_model.layoutChanged.emit()
+            self.ui.show()
+        else:
+            self.login_window.ui.show()
 
-        gazu.client.set_host("http://192.168.3.116/api")
-        gazu.log_in("keiel0326@gmail.com", "tmvpdltm")
-        self.ui.show()
+        # gazu.client.set_host("http://192.168.3.116/api")
+        # gazu.log_in("keiel0326@gmail.com", "tmvpdltm")
+        # self.ui.show()
 
         # 메인 윈도우의 레이아웃에 TableView 2개 추가
         self.table = Table()
@@ -76,15 +79,11 @@ class MainWindow(QMainWindow):
         self.table2_model = CustomTableModel2()
         self.table2.setModel(self.table2_model)
 
-        # Set table1 data
-        self.table1_model.load_data(self.read_data())
-        self.table1_model.layoutChanged.emit()
-
         # ----------------------------------------------------------------------------------------------
 
-        # # Login 버튼, Logout 버튼 연결
-        # self.login_window.ui.Login_Button.clicked.connect(self.login_button)
-        # self.ui.Logout_Button.clicked.connect(self.logout_button)
+        # Login 버튼, Logout 버튼 연결
+        self.login_window.ui.Login_Button.clicked.connect(self.login_button)
+        self.ui.Logout_Button.clicked.connect(self.logout_button)
 
         # TableView 2개 연결
         self.table.clicked.connect(self.table_clicked)

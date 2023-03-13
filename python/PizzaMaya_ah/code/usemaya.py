@@ -54,9 +54,9 @@ class MayaThings:
                 mc.playbackOptions(min=False, max=frame_range)
 
         mc.file(
-            path, i=True, ignoreVersion=True,
+            path, r=True, ignoreVersion=True,
             # path의 아웃풋 파일을 import 하는데, 이 때 fbx파일의 버전 번호를 무시한다.
-            mergeNamespacesOnClash=False, importTimeRange="combine",
+            mergeNamespacesOnClash=False,
             # 네임스페이스 충돌이 발생하면 병합하지 않도록 지정
             # fbx 애니메이션 데이터를 씬의 기존 애니메이션과 결합하도록 지정
             loadReferenceDepth="all",

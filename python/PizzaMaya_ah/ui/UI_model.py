@@ -8,16 +8,15 @@ class CustomTableModel(QAbstractTableModel):
     """
     task 선택하는 TableView의 모델
     """
-    def __init__(self, data=None):
+    def __init__(self, table_data=[]):
         QAbstractTableModel.__init__(self)
         self.row_count = None
         self.input_data = None
         self.column_count = None
-        self.load_data(data)
+        self.load_data(table_data)
 
     def load_data(self, data):
         self.column_count = 3
-
         self.input_data = data
         self.row_count = len(data)
 
@@ -55,16 +54,15 @@ class CustomTableModel2(QAbstractTableModel):
     """
     asset, camera, undi_img 선택하는 TableView의 모델
     """
-    def __init__(self, data=None):
+    def __init__(self, table_data=[]):
         QAbstractTableModel.__init__(self)
         self.row_count = None
         self.input_data = None
         self.column_count = None
-        self.load_data2(data)
+        self.load_data2(table_data)
 
     def load_data2(self, data):
         self.column_count = 3
-
         self.input_data = data
         self.row_count = len(data)
 
@@ -87,10 +85,7 @@ class CustomTableModel2(QAbstractTableModel):
         row = index.row()
 
         if role == Qt.DisplayRole:
-            if column == 1:
-                return str(self.input_data[row][1])
-            elif column == 2:
-                return str(self.input_data[row][2])
+            return str(self.input_data[row][column])
 
         elif role == Qt.DecorationRole:
             if column == 0:
@@ -103,3 +98,14 @@ class CustomTableModel2(QAbstractTableModel):
             return Qt.AlignRight
 
         return None
+
+    def setData(self, index, value, role):
+        if role == Qt.EditRole:
+            self.input_data = value
+            self.dataChanged.emit(index, index)
+            return True
+
+        return False
+
+    def flags(self, index):
+        return Qt.ItemIsEditable | Qt.ItemIsEnabled | Qt.ItemIsSelectable

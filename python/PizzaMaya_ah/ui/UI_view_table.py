@@ -1,7 +1,5 @@
 # coding=utf-8
 
-from UI_model import CustomTableModel
-from UI_model import CustomTableModel2
 from PySide2 import QtWidgets, QtCore, QtGui
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QFont
@@ -23,12 +21,10 @@ class Table(QTableView):
     """
     task 선택하는 TableView
     """
-    def __init__(self, data):
+    def __init__(self):
         QTableView.__init__(self)
 
         self.setSortingEnabled(True)
-        self.model = CustomTableModel(data)
-        self.setModel(self.model)
 
         font = QFont()
         font.setFamily("Arial")
@@ -99,12 +95,8 @@ class Table2(QTableView):
     """
     asset, camera, undi_img 선택하는 TableView
     """
-    def __init__(self, data):
+    def __init__(self):
         QTableView.__init__(self)
-
-        # Getting the Model
-        self.model_ = CustomTableModel2(data)
-        self.setModel(self.model_)
 
         font = QFont()
         font.setFamily("Arial")

@@ -14,9 +14,11 @@ from PizzaMaya_ah.ui.UI_view_load import Load
 from PizzaMaya_ah.ui.UI_view_table import Table
 from PizzaMaya_ah.ui.UI_view_table import Table2
 from PizzaMaya_ah.ui.UI_view_login import LoginWindow
+from PizzaMaya_ah.ui.UI_model import CustomTableModel
+from PizzaMaya_ah.ui.UI_model import CustomTableModel2
 
 from PySide2 import QtWidgets, QtCore, QtUiTools
-from PySide2.QtWidgets import QMainWindow, QLabel
+from PySide2.QtWidgets import QMainWindow
 from PySide2.QtGui import QPixmap
 
 
@@ -26,8 +28,12 @@ class MainWindow(QMainWindow):
         QMainWindow.__init__(self)
         # 현재 작업 디렉토리 경로를 가져옴
         self.task = None
+        self.my_task = None
         self.task_num = None
         self.task_info = None
+        self.undi_info_list = None
+        self.camera_info_list = None
+        self.casting_info_list = None
         cwd = os.path.dirname(os.path.abspath(__file__))
         # ui 파일 경로 생성
         ui_path = os.path.join(cwd, 'UI_design', 'Main.ui')
@@ -57,11 +63,22 @@ class MainWindow(QMainWindow):
         self.ui.show()
 
         # 메인 윈도우의 레이아웃에 TableView 2개 추가
-        self.table = Table(self.read_data())
+        self.table = Table()
         self.ui.verticalLayout2.addWidget(self.table, 0)
 
-        self.table2 = Table2(self.read_data2())
+        self.table2 = Table2()
         self.ui.verticalLayout.addWidget(self.table2, 0)
+
+        # Getting the Model
+        self.table1_model = CustomTableModel()
+        self.table.setModel(self.table1_model)
+
+        self.table2_model = CustomTableModel2()
+        self.table2.setModel(self.table2_model)
+
+        # Set table1 data
+        self.table1_model.load_data(self.read_data())
+        self.table1_model.layoutChanged.emit()
 
         # ----------------------------------------------------------------------------------------------
 
@@ -119,13 +136,9 @@ class MainWindow(QMainWindow):
     # TableView의 항목을 클릭하면 항목의 정보를 프린트 해줌
 
     def table_clicked(self, event):
-        # selected_data = self.read_data()[event.row()]
-        # print(selected_data)
-        png = thumbnail_control(self.task, event.row())
-
         ft = Filter()
-        task, _, _, _, _ = ft.select_task()
-        tup = thumbnail_control(task, 0)
+        self.my_task, _, self.casting_info_list, self.undi_info_list,\
+            self.camera_info_list, tup = ft.select_task(task_num=event.row())
         png = bytes(tup[0])
 
         pixmap = QPixmap()
@@ -137,11 +150,15 @@ class MainWindow(QMainWindow):
         label.setPixmap(pixmap)
         label.setFixedSize(pixmap.width(), pixmap.height())
 
+        self.table2_model.load_data2(self.read_data2())
+        self.table2_model.layoutChanged.emit()
+
         # return pixmap
 
     def table_clicked2(self, event):
-        selected_data = self.read_data2()[event.row()]
-        print(selected_data)
+        # selected_data = self.read_data2()[event.row()]
+        # print(selected_data)
+        pass
 
     # ----------------------------------------------------------------------------------------------
     # TableView 두개에 띄울 각각의 정보를 넣어둠
@@ -156,7 +173,7 @@ class MainWindow(QMainWindow):
 
         """
         ft = Filter()
-        self.task, task_info, _, _, _ = ft.select_task()
+        self.task, task_info, _, _, _, _ = ft.select_task()
         data = []
         for index in range(len(task_info)):
             data.append([task_info[index]['project_name'], task_info[index]['sequence_name'],
@@ -164,8 +181,7 @@ class MainWindow(QMainWindow):
 
         return data
 
-    @staticmethod
-    def read_data2():
+    def read_data2(self):
         """
         asset, camera, undi_img 선택하는 TableView의 데이터
 
@@ -175,16 +191,14 @@ class MainWindow(QMainWindow):
 
         """
         # 썸네일을 얻기 위해 받아와야 하는 정보
-        project = gazu.project.get_project_by_name('jeongtae')
-        asset = gazu.asset.get_asset_by_name(project, 'chair')
-        task_type = gazu.task.get_task_type_by_name('Layout_asset')
-        task = gazu.task.get_task_by_entity(asset, task_type)
-
-        png = thumbnail_control([task])
-        data = [
-            [png, 'Avata', '2023-03-02']
-        ]
-        return data
+        data = []
+        if self.my_task is not None:
+            _, asset_thumbnail_list, _ = thumbnail_control(self.my_task, 0, self.casting_info_list)
+            for index, cast in enumerate(self.casting_info_list):
+                data.append([asset_thumbnail_list[index], cast[0], cast[2]])
+            return data
+        else:
+            return data
 
     # ----------------------------------------------------------------------------------------------
 

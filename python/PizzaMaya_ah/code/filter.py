@@ -1,5 +1,4 @@
 #coding:utf8
-import pprint
 
 import gazu
 import pprint as pp
@@ -79,7 +78,7 @@ class Filter:
         """
         info_list = []
         task_type = gazu.task.get_task_type_by_name('Matchmove')
-        output_list = gazu.files.get_last_output_files_for_entity(shot, output_type, task_type)
+        output_list = gazu.files.get_last_output_files_for_entity(shot['shot_id'], output_type, task_type)
         for output in output_list:
             if output is None:
                 raise ValueError("해당하는 output file이 존재하지 않습니다.")
@@ -108,6 +107,7 @@ class Filter:
         casting_info_list = []
         undi_info_list = []
         camera_info_list = []
+        output_list = []
         output_dict = {'output_type': None,
                        'revision': None,
                        'representation': None,
@@ -122,19 +122,20 @@ class Filter:
                 revision = gazu.files.get_last_entity_output_revision(asset, item, task_type)
                 output_dict['output_type'] = item['name']
                 output_dict['revision'] = revision
+                output_list.append(output_dict)
 
             casting_dict = {'asset_name': asset['name'],
                             'description': asset['description'],
                             'asset_type_name': asset['asset_type_name'],
                             'nb_occurences': cast['nb_occurences'],
-                            'output': output_dict}
+                            'output': output_list}
             casting_info_list.append(casting_dict)
 
         shot_list = gazu.casting.get_asset_cast_in(task_asset)
-        shot = gazu.shot.get_shot(shot_list[0]['shot_id'])
-        seq = gazu.shot.get_sequence_from_shot(shot)
-        all_shots = gazu.shot.all_shots_for_sequence(seq)
-        for shot in all_shots:
+        # shot = gazu.shot.get_shot(shot_list[0]['shot_id'])
+        # seq = gazu.shot.get_sequence_from_shot(shot)
+        # all_shots = gazu.shot.all_shots_for_sequence(seq)
+        for shot in shot_list:
             undi_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Undistortion_img')))  ####output type 이름 바꿔야 함
             camera_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Camera')))
 
@@ -258,12 +259,6 @@ class Filter:
             casting_info_list, undi_info_list, camera_info_list = self._collect_info_casting(task)
         tup = thumbnail_control(task, task_num, casting_info_list, undi_info_list)
 
-        # pp.pprint(task)
-        # pp.pprint(task_info)
-        # print('cast', casting_info_list)
-        # print('undi', undi_info_list)
-        # print('cam', camera_info_list)
-
         return task, task_info, casting_info_list, undi_info_list, camera_info_list, tup
 
     def select_shot(self, shot_list, shot_num):
@@ -295,7 +290,3 @@ class Filter:
                 casting_info_dict.append(casting_dict)
         undi_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Undistortion_img')))  ####output type 이름 바꿔야 함
         camera_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Camera')))
-
-        print('cast', casting_info_dict)
-        print('undi', undi_info_list)
-        print('cam', camera_info_list)

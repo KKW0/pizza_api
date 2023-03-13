@@ -94,11 +94,7 @@ class MainWindow(QMainWindow):
         else:
             self.login_window.ui.show()
 
-
-        # # Set table1 data
-        # 키지 마시오...로그인에 있음
-        # self.table1_model.load_data(self.read_data())
-        # self.table1_model.layoutChanged.emit()
+        self.ft = Filter()
 
         # ----------------------------------------------------------------------------------------------
 
@@ -163,9 +159,8 @@ class MainWindow(QMainWindow):
     # TableView의 항목을 클릭하면 항목의 정보를 프린트 해줌
 
     def table_clicked(self, event):
-        ft = Filter()
-        self.my_task, _, self.casting_info_list, self.undi_info_list,\
-            self.camera_info_list, tup = ft.select_task(task_num=event.row())
+        self.my_task, task_info, self.casting_info_list, self.undi_info_list,\
+            self.camera_info_list, tup = self.ft.select_task(task_num=event.row())
         png = bytes(tup[0])
 
         pixmap = QPixmap()
@@ -177,15 +172,35 @@ class MainWindow(QMainWindow):
         label.setPixmap(pixmap)
         label.setFixedSize(pixmap.width(), pixmap.height())
 
+        self.ui.InfoTextBox.setPlainText('Project Name: {}'.format(task_info['project_name'] + '\n'))
+        self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(task_info['description']))
+        self.ui.InfoTextBox.appendPlainText('Due Date: {0}'.format(task_info['due_date']))
+        self.ui.InfoTextBox.appendPlainText('Comment: {0}'.format(str(task_info['last_comment'])))
+
         self.table2_model.load_data2(self.read_data2())
         self.table2_model.layoutChanged.emit()
 
-        # return pixmap
-
     def table_clicked2(self, event):
-        # selected_data = self.read_data2()[event.row()]
-        # print(selected_data)
-        pass
+        clicked_cast = self.casting_info_list[event.row()]
+
+        self.my_task, _, self.casting_info_list, self.undi_info_list, \
+            self.camera_info_list, tup = self.ft.select_task(task_num=event.row())
+        png = bytes(tup[0])
+        pixmap = QPixmap()
+        if pixmap.loadFromData(png) is False:
+            print("Error")
+        pixmap = pixmap.scaled(300, 350)
+
+        label = self.ui.Preview
+        label.setPixmap(pixmap)
+        label.setFixedSize(pixmap.width(), pixmap.height())
+
+        self.ui.InfoTextBox.setPlainText('Asset Name: {}'.format(clicked_cast['asset_name']+'\n'))
+        self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(clicked_cast['description']))
+        self.ui.InfoTextBox.appendPlainText('Asset Type: {0}'.format(clicked_cast['asset_type_name']))
+        self.ui.InfoTextBox.appendPlainText('Occurence: {0}'.format(str(clicked_cast['nb_occurences'])))
+        self.ui.InfoTextBox.appendPlainText('Output File: {0}'.format(str(len(clicked_cast['output']))))
+        self.ui.InfoTextBox.appendPlainText('Newest or Not: Not')   # 모든 아웃풋 파일들이 전부 최신 리비전이면 YES로 표기
 
     # ----------------------------------------------------------------------------------------------
     # TableView 두개에 띄울 각각의 정보를 넣어둠

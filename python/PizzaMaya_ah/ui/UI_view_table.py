@@ -42,11 +42,9 @@ class Table(QTableView):
         self.combo_box.setGeometry(0, 0, 100, 30)
         self.combo_box.addItems(['All', 'Option 1', 'Option 2'])
 
-
         self.combo_box2 = QComboBox(self.horizontalHeader())
         self.combo_box2.setGeometry(100, 0, 100, 30)
         self.combo_box2.addItems(['All', 'Option A', 'Option B'])
-
 
         # self.horizontal_header = self.horizontalHeader()
         self.vertical_header = self.verticalHeader()

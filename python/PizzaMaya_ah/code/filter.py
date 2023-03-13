@@ -125,7 +125,7 @@ class Filter:
         seq = gazu.shot.get_sequence_from_shot(shot)
         all_shots = gazu.shot.all_shots_for_sequence(seq)
         for shot in all_shots:
-            undi_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Undistortion_img')))
+            undi_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Undistortion_img')))  ####output type 이름 바꿔야 함
             camera_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Camera')))
 
         return casting_info_dict, undi_info_list, camera_info_list
@@ -283,7 +283,7 @@ class Filter:
                                 'revision': cast['revision'],
                                 'comment': cast['comment']}
                 casting_info_dict.append(casting_dict)
-        undi_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Undistortion_img')))
+        undi_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Undistortion_img')))  ####output type 이름 바꿔야 함
         camera_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Camera')))
 
         print('cast', casting_info_dict)

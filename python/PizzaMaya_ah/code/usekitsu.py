@@ -38,7 +38,7 @@ class KitsuThings:
             str: 첫번째 언디스토션 이미지의 path
         """
         padding = self._get_frame_padding(shot)
-        undi_path = gazu.files.build_entity_output_file_path(shot, 'Undistortion_img', 'Matchmove')
+        undi_path = gazu.files.build_entity_output_file_path(shot, 'Undistortion_img', 'Matchmove') ####output type 이름 바꿔야 함
         full_path = undi_path + padding + '.jpg'
 
         return full_path

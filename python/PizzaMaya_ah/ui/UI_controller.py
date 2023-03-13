@@ -105,6 +105,9 @@ class MainWindow(QMainWindow):
         # Login 버튼, Logout 버튼 연결
         self.login_window.ui.Login_Button.clicked.connect(self.login_button)
         self.ui.Logout_Button.clicked.connect(self.logout_button)
+        # Login 버튼, Logout 버튼 연결
+        self.login_window.ui.Login_Button.clicked.connect(self.login_button)
+        self.ui.Logout_Button.clicked.connect(self.logout_button)
 
         # TableView 2개 연결
         self.table.clicked.connect(self.table_clicked)

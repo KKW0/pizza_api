@@ -48,19 +48,11 @@ class MainWindow(QMainWindow):
         self.ui = loader.load(ui_file)
         ui_file.close()
 
-        # # 프로그램 시작 시 auto login이 체크되어 있는지 확인하며, 체크되어 있으면 바로 main window 띄움
-        # self.login_window = LoginWindow()
-        # self.login = LogIn()
-        # value = self.login.load_setting()
-        # if value and value['auto_login'] and value['valid_host'] and value['valid_user'] is True:
-        #     self.login.log_in()
-        #     self.ui.show()
-        # else:
-        #     self.login_window.ui.show()
 
-        gazu.client.set_host("http://192.168.3.116/api")
-        gazu.log_in("keiel0326@gmail.com", "tmvpdltm")
-        self.ui.show()
+
+        # gazu.client.set_host("http://192.168.3.116/api")
+        # gazu.log_in("keiel0326@gmail.com", "tmvpdltm")
+        # self.ui.show()
 
         # 메인 윈도우의 레이아웃에 TableView 2개 추가
         self.table = Table()
@@ -80,15 +72,39 @@ class MainWindow(QMainWindow):
         self.table2_model = CustomTableModel2()
         self.table2.setModel(self.table2_model)
 
-        # Set table1 data
-        self.table1_model.load_data(self.read_data())
-        self.table1_model.layoutChanged.emit()
+
+        # 프로그램 시작 시 auto login이 체크되어 있는지 확인하며, 체크되어 있으면 바로 main window 띄움
+        self.login_window = LoginWindow()
+        self.login = LogIn()
+
+        value = self.login.load_setting()
+        if value and value['auto_login'] and value['valid_host'] and value['valid_user'] is True:
+
+            self.login.host = value['host']
+            self.login.user_id = value['user_id']
+            self.login.user_pw = value['user_pw']
+            self.login.auto_login = value['auto_login']
+            self.login.connect_host()
+            self.login.log_in()
+            self.ui.show()
+
+            # Set table1 data
+            self.table1_model.load_data(self.read_data())
+            self.table1_model.layoutChanged.emit()
+        else:
+            self.login_window.ui.show()
+
+
+        # # Set table1 data
+        # 키지 마시오...로그인에 있음
+        # self.table1_model.load_data(self.read_data())
+        # self.table1_model.layoutChanged.emit()
 
         # ----------------------------------------------------------------------------------------------
 
-        # # Login 버튼, Logout 버튼 연결
-        # self.login_window.ui.Login_Button.clicked.connect(self.login_button)
-        # self.ui.Logout_Button.clicked.connect(self.logout_button)
+        # Login 버튼, Logout 버튼 연결
+        self.login_window.ui.Login_Button.clicked.connect(self.login_button)
+        self.ui.Logout_Button.clicked.connect(self.logout_button)
 
         # TableView 2개 연결
         self.table.clicked.connect(self.table_clicked)
@@ -117,24 +133,28 @@ class MainWindow(QMainWindow):
     # 정보 입력 후 로그인 버튼을 클릭하면 Kitsu에 로그인을 하고, 오토로그인이 체크되어있는지 판별
     # 로그아웃 버튼 클릭 시 Kitsu에서 로그아웃을 하고, 메인 윈도우 hide한 뒤 로그인 윈도우 띄움
 
-    # def login_button(self):
-    #     host_box = self.login_window.ui.Host_Box
-    #     id_box = self.login_window.ui.ID_Box
-    #     pw_box = self.login_window.ui.PW_Box
-    #
-    #     self.login.host = host_box.text()
-    #     self.login.user_id = id_box.text()
-    #     self.login.user_pw = pw_box.text()
-    #     self.login.auto_login = self.login_window.ui.Auto_Login_Check.isChecked()
-    #
-    #     if self.login.connect_host() and self.login.log_in():
-    #         self.login_window.ui.hide()     ###### close가 아니라 hide 해야 하는지?
-    #         self.ui.show()
-    #
-    # def logout_button(self):
-    #     self.login.log_out()
-    #     self.ui.hide()
-    #     self.login_window.ui.show()
+    def login_button(self):
+        host_box = self.login_window.ui.Host_Box
+        id_box = self.login_window.ui.ID_Box
+        pw_box = self.login_window.ui.PW_Box
+
+        self.login.host = host_box.text()
+        self.login.user_id = id_box.text()
+        self.login.user_pw = pw_box.text()
+        self.login.auto_login = self.login_window.ui.Auto_Login_Check.isChecked()
+
+        if self.login.connect_host() and self.login.log_in():
+            self.login_window.ui.hide()     ###### close가 아니라 hide 해야 하는지?
+            self.ui.show()
+
+            # Set table1 data
+            self.table1_model.load_data(self.read_data())
+            self.table1_model.layoutChanged.emit()
+
+    def logout_button(self):
+        self.login.log_out()
+        self.ui.hide()
+        self.login_window.ui.show()
 
     # ----------------------------------------------------------------------------------------------
     # TableView의 항목을 클릭하면 항목의 정보를 프린트 해줌
@@ -150,7 +170,7 @@ class MainWindow(QMainWindow):
             print("Error")
         pixmap = pixmap.scaled(300, 350)
 
-        label = self.ui.Main_Preview
+        label = self.ui.Preview
         label.setPixmap(pixmap)
         label.setFixedSize(pixmap.width(), pixmap.height())
 

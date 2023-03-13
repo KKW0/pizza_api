@@ -222,7 +222,7 @@ class MainWindow(QMainWindow):
         if self.my_task is not None:
             _, asset_thumbnail_list, _ = thumbnail_control(self.my_task, 0, self.casting_info_list)
             for index, cast in enumerate(self.casting_info_list):
-                data.append([asset_thumbnail_list[index], cast[0], cast[2]])
+                data.append([asset_thumbnail_list[index], cast['asset_name'], cast['asset_type_name']])
             return data
         else:
             return data

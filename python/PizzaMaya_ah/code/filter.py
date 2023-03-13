@@ -105,20 +105,30 @@ class Filter:
                                     (output type name, comment, description)
         """
         self._get_information_dict(task)
-        casting_info_dict = []
+        casting_info_list = []
         undi_info_list = []
         camera_info_list = []
+        output_dict = {'output_type': None,
+                       'revision': None,
+                       'representation': None,
+                       'description': None}
         task_asset = gazu.asset.get_asset(task['entity_id'])
+        task_type = gazu.task.get_task_type(task['task_type_id'])
         all_casting_list = gazu.casting.get_asset_casting(task_asset)
         for cast in all_casting_list:
             asset = gazu.asset.get_asset(cast['asset_id'])
-            casting_dict = {'asset_name': cast['asset_name'],
+            output_type = gazu.files.all_output_types_for_entity(asset)
+            for item in output_type:
+                revision = gazu.files.get_last_entity_output_revision(asset, item, task_type)
+                output_dict['output_type'] = item['name']
+                output_dict['revision'] = revision
+
+            casting_dict = {'asset_name': asset['name'],
                             'description': asset['description'],
-                            'asset_type_name': cast['asset_type_name'],
+                            'asset_type_name': asset['asset_type_name'],
                             'nb_occurences': cast['nb_occurences'],
-                            'revision': cast['revision'],
-                            'comment': cast['comment']}
-            casting_info_dict.append(casting_dict)
+                            'output': output_dict}
+            casting_info_list.append(casting_dict)
 
         shot_list = gazu.casting.get_asset_cast_in(task_asset)
         shot = gazu.shot.get_shot(shot_list[0]['shot_id'])
@@ -128,7 +138,7 @@ class Filter:
             undi_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Undistortion_img')))  ####output type 이름 바꿔야 함
             camera_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Camera')))
 
-        return casting_info_dict, undi_info_list, camera_info_list
+        return casting_info_list, undi_info_list, camera_info_list
 
     def get_task_info(self, task):
         """
@@ -141,12 +151,12 @@ class Filter:
         Returns:
             dict: 작업에 대한 관련 정보가 들어 있는 사전입니다.
         """
-        task_type = gazu.task.get_task_type_by_id(task['task_type_id'])
+        task_type = gazu.task.get_task_type(task['task_type_id'])
         entity = gazu.entity.get_entity(task['entity_id'])
         project = gazu.project.get_project(entity['project_id'])
         sequence = gazu.shot.get_sequence(entity['parent_id'])
         shot = gazu.shot.get_shot(entity['id'])
-        assignee = gazu.user.get_user(task['assigned_to_id'])
+        assignee = gazu.person.get_person(task['assigned_to_id'])
 
         task_info = {
             'id': task['id'],

@@ -61,7 +61,7 @@ def thumbnail_control(task_list_or_dict, task_num=None, casting_info_list=None, 
         for info in casting_info_list:
             # 캐스팅된 에셋들의 썸네일
             proj = gazu.project.get_project(task_list_or_dict['project_id'])
-            asset = gazu.asset.get_asset_by_name(proj, info[0])
+            asset = gazu.asset.get_asset_by_name(proj, info['asset_name'])
             preview = gazu.files.get_preview_file(asset['preview_file_id'])
             asset_thumbnail_list.append(_get_thumbnail(preview))
 
@@ -76,22 +76,22 @@ def thumbnail_control(task_list_or_dict, task_num=None, casting_info_list=None, 
         # 카메라는 썸네일 없음
 
 
-def create_thumbnail(file_data, file_extension, entity_id, preview_type):
-    thumbnail_dict = {
-        "file_data": file_data,
-        "file_extension": file_extension,
-        "entity_id": entity_id,
-        "preview_type": preview_type
-    }
-    new_thumbnail = gazu.files.create_preview_file(thumbnail_dict)
-    print("Created new thumbnail with ID:", new_thumbnail["id"])
-    return new_thumbnail
-
-
-file_data = b"thumbnail data"  # 실제 썸네일 이미지 데이터로 대체
-file_extension = ".png"  # 썸네일 파일 확장자로 대체
-entity_id = 1234  # 썸네일 이미지를 연결할 엔티티의 ID로 대체
-preview_type = "thumbnail"  # 미리 보기 유형으로 대체
-
-new_thumbnail = create_thumbnail(file_data, file_extension, entity_id, preview_type)
+# def create_thumbnail(file_data, file_extension, entity_id, preview_type):
+#     thumbnail_dict = {
+#         "file_data": file_data,
+#         "file_extension": file_extension,
+#         "entity_id": entity_id,
+#         "preview_type": preview_type
+#     }
+#     new_thumbnail = gazu.files.create_preview_file(thumbnail_dict)
+#     print("Created new thumbnail with ID:", new_thumbnail["id"])
+#     return new_thumbnail
+#
+#
+# file_data = b"thumbnail data"  # 실제 썸네일 이미지 데이터로 대체
+# file_extension = ".png"  # 썸네일 파일 확장자로 대체
+# entity_id = 1234  # 썸네일 이미지를 연결할 엔티티의 ID로 대체
+# preview_type = "thumbnail"  # 미리 보기 유형으로 대체
+#
+# new_thumbnail = create_thumbnail(file_data, file_extension, entity_id, preview_type)
 

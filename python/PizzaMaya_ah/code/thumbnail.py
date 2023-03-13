@@ -47,27 +47,23 @@ def thumbnail_control(task_list_or_dict, task_num=None, casting_info_list=None, 
         png: 언디스토션 이미지의 썸네일
     """
     if task_num is None:
-        # 테스크 선택 전에는 첫번째 테스크의 메인 썸네일을 return 한다.
-        layout_asset = gazu.entity.get_entity(task_list_or_dict[0]['entity_id'])
-        preview = gazu.files.get_preview_file(layout_asset['preview_file_id'])
-        png = _get_thumbnail(preview)
-
-        return png
+        # 테스크 선택 전에는 아무것도 하지 않는다.
+        return None
     else:
         # 테스크 선택 시 선택한 테스크의 메인 썸네일과 캐스팅 목록의 썸네일들을 return 한다.
         asset_thumbnail_list = []
         undi_png = None
-        layout_asset = gazu.entity.get_entity(task_list_or_dict[0]['entity_id'])
+        layout_asset = gazu.entity.get_entity(task_list_or_dict['entity_id'])
         preview = gazu.files.get_preview_file(layout_asset['preview_file_id'])
         png = _get_thumbnail(preview)
 
-        # for info in casting_info_list:
-        #     # 캐스팅된 에셋들의 썸네일
-        #     proj = gazu.project.get_project(task_list_or_dict[task_num]['project_id'])
-        #     asset = gazu.asset.get_asset_by_name(proj, info[0])
-        #     preview = gazu.files.get_preview_file(asset['preview_file_id'])
-        #     asset_thumbnail_list.append(_get_thumbnail(preview))
-        #
+        for info in casting_info_list:
+            # 캐스팅된 에셋들의 썸네일
+            proj = gazu.project.get_project(task_list_or_dict['project_id'])
+            asset = gazu.asset.get_asset_by_name(proj, info[0])
+            preview = gazu.files.get_preview_file(asset['preview_file_id'])
+            asset_thumbnail_list.append(_get_thumbnail(preview))
+
         # for info in undi_info_list:
         #     # 언디스토션 이미지의 썸네일
         #     shot = gazu.shot.get_shot(info['entity_id'])

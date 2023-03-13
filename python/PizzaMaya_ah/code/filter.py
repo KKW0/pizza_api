@@ -2,6 +2,7 @@
 import pprint
 
 import gazu
+import pprint as pp
 from thumbnail import thumbnail_control
 
 
@@ -106,18 +107,20 @@ class Filter:
                                     (output type name, comment, description)
         """
         self._get_information_dict(task)
-        seq = gazu.shot.get_sequence(gazu.casting.get_asset_cast_in(task['entity_id'])[0]['id'])
-        all_shots = gazu.shot.all_shots_for_sequence(seq)
-        all_casts = gazu.casting.get_sequence_casting(seq)
-        all_casting_list = all_casts.values()
         casting_info_list = []
         undi_info_list = []
         camera_info_list = []
-        for casting_list in all_casting_list:
-            for cast in casting_list:
-                asset = gazu.asset.get_asset(cast['asset_id'])
-                casting_info_list.append([cast['asset_name'], asset['description'],
-                                          cast['asset_type_name'], cast['nb_occurences']])
+        task_asset = gazu.asset.get_asset(task['entity_id'])
+        all_casting_list = gazu.casting.get_asset_casting(task_asset)
+        for cast in all_casting_list:
+            asset = gazu.asset.get_asset(cast['asset_id'])
+            casting_info_list.append([cast['asset_name'], asset['description'],
+                                      cast['asset_type_name'], cast['nb_occurences']])
+
+        shot_list = gazu.casting.get_asset_cast_in(task_asset)
+        shot = gazu.shot.get_shot(shot_list[0]['shot_id'])
+        seq = gazu.shot.get_sequence_from_shot(shot)
+        all_shots = gazu.shot.all_shots_for_sequence(seq)
         for shot in all_shots:
             undi_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Undistortion_img')))
             camera_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Camera')))
@@ -203,7 +206,7 @@ class Filter:
             task = final_task_list[task_num]
             task_info = final_task_info_list[task_num]
             casting_info_list, undi_info_list, camera_info_list = self._collect_info_casting(task)
-        thumbnail_control(task, task_num, casting_info_list, undi_info_list)
+        tup = thumbnail_control(task, task_num, casting_info_list, undi_info_list)
 
         # pp.pprint(task)
         # pp.pprint(task_info)
@@ -211,7 +214,7 @@ class Filter:
         # print('undi', undi_info_list)
         # print('cam', camera_info_list)
 
-        return task, task_info, casting_info_list, undi_info_list, camera_info_list
+        return task, task_info, casting_info_list, undi_info_list, camera_info_list, tup
 
     def select_shot(self, shot_list, shot_num):
         """

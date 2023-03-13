@@ -27,13 +27,16 @@ class MainWindow(QMainWindow):
         # Load main window UI
         QMainWindow.__init__(self)
         # 현재 작업 디렉토리 경로를 가져옴
+
         self.task = None
         self.my_task = None
         self.task_num = None
         self.task_info = None
+        self.preview_pixmap = None
         self.undi_info_list = None
         self.camera_info_list = None
         self.casting_info_list = None
+        self.task_clicked_index = None
         cwd = os.path.dirname(os.path.abspath(__file__))
         # ui 파일 경로 생성
         ui_path = os.path.join(cwd, 'UI_design', 'Main.ui')
@@ -47,12 +50,6 @@ class MainWindow(QMainWindow):
         loader = QtUiTools.QUiLoader()
         self.ui = loader.load(ui_file)
         ui_file.close()
-
-
-
-        # gazu.client.set_host("http://192.168.3.116/api")
-        # gazu.log_in("keiel0326@gmail.com", "tmvpdltm")
-        # self.ui.show()
 
         # 메인 윈도우의 레이아웃에 TableView 2개 추가
         self.table = Table()
@@ -71,7 +68,6 @@ class MainWindow(QMainWindow):
 
         self.table2_model = CustomTableModel2()
         self.table2.setModel(self.table2_model)
-
 
         # 프로그램 시작 시 auto login이 체크되어 있는지 확인하며, 체크되어 있으면 바로 main window 띄움
         self.login_window = LoginWindow()
@@ -95,6 +91,16 @@ class MainWindow(QMainWindow):
             self.login_window.ui.show()
 
         self.ft = Filter()
+
+        # Set main preview pixmap
+        self.preview_pixmap = QPixmap()
+        cwd = os.path.dirname(os.path.abspath(__file__))
+        pizza_path = os.path.join(cwd, 'UI_design', 'pizza.jpeg')
+        self.preview_pixmap.load(pizza_path)
+        label = self.ui.Preview
+        label.setPixmap(self.preview_pixmap)
+        self.preview_pixmap = self.preview_pixmap.scaled(350, 300)
+        label.setFixedSize(self.preview_pixmap.width(), self.preview_pixmap.height())
 
         # ----------------------------------------------------------------------------------------------
 
@@ -159,18 +165,13 @@ class MainWindow(QMainWindow):
     # TableView의 항목을 클릭하면 항목의 정보를 프린트 해줌
 
     def table_clicked(self, event):
+        self.task_clicked_index = event.row()
         self.my_task, task_info, self.casting_info_list, self.undi_info_list,\
-            self.camera_info_list, tup = self.ft.select_task(task_num=event.row())
+            self.camera_info_list, tup = self.ft.select_task(task_num=self.task_clicked_index)
         png = bytes(tup[0])
 
-        pixmap = QPixmap()
-        if pixmap.loadFromData(png) is False:
+        if self.preview_pixmap.loadFromData(png) is False:
             print("Error")
-        pixmap = pixmap.scaled(300, 350)
-
-        label = self.ui.Preview
-        label.setPixmap(pixmap)
-        label.setFixedSize(pixmap.width(), pixmap.height())
 
         self.ui.InfoTextBox.setPlainText('Project Name: {}'.format(task_info['project_name'] + '\n'))
         self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(task_info['description']))
@@ -183,17 +184,10 @@ class MainWindow(QMainWindow):
     def table_clicked2(self, event):
         clicked_cast = self.casting_info_list[event.row()]
 
-        self.my_task, _, self.casting_info_list, self.undi_info_list, \
-            self.camera_info_list, tup = self.ft.select_task(task_num=event.row())
-        png = bytes(tup[0])
-        pixmap = QPixmap()
-        if pixmap.loadFromData(png) is False:
+        _, asset_thumbnail_list, _ = thumbnail_control(self.my_task, self.task_clicked_index, self.casting_info_list)
+        png = bytes(asset_thumbnail_list[event.row()])
+        if self.preview_pixmap.loadFromData(png) is False:
             print("Error")
-        pixmap = pixmap.scaled(300, 350)
-
-        label = self.ui.Preview
-        label.setPixmap(pixmap)
-        label.setFixedSize(pixmap.width(), pixmap.height())
 
         self.ui.InfoTextBox.setPlainText('Asset Name: {}'.format(clicked_cast['asset_name']+'\n'))
         self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(clicked_cast['description']))

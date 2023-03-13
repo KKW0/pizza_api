@@ -18,7 +18,10 @@ class CustomTableModel(QAbstractTableModel):
     def load_data(self, data):
         self.column_count = 3
         self.input_data = data
-        self.row_count = len(data)
+        if data == None:
+            self.row_count = 3
+        else:
+            self.row_count = len(data)
 
     def rowCount(self, parent=QModelIndex()):
         return self.row_count

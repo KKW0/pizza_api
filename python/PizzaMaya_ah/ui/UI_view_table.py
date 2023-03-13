@@ -41,12 +41,12 @@ class Table(QTableView):
         self.combo_box = QComboBox(self.horizontalHeader())
         self.combo_box.setGeometry(0, 0, 100, 30)
         self.combo_box.addItems(['All', 'Option 1', 'Option 2'])
-        self.combo_box.currentIndexChanged.connect(self.filter_list)
+
 
         self.combo_box2 = QComboBox(self.horizontalHeader())
         self.combo_box2.setGeometry(100, 0, 100, 30)
         self.combo_box2.addItems(['All', 'Option A', 'Option B'])
-        self.combo_box2.currentIndexChanged.connect(self.filter_list)
+
 
         # self.horizontal_header = self.horizontalHeader()
         self.vertical_header = self.verticalHeader()
@@ -64,31 +64,6 @@ class Table(QTableView):
 
         delegate2 = WrapDelegate(self.combo_box2)
         self.horizontalHeader().setItemDelegateForColumn(1, delegate2)
-
-    def filter_list(self, index):
-        option = self.combo_box.currentText()
-        option2 = self.combo_box2.currentText()
-
-        proxy_model = QtCore.QSortFilterProxyModel()
-        proxy_model.setSourceModel(self.model)
-
-        if option != 'All':
-            proxy_model.setFilterRegExp('^{}$'.format(option))
-            proxy_model.setFilterKeyColumn(0)
-            self.combo_box2.setDisabled(False)
-        else:
-            self.combo_box2.setCurrentIndex(0)
-            option2 = 'All'
-            self.combo_box2.setDisabled(True)
-
-        if option2 != 'All':
-            proxy_model2 = QtCore.QSortFilterProxyModel()
-            proxy_model2.setSourceModel(proxy_model)
-            proxy_model2.setFilterRegExp('^{}$'.format(option2))
-            proxy_model2.setFilterKeyColumn(1)
-            self.setModel(proxy_model2)
-        else:
-            self.setModel(proxy_model)
 
 
 class Table2(QTableView):

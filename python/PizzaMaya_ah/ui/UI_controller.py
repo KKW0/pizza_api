@@ -69,6 +69,10 @@ class MainWindow(QMainWindow):
         self.table2 = Table2()
         self.ui.verticalLayout.addWidget(self.table2, 0)
 
+        # Connect filter list function to combobox
+        self.table.combo_box.currentIndexChanged.connect(self.filter_list)
+        self.table.combo_box2.currentIndexChanged.connect(self.filter_list)
+
         # Getting the Model
         self.table1_model = CustomTableModel()
         self.table.setModel(self.table1_model)
@@ -200,6 +204,32 @@ class MainWindow(QMainWindow):
         else:
             return data
 
+    # ----------------------------------------------------------------------------------------------
+    # 테이블 모델 필터링
+    def filter_list(self, index):
+        option = self.table.combo_box.currentText()
+        option2 = self.table.combo_box2.currentText()
+
+        proxy_model = QtCore.QSortFilterProxyModel()
+        proxy_model.setSourceModel(self.table1_model)
+
+        if option != 'All':
+            proxy_model.setFilterRegExp('^{}$'.format(option))
+            proxy_model.setFilterKeyColumn(0)
+            self.table.combo_box2.setDisabled(False)
+        else:
+            self.table.combo_box2.setCurrentIndex(0)
+            option2 = 'All'
+            self.table.combo_box2.setDisabled(True)
+
+        if option2 != 'All':
+            proxy_model2 = QtCore.QSortFilterProxyModel()
+            proxy_model2.setSourceModel(proxy_model)
+            proxy_model2.setFilterRegExp('^{}$'.format(option2))
+            proxy_model2.setFilterKeyColumn(1)
+            self.setModel(proxy_model2)
+        else:
+            self.setModel(proxy_model)
     # ----------------------------------------------------------------------------------------------
 
 

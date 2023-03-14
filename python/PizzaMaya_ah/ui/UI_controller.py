@@ -69,6 +69,17 @@ class MainWindow(QMainWindow):
         self.table2_model = CustomTableModel2()
         self.table2.setModel(self.table2_model)
 
+        # # Set main preview pixmap
+        # cwd = os.path.dirname(os.path.abspath(__file__))
+        # pizza_path = os.path.join(cwd, 'UI_design', 'pizza.jpg')
+        # self.preview_pixmap = QPixmap(pizza_path)
+        # label = self.ui.Preview
+        # label.setPixmap(self.preview_pixmap)
+        # self.preview_pixmap.load(pizza_path)
+        # label.setPixmap(self.preview_pixmap)
+        # # self.preview_pixmap = self.preview_pixmap.scaled(350, 300)
+        # # label.setFixedSize(self.preview_pixmap.width(), self.preview_pixmap.height())
+
         # 프로그램 시작 시 auto login이 체크되어 있는지 확인하며, 체크되어 있으면 바로 main window 띄움
         self.login_window = LoginWindow()
         self.login = LogIn()
@@ -91,16 +102,6 @@ class MainWindow(QMainWindow):
             self.login_window.ui.show()
 
         self.ft = Filter()
-
-        # Set main preview pixmap
-        self.preview_pixmap = QPixmap()
-        cwd = os.path.dirname(os.path.abspath(__file__))
-        pizza_path = os.path.join(cwd, 'UI_design', 'pizza.jpeg')
-        self.preview_pixmap.load(pizza_path)
-        label = self.ui.Preview
-        label.setPixmap(self.preview_pixmap)
-        self.preview_pixmap = self.preview_pixmap.scaled(350, 300)
-        label.setFixedSize(self.preview_pixmap.width(), self.preview_pixmap.height())
 
         # ----------------------------------------------------------------------------------------------
 
@@ -170,8 +171,11 @@ class MainWindow(QMainWindow):
             self.camera_info_list, tup = self.ft.select_task(task_num=self.task_clicked_index)
         png = bytes(tup[0])
 
-        if self.preview_pixmap.loadFromData(png) is False:
-            print("Error")
+        self.preview_pixmap = QPixmap()
+        self.preview_pixmap.loadFromData(png)
+        self.preview_pixmap = self.preview_pixmap.scaled(350, 300)
+        label = self.ui.Preview
+        label.setPixmap(self.preview_pixmap)
 
         self.ui.InfoTextBox.setPlainText('Project Name: {}'.format(task_info['project_name'] + '\n'))
         self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(task_info['description']))
@@ -186,8 +190,12 @@ class MainWindow(QMainWindow):
 
         _, asset_thumbnail_list, _ = thumbnail_control(self.my_task, self.task_clicked_index, self.casting_info_list)
         png = bytes(asset_thumbnail_list[event.row()])
-        if self.preview_pixmap.loadFromData(png) is False:
-            print("Error")
+
+        self.preview_pixmap = QPixmap()
+        self.preview_pixmap.loadFromData(png)
+        self.preview_pixmap = self.preview_pixmap.scaled(350, 300)
+        label = self.ui.Preview
+        label.setPixmap(self.preview_pixmap)
 
         self.ui.InfoTextBox.setPlainText('Asset Name: {}'.format(clicked_cast['asset_name']+'\n'))
         self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(clicked_cast['description']))

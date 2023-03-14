@@ -9,6 +9,8 @@ class Filter:
     def __init__(self):
         # gazu.client.set_host("http://192.168.3.116/api")
         # gazu.log_in("keiel0326@gmail.com", "tmvpdltm")
+        gazu.client.set_host("http://192.168.3.116/api")
+        gazu.log_in("pipeline@rapa.org", "netflixacademy")
         pass
 
     def _get_information_dict(self, task):
@@ -53,13 +55,16 @@ class Filter:
         """
         seq_list = []
         proj_list = []
+        task_list = []
         task_info_list = []
-        task_list = gazu.user.all_tasks_to_do()
-        for task in task_list:
-            proj_list.append(task['project_name'])
-            task_info, seq_name = self._get_information_dict(task)
-            task_info_list.append(task_info)
-            seq_list.append(seq_name)
+        tmp_task_list = gazu.user.all_tasks_to_do()
+        for index, task in enumerate(tmp_task_list):
+            if task['task_type_name'] == 'Layout_asset':
+                proj_list.append(task['project_name'])
+                task_info, seq_name = self._get_information_dict(task)
+                task_info_list.append(task_info)
+                task_list.append(task)
+                seq_list.append(seq_name)
         proj_set = list(set(proj_list))
         seq_set = list(set(seq_list))
 
@@ -87,6 +92,29 @@ class Filter:
                                   output['entity_id']])
                 return info_list
 
+    def _cast_dict_append(self, cast, output_type, asset, task_type):
+        '''
+        캐스팅 정보가 담긴 딕셔너리의 집합을 리턴하는 매서드
+        '''
+        output_list = []
+        output_dict = {'output_type': None,
+                       'revision': None,
+                       'representation': None,
+                       'description': None}
+        for item in output_type:
+            revision = gazu.files.get_last_entity_output_revision(asset, item, task_type)
+            output_dict['output_type'] = item['name']
+            output_dict['revision'] = revision
+            output_list.append(output_dict)
+
+        casting_dict = {'asset_name': asset['name'],
+                        'description': asset['description'],
+                        'asset_type_name': asset['asset_type_name'],
+                        'nb_occurences': cast['nb_occurences'],
+                        'output': output_list}
+
+        return casting_dict
+
     def _collect_info_casting(self, task):
         """
         선택한 task가 속한 asset(task asset)에 casting된 에셋들의 정보 중 필요한 내용을 추출하여 저장한다.
@@ -103,38 +131,18 @@ class Filter:
             list(camera_info_list): task asset에 캐스팅된 샷의 카메라 정보를 담은 리스트의 집합
                                     (output type name, comment, description)
         """
-        self._get_information_dict(task)
         casting_info_list = []
         undi_info_list = []
         camera_info_list = []
-        output_list = []
-        output_dict = {'output_type': None,
-                       'revision': None,
-                       'representation': None,
-                       'description': None}
         task_asset = gazu.asset.get_asset(task['entity_id'])
         task_type = gazu.task.get_task_type(task['task_type_id'])
         all_casting_list = gazu.casting.get_asset_casting(task_asset)
         for cast in all_casting_list:
             asset = gazu.asset.get_asset(cast['asset_id'])
             output_type = gazu.files.all_output_types_for_entity(asset)
-            for item in output_type:
-                revision = gazu.files.get_last_entity_output_revision(asset, item, task_type)
-                output_dict['output_type'] = item['name']
-                output_dict['revision'] = revision
-                output_list.append(output_dict)
-
-            casting_dict = {'asset_name': asset['name'],
-                            'description': asset['description'],
-                            'asset_type_name': asset['asset_type_name'],
-                            'nb_occurences': cast['nb_occurences'],
-                            'output': output_list}
+            casting_dict = self._cast_dict_append(cast, output_type, asset, task_type)
             casting_info_list.append(casting_dict)
-
         shot_list = gazu.casting.get_asset_cast_in(task_asset)
-        # shot = gazu.shot.get_shot(shot_list[0]['shot_id'])
-        # seq = gazu.shot.get_sequence_from_shot(shot)
-        # all_shots = gazu.shot.all_shots_for_sequence(seq)
         for shot in shot_list:
             undi_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Undistortion_img')))  ####output type 이름 바꿔야 함
             camera_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Camera')))

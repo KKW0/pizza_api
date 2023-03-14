@@ -256,3 +256,5 @@
 2023-03-13 22:04:15,129 - DEBUG : ahyeon jo: log-in succeed
 2023-03-13 22:05:04,024 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
 2023-03-13 22:05:04,216 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 09:03:07,429 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 09:03:07,626 - DEBUG : ahyeon jo: log-in succeed

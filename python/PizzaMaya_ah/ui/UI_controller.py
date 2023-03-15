@@ -19,7 +19,6 @@ from PizzaMaya_ah.ui.UI_model import CustomTableModel2
 
 from PySide2 import QtWidgets, QtCore, QtUiTools
 from PySide2.QtWidgets import QMainWindow
-from PySide2.QtWidgets import QTableView
 from PySide2.QtGui import QPixmap
 
 
@@ -33,6 +32,7 @@ class MainWindow(QMainWindow):
         self.task_num = None
         self.my_shots = None
         self.task_info = None
+        self.row_index_list = []
         self.preview_pixmap = None
         self.undi_info_list = None
         self.camera_info_list = None
@@ -57,8 +57,9 @@ class MainWindow(QMainWindow):
         self.horizontalHeader = HorizontalHeader()
         self.table.setHorizontalHeader(self.horizontalHeader)
 
-        self.table.horizontalHeader().sectionClicked.connect(self.filter_list)
-
+        # self.table.horizontalHeader().sectionClicked.connect(self.filter_list)
+        # self.horizontalHeader.combo.currentTextChanged.connect(self.combobox_changed1)
+        # self.horizontalHeader.combo2.currentTextChanged.connect(self.combobox_changed2)
 
         self.table2 = Table2()
         self.ui.verticalLayout.addWidget(self.table2, 0)
@@ -121,9 +122,20 @@ class MainWindow(QMainWindow):
     def selection_changed(self, selected, deselected):
         selection_model = self.table2.selectionModel()
         selected_rows = selection_model.selectedRows()
+        selected_indexes = selection_model.selectedIndexes()
         row_count = self.table2_model.row_count
+
+        print(selected_indexes[0].row())
+        self.row_index_list.append(selected_indexes[0].row())
+
         self.ui.Selection_Lable.setText('Selected Files %d / %d' % (len(selected_rows), row_count))
         print(self.ui.Selection_Lable.text())
+
+    # def combobox_changed1(self, event):
+    #     print(event)
+    #
+    # def combobox_changed2(self, event):
+    #     print(event)
 
 
     # ----------------------------------------------------------------------------------------------
@@ -137,6 +149,7 @@ class MainWindow(QMainWindow):
         # self.ui.hide()  # 메인 윈도우 숨김
         self.load.my_task = self.my_task
         self.load.my_shots = self.my_shots
+        self.load.selected_index_list = list(set(self.row_index_list))
         self.load.ui.show()
 
     # ----------------------------------------------------------------------------------------------
@@ -258,30 +271,30 @@ class MainWindow(QMainWindow):
 
     # ----------------------------------------------------------------------------------------------
     # 테이블 모델 필터링
-    def filter_list(self, index):
-        option = self.table.combo_box.currentText()
-        option2 = self.table.combo_box2.currentText()
-
-        proxy_model = QtCore.QSortFilterProxyModel()
-        proxy_model.setSourceModel(self.table1_model)
-
-        if option != 'All':
-            proxy_model.setFilterRegExp('^{}$'.format(option))
-            proxy_model.setFilterKeyColumn(0)
-            self.table.combo_box2.setDisabled(False)
-        else:
-            self.table.combo_box2.setCurrentIndex(0)
-            option2 = 'All'
-            self.table.combo_box2.setDisabled(True)
-
-        if option2 != 'All':
-            proxy_model2 = QtCore.QSortFilterProxyModel()
-            proxy_model2.setSourceModel(proxy_model)
-            proxy_model2.setFilterRegExp('^{}$'.format(option2))
-            proxy_model2.setFilterKeyColumn(1)
-            self.setModel(proxy_model2)
-        else:
-            self.setModel(proxy_model)
+    # def filter_list(self, index):
+    #     option = self.table.combo_box.currentText()
+    #     option2 = self.table.combo_box2.currentText()
+    #
+    #     proxy_model = QtCore.QSortFilterProxyModel()
+    #     proxy_model.setSourceModel(self.table1_model)
+    #
+    #     if option != 'All':
+    #         proxy_model.setFilterRegExp('^{}$'.format(option))
+    #         proxy_model.setFilterKeyColumn(0)
+    #         self.table.combo_box2.setDisabled(False)
+    #     else:
+    #         self.table.combo_box2.setCurrentIndex(0)
+    #         option2 = 'All'
+    #         self.table.combo_box2.setDisabled(True)
+    #
+    #     if option2 != 'All':
+    #         proxy_model2 = QtCore.QSortFilterProxyModel()
+    #         proxy_model2.setSourceModel(proxy_model)
+    #         proxy_model2.setFilterRegExp('^{}$'.format(option2))
+    #         proxy_model2.setFilterKeyColumn(1)
+    #         self.setModel(proxy_model2)
+    #     else:
+    #         self.setModel(proxy_model)
 
 
     # ----------------------------------------------------------------------------------------------

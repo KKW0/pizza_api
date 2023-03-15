@@ -52,18 +52,20 @@ class Filter:
         proj_list = []
         task_list = []
         task_info_list = []
+        sort_dict = dict()
         tmp_task_list = gazu.user.all_tasks_to_do()
         for index, task in enumerate(tmp_task_list):
             if task['task_type_name'] == 'LayoutPizza':
                 proj_list.append(task['project_name'])
                 task_info, seq_name = self._get_information_dict(task)
+                sort_dict[task['project_name']] = seq_name
                 task_info_list.append(task_info)
                 task_list.append(task)
                 seq_list.append(seq_name)
         proj_set = list(set(proj_list))
         seq_set = list(set(seq_list))
 
-        return task_info_list, task_list, proj_set, seq_set
+        return task_info_list, task_list, proj_set, seq_set, sort_dict
 
     def _list_append(self, shot, output_type):
         """
@@ -162,43 +164,6 @@ class Filter:
 
         return casting_info_list, undi_info_list, camera_info_list
 
-    # def get_task_info(self, task):
-    #     """
-    #     작업 유형, 연결된 엔티티, 프로젝트, 시퀀스, 샷 및 할당된 사용자 뿐만 아니라
-    #     시작 날짜, 기한, 상태 및 우선 순위와 같은 다양한 기타 속성을 포함하여 작업에 대한 관련 정보를 검색합니다.
-    #
-    #     Args:
-    #         task (dict): 작업 개체를 나타내는 사전입니다.
-    #
-    #     Returns:
-    #         dict: 작업에 대한 관련 정보가 들어 있는 사전입니다.
-    #     """
-    #     task_type = gazu.task.get_task_type(task['task_type_id'])
-    #     entity = gazu.entity.get_entity(task['entity_id'])
-    #     project = gazu.project.get_project(entity['project_id'])
-    #     sequence = gazu.shot.get_sequence(entity['parent_id'])
-    #     shot = gazu.shot.get_shot(entity['id'])
-    #     assignee = gazu.person.get_person(task['assigned_to_id'])
-    #
-    #     task_info = {
-    #         'id': task['id'],
-    #         'name': task['name'],
-    #         'task_type': task_type['name'],
-    #         'entity': entity['name'],
-    #         'project': project['name'],
-    #         'sequence': sequence['name'],
-    #         'shot': shot['name'],
-    #         'assignee': assignee['name'],
-    #         'start_date': task['start_date'],
-    #         'due_date': task['due_date'],
-    #         'status': task['status'],
-    #         'priority': task['priority'],
-    #         'description': task['description'],
-    #         'comment': task['comment']
-    #     }
-    #
-    #     return task_info
-
     def _filter_info(self, proj_num=0, seq_num=0):
         """
         유저가 필터링을 했는지 판별하여 해당하는 task들만 노출하는 매서드
@@ -212,7 +177,7 @@ class Filter:
             list: 필터링된 task(dict)의 집합
             list: 필터링된 task 정보 중 필요한 내용만 담긴 dict의 집합
         """
-        task_info_list, task_list, proj_set, seq_set = self._collect_info_task()
+        task_info_list, task_list, proj_set, seq_set, _ = self._collect_info_task()
         filtered_task_list = []
         filtered_task_info_list = []
         double_filtered_task_list = []

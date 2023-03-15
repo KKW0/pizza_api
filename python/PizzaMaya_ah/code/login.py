@@ -246,6 +246,7 @@ class LogIn(object):
         }
         with open(self.user_path, 'w') as json_file:
             json.dump(user_dict, json_file)
+        return user_dict
 
     def reset_setting(self):
         """

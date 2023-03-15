@@ -41,10 +41,7 @@ class PublishThings:
             str(preview_path): preview file이 저장될 경로(확장자 제외)
         """
         casted_list = gazu.casting.get_asset_cast_in(task['entity_id'])
-        for cast in casted_list:
-            if 'SEQ' in cast['name']:
-                seq = cast
-
+        seq = casted_list[0]
         # working file 모델 생성
         working_file_list = gazu.files.get_working_files_for_task(task['id'])
         if working_file_list is []:
@@ -101,7 +98,7 @@ class PublishThings:
                                                                representation=output_file['representation'],
                                                                revision=output_file['revision'])
         # main preview용 패스 build
-        self._preview_type = gazu.files.get_output_type_by_name('Preview')
+        self._preview_type = gazu.files.get_output_type_by_name('PreviewMov')
         preview_path = gazu.files.build_entity_output_file_path(task['entity_id'],
                                                                 self._preview_type,
                                                                 task['task_type_id'],
@@ -141,6 +138,7 @@ class PublishThings:
             path(str): working file 또는 main preview file의 확장자를 제외한 path
             file_type(dict): 업로드할 working file의 딕셔너리. preview를 업로드할 경우 사용하지 않는다.
         """
+        full_path = None
         if 'working' in path:
             # working file 업로드
             full_path = path + '.' + self._software['file_extension']
@@ -191,9 +189,9 @@ class PublishThings:
         self._upload_files(task, working_path, working_file)
         self._upload_files(task, preview_path, comment=comment)
 
-    def save_publish_previews(self, shot_list, comment):
+    def save_publish_previews(self, shot_list, comment='Layout mb파일 퍼블리시 완료'):
         """
-        각 샷에 해당하는 레이아웃의 preview file을 업로드하는 매서드
+        각 샷에 해당하는 레이아웃의 preview file과 mb 파일을 저장하고 업로드하는 매서드
 
         먼저 프리뷰 파일이 저장된 path를 build하고, shot에는 Layout의 Preview 올리기 용도의 task만 있고
         output이나 working file이 존재하지 않기 때문에 폴더 path의 revision을 직접 업데이트한다.
@@ -202,21 +200,24 @@ class PublishThings:
 
         Args:
             shot_list(list): 에셋이 캐스팅된 시퀀스 아래에 있는 모든 샷 딕셔너리들의 집합
-            comment(str): 프리뷰를 올릴 때 첨부할 코멘트
         """
         revision = 0
         task_type = gazu.task.get_task_type_by_name('Layout')
+        output_type = gazu.files.get_output_type_by_name('MayaBinary')
         for shot in shot_list:
-            path = gazu.files.build_entity_output_file_path(shot, self._preview_type,
-                                                            task_type, revision=revision)
-            while os.path.exists(path) is True:
-                revision += 1
-                path = gazu.files.build_entity_output_file_path(shot, self._preview_type,
+            pre_path = gazu.files.build_entity_output_file_path(shot, self._preview_type,
                                                                 task_type, revision=revision)
-            self.maya.export_shot_previews(path, shot)
+            mb_path = gazu.files.build_entity_output_file_path(shot, output_type, task_type, revision=revision)
+            while os.path.exists(pre_path) is True:
+                revision += 1
+                pre_path = gazu.files.build_entity_output_file_path(shot, self._preview_type,
+                                                                    task_type, revision=revision)
+                mb_path = gazu.files.build_entity_output_file_path(shot, output_type, task_type, revision=revision)
+            self.maya.export_shot_previews(pre_path, shot)
+            self.maya.export_shot_scene(mb_path, shot)
 
-            # Kitsu에 shot의 preview file 업로드
-            full_path = path + '.mov'
+            # Kitsu shot에 Layout task의 preview file 업로드
+            full_path = pre_path + '.mov'
             task = gazu.task.get_task_by_entity(shot, task_type)
             comment_dict = gazu.task.add_comment(task, self._task_status, comment)
             gazu.task.add_preview(task, comment_dict, full_path)

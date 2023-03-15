@@ -138,7 +138,7 @@ class Table(QTableView):
 
 class Table2(QtWidgets.QTableView):
     """
-    asset, camera, undi_img 선택하는 TableView
+    asset 선택하는 TableView
     """
     def __init__(self, data=None):
         super(Table2, self).__init__()

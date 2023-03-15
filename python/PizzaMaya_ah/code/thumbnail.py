@@ -2,15 +2,11 @@
 
 import gazu
 import pprint as pp
-# from login import LogIn
 
 """
 Kitsu에 로그인한 상태에서 task entity(레이아웃 에셋)의 메인 프리뷰 url을 구하고,
 구한 url에서부터 데이터를 받아오는 모듈
 """
-
-# gazu.client.set_host("http://192.168.3.116/api")
-# gazu.log_in("pipeline@rapa.org", "netflixacademy")
 
 
 def _get_thumbnail(preview):
@@ -29,11 +25,11 @@ def _get_thumbnail(preview):
     return data
 
 
-def thumbnail_control(task_list_or_dict, task_num=None, casting_info_list=None, undi_info_list=None):
+def thumbnail_control(task_dict, task_num=None, casting_info_list=None, undi_info_list=None):
     """
 
     Args:
-        task_list_or_dict(list/dict): 사용자가 선택한 테스크, 또는 필터링한 테스크 딕셔너리의 집합
+        task_dict(dict): 사용자가 선택한 테스크, 또는 필터링한 테스크 딕셔너리의 집합
                                       task_num의 타입이 int면 딕셔너리, None이면 리스트 타입이다.
         task_num(int): 사용자가 선택한 테스크의 인덱스 번호. 사용자가 task를 선택하기 전에는 None
         casting_info_list(list): 사용자가 task를 선택하기 전에는 None
@@ -53,45 +49,35 @@ def thumbnail_control(task_list_or_dict, task_num=None, casting_info_list=None, 
     else:
         # 테스크 선택 시 선택한 테스크의 메인 썸네일과 캐스팅 목록의 썸네일들을 return 한다.
         asset_thumbnail_list = []
-        undi_png = None
-        layout_asset = gazu.entity.get_entity(task_list_or_dict['entity_id'])
+        undi_thumbnail_list = []
+        layout_asset = gazu.entity.get_entity(task_dict['entity_id'])
         preview = gazu.files.get_preview_file(layout_asset['preview_file_id'])
         png = _get_thumbnail(preview)
-
         for info in casting_info_list:
             # 캐스팅된 에셋들의 썸네일
-            proj = gazu.project.get_project(task_list_or_dict['project_id'])
+            proj = gazu.project.get_project(task_dict['project_id'])
             asset = gazu.asset.get_asset_by_name(proj, info['asset_name'])
-            preview = gazu.files.get_preview_file(asset['preview_file_id'])
-            asset_thumbnail_list.append(_get_thumbnail(preview))
-
-        # for info in undi_info_list:
-        #     # 언디스토션 이미지의 썸네일
-        #     shot = gazu.shot.get_shot(info['entity_id'])
-        #     preview = gazu.files.get_preview_file(shot['preview_file_id'])
-        #     undi_png = _get_thumbnail(preview)
-
-        return png, asset_thumbnail_list, undi_png
+            if asset['preview_file_id']:
+                preview_cast = gazu.files.get_preview_file(asset['preview_file_id'])
+                pp.pprint(preview_cast)
+                data = _get_thumbnail(preview_cast)
+            else:
+                data = None
+            asset_thumbnail_list.append(data)
+        # 언디스토션 이미지의 프리뷰. Matchmove 팀이 올린 프리뷰들 중 가장 최근 것.
+        if len(undi_info_list) == 0:
+            return png, asset_thumbnail_list, undi_thumbnail_list, None
+        else:
+            shot_list = None
+            task_type = gazu.task.get_task_type_by_name('Matchmove')
+            for info_list in undi_info_list:
+                for info in info_list:
+                    shot_list = gazu.shot.all_shots_for_sequence(info['seq_id'])
+            for shot in shot_list:
+                task = gazu.task.get_task_by_entity(shot, task_type)
+                previews = gazu.files.get_all_preview_files_for_task(task)
+                undi_thumbnail_list.append(previews[0])
+            return png, asset_thumbnail_list, undi_thumbnail_list, shot_list
 
         # 카메라는 썸네일 없음
-
-
-# def create_thumbnail(file_data, file_extension, entity_id, preview_type):
-#     thumbnail_dict = {
-#         "file_data": file_data,
-#         "file_extension": file_extension,
-#         "entity_id": entity_id,
-#         "preview_type": preview_type
-#     }
-#     new_thumbnail = gazu.files.create_preview_file(thumbnail_dict)
-#     print("Created new thumbnail with ID:", new_thumbnail["id"])
-#     return new_thumbnail
-#
-#
-# file_data = b"thumbnail data"  # 실제 썸네일 이미지 데이터로 대체
-# file_extension = ".png"  # 썸네일 파일 확장자로 대체
-# entity_id = 1234  # 썸네일 이미지를 연결할 엔티티의 ID로 대체
-# preview_type = "thumbnail"  # 미리 보기 유형으로 대체
-#
-# new_thumbnail = create_thumbnail(file_data, file_extension, entity_id, preview_type)
 

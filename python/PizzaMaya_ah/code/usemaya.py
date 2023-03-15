@@ -55,7 +55,7 @@ class MayaThings:
 
         mc.file(
             path, r=True, ignoreVersion=True,
-            # path의 아웃풋 파일을 import 하는데, 이 때 fbx파일의 버전 번호를 무시한다.
+            # path의 아웃풋 파일을 import 하는데, 이 때 파일의 버전 번호를 무시한다.
             mergeNamespacesOnClash=False,
             # 네임스페이스 충돌이 발생하면 병합하지 않도록 지정
             # fbx 애니메이션 데이터를 씬의 기존 애니메이션과 결합하도록 지정
@@ -67,9 +67,10 @@ class MayaThings:
             # 에셋이라면 nb_elements에 맞게 인스턴싱 진행
             for index in range(asset['nb_elements']-1):
                 full_filename = os.path.basename(asset['path'])
-                filename = full_filename.split('.')[0]
+                filename = full_filename.split('_')[2]
                 mc.instance(filename)
-                # 파일명과 마야에 import한 에셋의 이름이 같다는 전제 하에
+                # <Project>_<AssetType>_<Asset>_<OutputType>_v<Revision>.representation
+                #### Asset이름과 씬파일 안의 실제 파일명이 동일하다는 전제 하에...
 
     def _connect_image(self, undi_path, camera_path):
         """
@@ -96,7 +97,7 @@ class MayaThings:
         모두 import한 뒤(load_output), 언디스토션 시퀀스를 카메라와 연결시키는(connect_image) 매서드
 
         Args:
-            shot(dict): 선택한 테스크가 속한 에셋에 캐스팅된 샷
+            shot(dict): 선택한 테스크가 속한 시퀀스 아래의 샷들 중 import하길 원하는 샷
         """
         undi_seq_path = self.kit.get_undistortion_img(shot)
         camera_path = self.kit.get_camera(shot)
@@ -121,12 +122,13 @@ class MayaThings:
             num_list(list): import 하기를 선택한 에셋의 인덱스 번호의 집합
         """
         file_dict_list = []
-        casted_asset_list = gazu.casting.get_asset_casting(asset)
-        for casting in casted_asset_list:
+        all_cast_list = gazu.casting.get_asset_casting(asset)
+
+        for casting in all_cast_list:
             file_dict_list.append(self.kit.get_kitsu_path(casting))
         if num_list is [0]:
             # 캐스팅된 것들의 전체 선택인 경우
-            num_list = range(len(casted_asset_list))
+            num_list = range(len(all_cast_list))
         for index in num_list:
             asset_output_list = file_dict_list[index]
             for item in asset_output_list:
@@ -278,5 +280,41 @@ class MayaThings:
                     startTime=0,
                     endTime=frame_range
                 )
+                mc.setAttr("%s.visibility" % camera, False)
+                # 켰던 카메라 다시 꺼줌
+
+    def export_shot_scene(self, path, shot):
+        """
+        각 샷에 해당하는 .mb파일을 저장하는 매서드
+
+        그리고 저장을 하기 전에 방해가 되는 다른 카메라, 언디스토션 이미지를 모두 보이지 않게 한다.
+
+        Args:
+            path(str): 샷 씬파일의 확장자를 뺀 전체 경로
+            shot(dict): mb 파일을 저장할 shot의 딕셔너리
+        """
+        # 디폴트 카메라 필터링 후 사용자가 커스텀한 카메라 목록을 추출
+        startup_cameras = []
+        all_cameras = mc.ls(type='camera', l=True)
+        for camera in all_cameras:
+            if mc.camera(mc.listRelatives(camera, parent=True)[0], startupCamera=True, q=True):
+                startup_cameras.append(camera)
+        custom_camera = list(set(all_cameras) - set(startup_cameras))
+
+        # shot의 언디스토션 이미지들을 저장한 폴더로부터 프레임 레인지를 추출
+        undi_seq_path = self.kit.get_undistortion_img(shot)
+        file_list = os.listdir(os.path.dirname(undi_seq_path))
+        frame_range = len(file_list)
+
+        # 다른 카메라랑 이미지플레인 다 끄고, 샷에 해당하는 카메라만 켜서 플레이블라스트 프리뷰 저장
+        shot_name = shot['name']
+        for camera in custom_camera:
+            if shot_name not in camera:
+                mc.setAttr("%s.visibility" % camera, False)
+                continue
+            else:
+                mc.setAttr("%s.visibility" % camera, True)
+                mc.lookThru(camera)
+                self.save_scene_file(path, 'mb')
                 mc.setAttr("%s.visibility" % camera, False)
                 # 켰던 카메라 다시 꺼줌

@@ -13,19 +13,20 @@ from PizzaMaya_ah.ui.UI_view_save import Save
 from PizzaMaya_ah.ui.UI_view_load import Load
 from PizzaMaya_ah.ui.UI_view_table import Table
 from PizzaMaya_ah.ui.UI_view_table import Table2
+from PizzaMaya_ah.ui.UI_view_table import HorizontalHeader
 from PizzaMaya_ah.ui.UI_view_login import LoginWindow
 from PizzaMaya_ah.ui.UI_model import CustomTableModel
 from PizzaMaya_ah.ui.UI_model import CustomTableModel2
 
 from PySide2 import QtWidgets, QtCore, QtUiTools
 from PySide2.QtWidgets import QMainWindow
+from PySide2.QtWidgets import QTableView
 from PySide2.QtGui import QPixmap
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
-        # Load main window UI
-        QMainWindow.__init__(self)
+    def __init__(self, values=None, parent=None):
+        super(MainWindow, self).__init__()
         # 현재 작업 디렉토리 경로를 가져옴
 
         self.task = None
@@ -54,13 +55,15 @@ class MainWindow(QMainWindow):
         # 메인 윈도우의 레이아웃에 TableView 2개 추가
         self.table = Table()
         self.ui.verticalLayout2.addWidget(self.table, 0)
+        self.horizontalHeader = HorizontalHeader()
+        self.table.setHorizontalHeader(self.horizontalHeader)
+
+        self.table.horizontalHeader().sectionClicked.connect(self.filter_list)
+
 
         self.table2 = Table2()
         self.ui.verticalLayout.addWidget(self.table2, 0)
 
-        # Connect filter list function to combobox
-        self.table.combo_box.currentIndexChanged.connect(self.filter_list)
-        self.table.combo_box2.currentIndexChanged.connect(self.filter_list)
 
         # Getting the Model
         self.table1_model = CustomTableModel()
@@ -68,17 +71,6 @@ class MainWindow(QMainWindow):
 
         self.table2_model = CustomTableModel2()
         self.table2.setModel(self.table2_model)
-
-        # # Set main preview pixmap
-        # cwd = os.path.dirname(os.path.abspath(__file__))
-        # pizza_path = os.path.join(cwd, 'UI_design', 'pizza.jpg')
-        # self.preview_pixmap = QPixmap(pizza_path)
-        # label = self.ui.Preview
-        # label.setPixmap(self.preview_pixmap)
-        # self.preview_pixmap.load(pizza_path)
-        # label.setPixmap(self.preview_pixmap)
-        # # self.preview_pixmap = self.preview_pixmap.scaled(350, 300)
-        # # label.setFixedSize(self.preview_pixmap.width(), self.preview_pixmap.height())
 
         # 프로그램 시작 시 auto login이 체크되어 있는지 확인하며, 체크되어 있으면 바로 main window 띄움
         self.login_window = LoginWindow()
@@ -116,6 +108,7 @@ class MainWindow(QMainWindow):
         self.table.clicked.connect(self.table_clicked)
         self.table2.clicked.connect(self.table_clicked2)
 
+
         # Save 클릭시 Save ui로 전환
         self.ui.Save_Button.clicked.connect(self.save_button)
         self.save = Save()
@@ -124,15 +117,25 @@ class MainWindow(QMainWindow):
         self.ui.Load_Button.clicked.connect(self.load_button)
         self.load = Load()
 
+        self.table2.selectionModel().selectionChanged.connect(self.selection_changed)
+
+    def selection_changed(self, selected, deselected):
+        selection_model = self.table2.selectionModel()
+        selected_rows = selection_model.selectedRows()
+        row_count = self.table2_model.row_count
+        self.ui.Selection_Lable.setText('Selected Files %d / %d' % (len(selected_rows), row_count))
+        print(self.ui.Selection_Lable.text())
+
+
     # ----------------------------------------------------------------------------------------------
     # save 또는 load 버튼 누르면 save 또는 load 윈도우를 호출
 
     def save_button(self):
-        self.ui.hide()  ##### 메인 윈도우를 숨길 필요 있는지? 그냥 겹쳐서 띄우면 안되나 exec로
+        # self.ui.hide()  ##### 메인 윈도우를 숨길 필요 있는지? 그냥 겹쳐서 띄우면 안되나 exec로
         self.save.ui.show()
 
     def load_button(self):
-        self.ui.hide()  # 메인 윈도우 숨김
+        # self.ui.hide()  # 메인 윈도우 숨김
         self.load.ui.show()
 
     # ----------------------------------------------------------------------------------------------
@@ -173,7 +176,7 @@ class MainWindow(QMainWindow):
 
         self.preview_pixmap = QPixmap()
         self.preview_pixmap.loadFromData(png)
-        self.preview_pixmap = self.preview_pixmap.scaled(350, 300)
+        self.preview_pixmap = self.preview_pixmap.scaled(360, 300)
         label = self.ui.Preview
         label.setPixmap(self.preview_pixmap)
 
@@ -188,12 +191,13 @@ class MainWindow(QMainWindow):
     def table_clicked2(self, event):
         clicked_cast = self.casting_info_list[event.row()]
 
+
         _, asset_thumbnail_list, _ = thumbnail_control(self.my_task, self.task_clicked_index, self.casting_info_list)
         png = bytes(asset_thumbnail_list[event.row()])
 
         self.preview_pixmap = QPixmap()
         self.preview_pixmap.loadFromData(png)
-        self.preview_pixmap = self.preview_pixmap.scaled(350, 300)
+        self.preview_pixmap = self.preview_pixmap.scaled(360, 300)
         label = self.ui.Preview
         label.setPixmap(self.preview_pixmap)
 
@@ -270,6 +274,7 @@ class MainWindow(QMainWindow):
             self.setModel(proxy_model2)
         else:
             self.setModel(proxy_model)
+
     # ----------------------------------------------------------------------------------------------
 
 

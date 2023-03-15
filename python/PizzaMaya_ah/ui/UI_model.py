@@ -79,7 +79,7 @@ class CustomTableModel2(QAbstractTableModel):
         if role != Qt.DisplayRole:
             return None
         if orientation == Qt.Horizontal:
-            return ("Project", "Seq", "DueDate")[section]
+            return ("Thumbnail", "Name", "Type")[section]
         else:
             return str(section)
 

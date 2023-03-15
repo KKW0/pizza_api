@@ -66,7 +66,7 @@ class Table(QTableView):
 
 class Table2(QTableView):
     """
-    asset, camera, undi_img 선택하는 TableView
+    asset 선택하는 TableView
     """
     def __init__(self):
         QTableView.__init__(self)

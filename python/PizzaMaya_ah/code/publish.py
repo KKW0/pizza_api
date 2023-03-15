@@ -191,7 +191,7 @@ class PublishThings:
 
     def save_publish_previews(self, shot_list, comment='Layout mb파일 퍼블리시 완료'):
         """
-        각 샷에 해당하는 레이아웃의 preview filer과 mb 파일을 업로드하는 매서드
+        각 샷에 해당하는 레이아웃의 preview file과 mb 파일을 저장하고 업로드하는 매서드
 
         먼저 프리뷰 파일이 저장된 path를 build하고, shot에는 Layout의 Preview 올리기 용도의 task만 있고
         output이나 working file이 존재하지 않기 때문에 폴더 path의 revision을 직접 업데이트한다.

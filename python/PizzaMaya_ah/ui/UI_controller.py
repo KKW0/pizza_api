@@ -2,6 +2,7 @@
 
 import os
 import sys
+import pprint as pp
 
 from PizzaMaya_ah.code.login import LogIn
 from PizzaMaya_ah.code.filter import Filter
@@ -29,6 +30,7 @@ class MainWindow(QMainWindow):
         self.task = None
         self.my_task = None
         self.task_num = None
+        self.my_shots = None
         self.task_info = None
         self.preview_pixmap = None
         self.undi_info_list = None
@@ -38,7 +40,6 @@ class MainWindow(QMainWindow):
         cwd = os.path.dirname(os.path.abspath(__file__))
         # ui 파일 경로 생성
         ui_path = os.path.join(cwd, 'UI_design', 'Main.ui')
-        # print(ui_path)
         # ui 파일이 존재하는지 확인
         if not os.path.exists(ui_path):
             raise Exception("UI file not found at: {0}".format(ui_path))
@@ -66,17 +67,6 @@ class MainWindow(QMainWindow):
 
         self.table2_model = CustomTableModel2()
         self.table2.setModel(self.table2_model)
-
-        # # Set main preview pixmap
-        # cwd = os.path.dirname(os.path.abspath(__file__))
-        # pizza_path = os.path.join(cwd, 'UI_design', 'pizza.jpg')
-        # self.preview_pixmap = QPixmap(pizza_path)
-        # label = self.ui.Preview
-        # label.setPixmap(self.preview_pixmap)
-        # self.preview_pixmap.load(pizza_path)
-        # label.setPixmap(self.preview_pixmap)
-        # # self.preview_pixmap = self.preview_pixmap.scaled(350, 300)
-        # # label.setFixedSize(self.preview_pixmap.width(), self.preview_pixmap.height())
 
         # 프로그램 시작 시 auto login이 체크되어 있는지 확인하며, 체크되어 있으면 바로 main window 띄움
         self.login_window = LoginWindow()
@@ -132,6 +122,7 @@ class MainWindow(QMainWindow):
     def load_button(self):
         self.ui.hide()  # 메인 윈도우 숨김
         self.load.my_task = self.my_task
+        self.load.my_shots = self.my_shots
         self.load.ui.show()
 
     # ----------------------------------------------------------------------------------------------
@@ -166,8 +157,10 @@ class MainWindow(QMainWindow):
 
     def table_clicked(self, event):
         self.task_clicked_index = event.row()
-        self.my_task, task_info, self.casting_info_list, self.undi_info_list,\
-            self.camera_info_list, tup = self.ft.select_task(task_num=self.task_clicked_index)
+        self.my_task, task_info, self.casting_info_list,\
+            self.undi_info_list, self.camera_info_list = self.ft.select_task(task_num=self.task_clicked_index)
+        tup, _, _, _ = thumbnail_control(self.my_task, self.task_clicked_index,
+                                         self.casting_info_list, self.undi_info_list)
         png = bytes(tup[0])
 
         self.preview_pixmap = QPixmap()
@@ -186,7 +179,7 @@ class MainWindow(QMainWindow):
 
     def table_clicked2(self, event):
         clicked_cast = self.casting_info_list[event.row()]
-        _, asset_thumbnail_list, _ = thumbnail_control(self.my_task, self.task_clicked_index, self.casting_info_list)
+        _, asset_thumbnail_list, _, _ = thumbnail_control(self.my_task, self.task_clicked_index, self.casting_info_list)
         png = bytes(asset_thumbnail_list[event.row()])
 
         self.preview_pixmap = QPixmap()
@@ -215,7 +208,7 @@ class MainWindow(QMainWindow):
 
         """
         ft = Filter()
-        self.task, task_info, _, _, _, _ = ft.select_task()
+        self.task, task_info, _, _, _ = ft.select_task()
         data = []
         for index in range(len(task_info)):
             data.append([task_info[index]['project_name'], task_info[index]['sequence_name'],
@@ -235,9 +228,13 @@ class MainWindow(QMainWindow):
         # 썸네일을 얻기 위해 받아와야 하는 정보
         data = []
         if self.my_task is not None:
-            _, asset_thumbnail_list, _ = thumbnail_control(self.my_task, 0, self.casting_info_list)
+            _, asset_thumbnail_list, undi_thumbnail_list, shot_list = \
+                thumbnail_control(self.my_task, 0, self.casting_info_list, self.undi_info_list)
             for index, cast in enumerate(self.casting_info_list):
                 data.append([asset_thumbnail_list[index], cast['asset_name'], cast['asset_type_name']])
+
+            for index, info_list in enumerate(self.undi_info_list):
+                data.append([undi_thumbnail_list[index], shot_list[index]['name'], None])
             return data
         else:
             return data
@@ -268,6 +265,7 @@ class MainWindow(QMainWindow):
             self.setModel(proxy_model2)
         else:
             self.setModel(proxy_model)
+
     # ----------------------------------------------------------------------------------------------
 
 

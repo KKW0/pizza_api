@@ -29,13 +29,13 @@ class TestFilter(TestCase):
         self.seq1 = gazu.shot.get_sequence_by_name(self.project, 'seq1')
         self.seq2 = gazu.shot.get_sequence_by_name(self.project, 'seq2')
         self.shot1 = gazu.shot.get_shot_by_name(self.seq1, 'sh1')
+        pp.pprint(self.shot1)
         self.shot2 = gazu.shot.get_shot_by_name(self.seq1, 'sh2')
         # mb = gazu.files.new_output_type('MayaBinary', 'mb')
         # ma = gazu.files.new_output_type('MayaAskii', 'ma')
         # gazu.files.new_output_type('UndistortionJpg', 'jpg')
         # gazu.files.new_output_type('PreviewMov', 'mov')
         # JPG, OBJ, FBX, Alembic, MPEG-4 이미 있음
-        pp.pprint(gazu.files.all_output_types())
         # w = gazu.files.new_working_file(self.task, software=self.software, comment=self.comment)
         # gazu.files.new_entity_output_file(self.asset, mb, self.task_type, self.comment, w, representation='mb')
         self.output_type_mb = gazu.files.get_output_type_by_name('MayaBinary')
@@ -48,6 +48,8 @@ class TestFilter(TestCase):
         self.output_file = output_file[0]
         # self.path = '/home/rapa/foldertree_test/a/b/c/d/e/f/g/working/working_file'
         # self.path2 = '/home/rapa/foldertree_test/a/b/c/d/e/f/g/output/output_file'
+        # task_type = gazu.task.get_task_type_by_name('Matchmove')
+        # task = gazu.task.get_task_by_entity(self.shot1, task_type)
 
     # def test__get_information_dict(self):
     #     pass

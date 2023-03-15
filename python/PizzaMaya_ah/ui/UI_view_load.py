@@ -15,8 +15,7 @@ class Load(QtWidgets.QMainWindow):
         super(Load, self).__init__()
 
         self.my_task = None
-        self.shot_list = None
-        self.shot_num = None
+        self.my_shots = None
 
         # 현재 작업 디렉토리 경로를 가져옴
         cwd = os.path.dirname(os.path.abspath(__file__))
@@ -39,24 +38,14 @@ class Load(QtWidgets.QMainWindow):
 
     def final_load_button(self):
         self.hide()  # 메인 윈도우 숨김    # self.close() ???
-        my_shot = self.ft.select_shot(shot_list, shot_num)
-        asset_index_list = []
-        try:
-            self.ma.import_cam_seq(my_shot)
-        except Exception as exc:
-            raise ValueError("Error")
-        QtWidgets.QMessageBox.information(self,
-                                          "camera, undistortion img",
-                                          "로드가 완료되었습니다.")
-
+        selected_index_list = []   # 선택한 에셋들의 인덱스 번호
         my_layout_asset = gazu.asset.get_asset(self.my_task['entity_id'])
-        try:
-            self.ma.import_casting_asset(my_layout_asset, asset_index_list)
-        except Exception as exc:
-            raise ValueError("Error")
+        self.ma.import_casting_asset(my_layout_asset, selected_index_list)
+        for shot in self.my_shots:
+            self.ma.import_cam_seq(shot)
         QtWidgets.QMessageBox.information(self,
-                                          "asset {0}개의".format(checked_num),
-                                          "로드가 완료되었습니다.")
+                                          '''{0}개의 에셋과 선택한 샷의 이미지, 
+                                          카메라가 로드 완료되었습니다.'''.format(len(selected_index_list)))
 
         self.ui.close()
 

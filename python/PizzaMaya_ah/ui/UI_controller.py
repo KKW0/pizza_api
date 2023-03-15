@@ -175,9 +175,9 @@ class MainWindow(QMainWindow):
             self.undi_info_list, self.camera_info_list = self.ft.select_task(task_num=self.task_clicked_index)
         tup, _, _, _ = thumbnail_control(self.my_task, self.task_clicked_index,
                                          self.casting_info_list, self.undi_info_list)
-        png = bytes(tup[0])
-
+        png = bytes(tup)
         self.preview_pixmap = QPixmap()
+
         self.preview_pixmap.loadFromData(png)
         self.preview_pixmap = self.preview_pixmap.scaled(360, 300)
         label = self.ui.Preview
@@ -194,7 +194,8 @@ class MainWindow(QMainWindow):
     def table_clicked2(self, event):
         clicked_cast = self.casting_info_list[event.row()]
 
-        _, asset_thumbnail_list, _, _ = thumbnail_control(self.my_task, self.task_clicked_index, self.casting_info_list)
+        _, asset_thumbnail_list, _, _ = thumbnail_control(self.my_task, self.task_clicked_index,
+                                                          self.casting_info_list, undi_info_list=[])
         png = bytes(asset_thumbnail_list[event.row()])
 
         self.preview_pixmap = QPixmap()
@@ -245,11 +246,12 @@ class MainWindow(QMainWindow):
         if self.my_task is not None:
             _, asset_thumbnail_list, undi_thumbnail_list, shot_list = \
                 thumbnail_control(self.my_task, 0, self.casting_info_list, self.undi_info_list)
+            # 캐스팅된 에셋목록 추가
             for index, cast in enumerate(self.casting_info_list):
                 data.append([asset_thumbnail_list[index], cast['asset_name'], cast['asset_type_name']])
-
+            # 샷 목록 추가
             for index, info_list in enumerate(self.undi_info_list):
-                data.append([undi_thumbnail_list[index], shot_list[index]['name'], None])
+                data.append([undi_thumbnail_list[index], shot_list[index]['shot_name'], 'Shot'])
             return data
         else:
             return data

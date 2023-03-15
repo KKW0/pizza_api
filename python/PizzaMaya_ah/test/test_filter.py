@@ -11,7 +11,7 @@ class TestFilter(TestCase):
 
         # 테스트용 클래스변수 정의
         self.project = gazu.project.get_project_by_name('Project1')
-        self.asset = gazu.asset.get_asset_by_name(self.project, 'room1')
+        self.asset = gazu.asset.get_asset_by_name(self.project, 'lecture')
         self.user = gazu.person.get_person_by_full_name('ahyeon jo')
         self.task_status = gazu.task.get_task_status_by_name('Todo')
         self.task_type = gazu.task.get_task_type_by_name('LayoutPizza')
@@ -26,11 +26,12 @@ class TestFilter(TestCase):
         self.sa4 = gazu.asset.get_asset_by_name(self.project, 'paper')
         self.sa5 = gazu.asset.get_asset_by_name(self.project, 'human')
         self.sa6 = gazu.asset.get_asset_by_name(self.project, 'assetcasttest')
-        self.seq1 = gazu.shot.get_sequence_by_name(self.project, 'seq1')
-        self.seq2 = gazu.shot.get_sequence_by_name(self.project, 'seq2')
+        self.seq1 = gazu.shot.get_sequence_by_name(self.project, 'seq_1')
+        self.seq2 = gazu.shot.get_sequence_by_name(self.project, 'seq_2')
         self.shot1 = gazu.shot.get_shot_by_name(self.seq1, 'sh1')
-        pp.pprint(self.shot1)
         self.shot2 = gazu.shot.get_shot_by_name(self.seq1, 'sh2')
+        self.shot3 = gazu.shot.get_shot_by_name(self.seq2, 'sh1')
+        pp.pprint(self.shot3)
         # mb = gazu.files.new_output_type('MayaBinary', 'mb')
         # ma = gazu.files.new_output_type('MayaAskii', 'ma')
         # gazu.files.new_output_type('UndistortionJpg', 'jpg')
@@ -42,14 +43,22 @@ class TestFilter(TestCase):
         self.output_type_ma = gazu.files.get_output_type_by_name('MayaAskii')
         self.output_type_ujpg = gazu.files.get_output_type_by_name('UndistortionJpg')
         self.output_type_pmov = gazu.files.get_output_type_by_name('PreviewMov')
+        self.output_type_abc = gazu.files.get_output_type_by_name('Alembic')
         working_file = gazu.files.get_working_files_for_task(self.task)
         self.working_file = working_file[0]
         output_file = gazu.files.get_last_output_files_for_entity(self.asset, self.output_type_mb, self.task_type)
         self.output_file = output_file[0]
         # self.path = '/home/rapa/foldertree_test/a/b/c/d/e/f/g/working/working_file'
         # self.path2 = '/home/rapa/foldertree_test/a/b/c/d/e/f/g/output/output_file'
-        # task_type = gazu.task.get_task_type_by_name('Matchmove')
-        # task = gazu.task.get_task_by_entity(self.shot1, task_type)
+        task_type = gazu.task.get_task_type_by_name('Matchmove')
+        task = gazu.task.get_task_by_entity(self.shot1['id'], task_type)
+        # pp.pprint(task)
+        # ww = gazu.files.get_working_files_for_task(task)
+        # pp.pprint(ww)
+        # w1 = gazu.files.new_working_file(task)
+        # a1 = gazu.files.new_entity_output_file(self.shot3, self.output_type_ujpg, task_type, 'ppp', w1)
+        # w2 = gazu.files.new_working_file(task)
+        # a2 = gazu.files.new_entity_output_file(self.shot3, self.output_type_abc, task_type, 'ppp', w2)
 
     # def test__get_information_dict(self):
     #     pass

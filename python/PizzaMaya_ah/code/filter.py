@@ -71,26 +71,26 @@ class Filter:
 
         Args:
             shot(dict): 언디스토션 이미지, 카메라의 아웃풋 파일이 속한 shot
-            output_type(dict): 아웃풋 파일이 속한 아웃풋 타입(jpg, fbx, abc 등)
+            output_type(dict): 아웃풋 파일이 속한 아웃풋 타입(jpg, abc )
 
         Returns:
             list: output file의 모델에서 필요한 정보들만 담은 리스트의 집합
         """
         info_list = []
         task_type = gazu.task.get_task_type_by_name('Matchmove')
+        aa = gazu.files.get_last_output_files_for_entity(shot['id'], output_type, task_type)
         output_list = gazu.files.get_last_output_files_for_entity(shot['id'], output_type, task_type)
         output_dict = dict()
         output_dict['output_type_name'] = output_type['name']
-        if output_list is None:
+        if len(output_list) is 0:
             raise ValueError("해당하는 output file이 존재하지 않습니다.")
         for output in output_list:
             output_dict['output_name'] = output['name']
             output_dict['comment'] = output['comment']
             output_dict['description'] = output['description']
             info_list.append(output_dict)
-            print('ccccccccccccccccccccccccccccccc')
-            pp.pprint(info_list)
-            return info_list
+
+        return info_list
 
     def _cast_dict_append(self, cast, output_type, asset, task_type):
         """

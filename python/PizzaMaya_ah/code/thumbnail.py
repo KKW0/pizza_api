@@ -59,7 +59,6 @@ def thumbnail_control(task_dict, task_num=None, casting_info_list=None, undi_inf
             asset = gazu.asset.get_asset_by_name(proj, info['asset_name'])
             if asset['preview_file_id']:
                 preview_cast = gazu.files.get_preview_file(asset['preview_file_id'])
-                pp.pprint(preview_cast)
                 data = _get_thumbnail(preview_cast)
             else:
                 data = None
@@ -68,15 +67,13 @@ def thumbnail_control(task_dict, task_num=None, casting_info_list=None, undi_inf
         if len(undi_info_list) == 0:
             return png, asset_thumbnail_list, undi_thumbnail_list, None
         else:
-            shot_list = None
             task_type = gazu.task.get_task_type_by_name('Matchmove')
-            for info_list in undi_info_list:
-                for info in info_list:
-                    shot_list = gazu.shot.all_shots_for_sequence(info['seq_id'])
+            shot_list = gazu.casting.get_asset_cast_in(layout_asset)
             for shot in shot_list:
-                task = gazu.task.get_task_by_entity(shot, task_type)
+                task = gazu.task.get_task_by_entity(shot['shot_id'], task_type)
                 previews = gazu.files.get_all_preview_files_for_task(task)
-                undi_thumbnail_list.append(previews[0])
+                png = _get_thumbnail(previews[0])
+                undi_thumbnail_list.append(png)
             return png, asset_thumbnail_list, undi_thumbnail_list, shot_list
 
         # 카메라는 썸네일 없음

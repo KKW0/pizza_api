@@ -10,43 +10,44 @@ class TestFilter(TestCase):
         gazu.log_in("pipeline@rapa.org", "netflixacademy")
 
         # 테스트용 클래스변수 정의
-        self.project = gazu.project.get_project_by_name('jeongtae')
-        self.asset = gazu.asset.get_asset_by_name(self.project, 'chair')
-        self.seq = gazu.shot.get_sequence_by_name(self.project, 'seq1')
-        self.shot = gazu.shot.get_shot_by_name(self.seq, 'shot02')
-        task_type = gazu.task.all_task_types_for_shot(self.shot)
-        # self.task_type = task_type[0]  # 레이아웃, 1은 매치무브
+        self.project = gazu.project.get_project_by_name('Project1')
+        self.asset = gazu.asset.get_asset_by_name(self.project, 'room1')
         self.user = gazu.person.get_person_by_full_name('ahyeon jo')
-        # self.user.append(gazu.client.get_current_user())
         self.task_status = gazu.task.get_task_status_by_name('Todo')
-        # gazu.task.new_task_type('Layout_asset')           ####task type 이름 바꿔야 함
-        self.task_type = gazu.task.get_task_type_by_name('Layout_asset')            ####task type 이름 바꿔야 함
-        # gazu.task.new_task(self.asset, self.task_type, task_status=self.task_status)
+        self.task_type = gazu.task.get_task_type_by_name('LayoutPizza')
         self.task = gazu.task.get_task_by_entity(self.asset, self.task_type)
-        self.assignee = gazu.task.assign_task(self.task['id'], self.user['id'])
         self.comment = 'Unit Test'
         # gazu.task.add_comment(self.task, self.task_status, self.comment)
         self.comment_dict = gazu.task.get_last_comment_for_task(self.task)
-        software = gazu.files.all_softwares()
-        self.software = software[2]  # 마야
-        # gazu.files.new_working_file(self.task, software=self.software, comment=self.comment)
-        # gazu.files.new_output_type('Layout_mb', 'mb')         ####output type 이름 바꿔야 함
-        self.output_type = gazu.files.get_output_type_by_name('Layout_mb')          ####output type 이름 바꿔야 함
+        self.software = gazu.files.all_softwares()[1]  # 마야
+        self.sa1 = gazu.asset.get_asset_by_name(self.project, 'dog')
+        self.sa2 = gazu.asset.get_asset_by_name(self.project, 'chair')
+        self.sa3 = gazu.asset.get_asset_by_name(self.project, 'computer')
+        self.sa4 = gazu.asset.get_asset_by_name(self.project, 'paper')
+        self.sa5 = gazu.asset.get_asset_by_name(self.project, 'human')
+        self.sa6 = gazu.asset.get_asset_by_name(self.project, 'assetcasttest')
+        self.seq1 = gazu.shot.get_sequence_by_name(self.project, 'seq1')
+        self.seq2 = gazu.shot.get_sequence_by_name(self.project, 'seq2')
+        self.shot1 = gazu.shot.get_shot_by_name(self.seq1, 'sh1')
+        self.shot2 = gazu.shot.get_shot_by_name(self.seq1, 'sh2')
+        # mb = gazu.files.new_output_type('MayaBinary', 'mb')
+        # ma = gazu.files.new_output_type('MayaAskii', 'ma')
+        # gazu.files.new_output_type('UndistortionJpg', 'jpg')
+        # gazu.files.new_output_type('PreviewMov', 'mov')
+        # JPG, OBJ, FBX, Alembic, MPEG-4 이미 있음
+        pp.pprint(gazu.files.all_output_types())
+        # w = gazu.files.new_working_file(self.task, software=self.software, comment=self.comment)
+        # gazu.files.new_entity_output_file(self.asset, mb, self.task_type, self.comment, w, representation='mb')
+        self.output_type_mb = gazu.files.get_output_type_by_name('MayaBinary')
+        self.output_type_ma = gazu.files.get_output_type_by_name('MayaAskii')
+        self.output_type_ujpg = gazu.files.get_output_type_by_name('UndistortionJpg')
+        self.output_type_pmov = gazu.files.get_output_type_by_name('PreviewMov')
         working_file = gazu.files.get_working_files_for_task(self.task)
         self.working_file = working_file[0]
-        # gazu.files.new_entity_output_file(self.asset, self.output_type, self.task_type,
-        #                                   self.comment, self.working_file)
-        output_file = gazu.files.get_last_output_files_for_entity(self.asset, self.output_type, self.task_type)
+        output_file = gazu.files.get_last_output_files_for_entity(self.asset, self.output_type_mb, self.task_type)
         self.output_file = output_file[0]
-        self.path = '/home/rapa/foldertree_test/a/b/c/d/e/f/g/working/working_file'
-        self.path2 = '/home/rapa/foldertree_test/a/b/c/d/e/f/g/output/output_file'
-        new_asset = gazu.asset.get_asset_by_name(self.project, 'thomas')
-        new = {"asset_id": new_asset['id'], "nb_occurences": 55}
-        new1 = {"asset_id": self.asset['id'], "nb_occurences": 55}
-        new2 = {"shot_id": self.shot['id'], "nb_occurences": None}
-        # gazu.casting.update_sequence_casting(self.project, self.seq, new)
-        # gazu.casting.update_asset_casting(self.project, self.asset, new)
-        # gazu.casting.update_asset_casting(self.project, self.asset, new2)
+        # self.path = '/home/rapa/foldertree_test/a/b/c/d/e/f/g/working/working_file'
+        # self.path2 = '/home/rapa/foldertree_test/a/b/c/d/e/f/g/output/output_file'
 
     # def test__get_information_dict(self):
     #     pass

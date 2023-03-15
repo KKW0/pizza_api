@@ -258,3 +258,55 @@
 2023-03-13 22:05:04,216 - DEBUG : ahyeon jo: log-in succeed
 2023-03-14 09:03:07,429 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
 2023-03-14 09:03:07,626 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 14:30:12,902 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 14:30:13,094 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 14:30:23,155 - DEBUG : Logout Succeed
+2023-03-14 14:30:23,163 - DEBUG : Logout Succeed
+2023-03-14 14:30:41,723 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 14:30:41,915 - DEBUG : pipeline API: log-in succeed
+2023-03-14 14:30:42,202 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 14:30:42,394 - DEBUG : pipeline API: log-in succeed
+2023-03-14 15:11:31,724 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:11:31,921 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:11:32,173 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:11:32,355 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:15:34,032 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:15:34,228 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:16:25,060 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:16:25,251 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:21:31,299 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:21:31,487 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:23:55,462 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:23:55,659 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:25:30,326 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:25:30,519 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:29:22,198 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:29:22,391 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:30:47,423 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:30:47,616 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:35:49,541 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:35:49,731 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:39:08,618 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:39:08,817 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:40:43,046 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:40:43,242 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:41:37,335 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:41:37,526 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:43:01,136 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:43:01,328 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:43:50,146 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:43:50,336 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:46:06,353 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:46:06,542 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:48:00,774 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:48:00,967 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:49:50,206 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:49:50,400 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:53:01,636 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:53:01,827 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:55:49,154 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:55:49,344 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:55:57,107 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:55:57,297 - DEBUG : ahyeon jo: log-in succeed
+2023-03-14 15:56:36,536 - DEBUG : 연결에 성공하였습니다. http://192.168.3.116/api
+2023-03-14 15:56:36,728 - DEBUG : ahyeon jo: log-in succeed

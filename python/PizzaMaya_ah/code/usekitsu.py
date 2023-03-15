@@ -16,7 +16,7 @@ class KitsuThings:
         프레임 정보가 없으면 4자리로 생성한다.
 
         Args:
-            shot(dict): 선택한 테스크가 속한 에셋에 캐스팅된 샷
+            shot(dict): 선택한 테스크 에셋이 캐스팅된 시퀀스 아래에 잇는 샷들 중 로드하길 원하는 샷
         """
         padding_info = shot.get('nb_frames') - 1
         if padding_info is False:
@@ -33,7 +33,7 @@ class KitsuThings:
         샷에 대한 패딩을 얻어(get_frame_padding) 첫번째 언디스토션 시퀀스 이미지의 경로를 추출한다.
 
         Args:
-            shot(dict): 선택한 테스크가 속한 에셋에 캐스팅된 샷
+            shot(dict): 선택한 테스크 에셋이 캐스팅된 시퀀스 아래에 잇는 샷들 중 로드하길 원하는 샷
         Returns:
             str: 첫번째 언디스토션 이미지의 path
         """
@@ -52,7 +52,7 @@ class KitsuThings:
         path와 이어붙여 샷에 해당하는 가상 카메라의 전체 경로를 구한다.
 
         Args:
-            shot(dict): 선택한 테스크가 속한 에셋에 캐스팅된 샷
+            shot(dict): 선택한 테스크 에셋이 캐스팅된 시퀀스 아래에 잇는 샷들 중 로드하길 원하는 샷
         Returns:
             str: 카메라(fbx 등) 아웃풋 파일이 저장된 path
         """
@@ -72,10 +72,10 @@ class KitsuThings:
         file_dict: 캐스팅된 에셋에서 필요한 정보들(path, nb_elements)만 정제한 딕셔너리
 
         Args:
-            casting(dict): task에 캐스팅된 에셋의 간략한 정보가 담긴 dict
+            casting(dict): 캐스팅된 에셋의 간략한 정보가 담긴 dict
 
         Returns:
-            list: 아웃풋 파일들의 패스(확장자 포함), 개수가 담긴 dict를 수집한 리스트
+            str: 아웃풋 파일들의 패스(확장자 포함), 개수가 담긴 dict를 수집한 리스트
         """
         file_list = []
         file_dict = {

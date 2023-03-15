@@ -45,7 +45,7 @@ def update_filetree(mountpoint, root):
             }
         }
     }
-    project = gazu.project.get_project_by_name('jeongtae')
+    project = gazu.project.get_project_by_name('Project2')
     gazu.files.update_project_file_tree(project, tree)
 
 

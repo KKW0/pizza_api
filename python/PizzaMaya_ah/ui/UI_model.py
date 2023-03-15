@@ -93,7 +93,7 @@ class CustomTableModel2(QAbstractTableModel):
         elif role == Qt.DecorationRole:
             if column == 0:
                 pixmap = QPixmap()
-                pixmap.loadFromData(self.input_data[0][0])
+                pixmap.loadFromData(self.input_data[row][0])
                 pixmap = pixmap.scaled(100, 100)
                 return pixmap
 

@@ -9,9 +9,10 @@ class Filter:
     def __init__(self):
         # gazu.client.set_host("http://192.168.3.116/api")
         # gazu.log_in("keiel0326@gmail.com", "tmvpdltm")
-        gazu.client.set_host("http://192.168.3.116/api")
-        gazu.log_in("pipeline@rapa.org", "netflixacademy")
-        pass
+        # gazu.client.set_host("http://192.168.3.116/api")
+        # gazu.log_in("pipeline@rapa.org", "netflixacademy")
+        self.seq = None
+        self.asset = None
 
     def _get_information_dict(self, task):
         """
@@ -30,17 +31,23 @@ class Filter:
         task_info['description'] = task['description']
         task_info['last_comment'] = task['last_comment']
         # task asset이 사용되는 seq 구하기
-        task_asset = gazu.asset.get_asset(task['entity_id'])
-        casted_list = gazu.casting.get_asset_cast_in(task_asset)
-        seq = dict
-        for cast in casted_list:
-            if cast['shot_name'] is not None:
-                shot = gazu.shot.get_shot(cast['shot_id'])
-                seq = gazu.shot.get_sequence_from_shot(shot)
-                task_info['sequence_name'] = seq['name']
-                return task_info, seq['name']
-            else:
-                continue
+        self.asset = gazu.asset.get_asset(task['entity_id'])
+        shots = gazu.casting.get_asset_cast_in(self.asset)
+        self.seq = gazu.shot.get_sequence_from_shot(shots[0])
+        task_info['sequence_name'] = self.seq['name']
+
+        return task_info, self.seq['name']
+        # task_asset = gazu.asset.get_asset(task['entity_id'])
+        # casted_list = gazu.casting.get_asset_cast_in(task_asset)
+        # seq = dict
+        # for cast in casted_list:
+        #     if cast['shot_name'] is not None:
+        #         shot = gazu.shot.get_shot(cast['shot_id'])
+        #         seq = gazu.shot.get_sequence_from_shot(shot)
+        #         task_info['sequence_name'] = seq['name']
+        #         return task_info, seq['name']
+        #     else:
+        #         continue
 
     def _collect_info_task(self):
         """
@@ -59,7 +66,7 @@ class Filter:
         task_info_list = []
         tmp_task_list = gazu.user.all_tasks_to_do()
         for index, task in enumerate(tmp_task_list):
-            if task['task_type_name'] == 'Layout_asset':
+            if task['task_type_name'] == 'LayoutPizza':
                 proj_list.append(task['project_name'])
                 task_info, seq_name = self._get_information_dict(task)
                 task_info_list.append(task_info)
@@ -76,7 +83,7 @@ class Filter:
 
         Args:
             shot(dict): 언디스토션 이미지, 카메라의 아웃풋 파일이 속한 shot
-            output_type(dict): 아웃풋 파일이 속한 아웃풋 타입
+            output_type(dict): 아웃풋 파일이 속한 아웃풋 타입(jpg, fbx, abc 등)
 
         Returns:
             list: output file의 모델에서 필요한 정보들만 담은 리스트의 집합
@@ -93,14 +100,23 @@ class Filter:
                 return info_list
 
     def _cast_dict_append(self, cast, output_type, asset, task_type):
-        '''
+        """
         캐스팅 정보가 담긴 딕셔너리의 집합을 리턴하는 매서드
-        '''
+
+        Args:
+            cast:
+            output_type(list): 에셋에서 쓰이는 아웃풋 타입의 집합
+            asset:
+            task_type:
+
+        Return:
+        """
         output_list = []
         output_dict = {'output_type': None,
                        'revision': None,
                        'representation': None,
-                       'description': None}
+                       'description': None
+                       }
         for item in output_type:
             revision = gazu.files.get_last_entity_output_revision(asset, item, task_type)
             output_dict['output_type'] = item['name']
@@ -111,7 +127,8 @@ class Filter:
                         'description': asset['description'],
                         'asset_type_name': asset['asset_type_name'],
                         'nb_occurences': cast['nb_occurences'],
-                        'output': output_list}
+                        'output': output_list
+                        }
 
         return casting_dict
 
@@ -134,57 +151,56 @@ class Filter:
         casting_info_list = []
         undi_info_list = []
         camera_info_list = []
-        task_asset = gazu.asset.get_asset(task['entity_id'])
         task_type = gazu.task.get_task_type(task['task_type_id'])
-        all_casting_list = gazu.casting.get_asset_casting(task_asset)
+        shot_list = gazu.shot.all_shots_for_sequence(self.seq['id'])
+        all_casting_list = gazu.casting.get_asset_casting(self.asset)
         for cast in all_casting_list:
             asset = gazu.asset.get_asset(cast['asset_id'])
-            output_type = gazu.files.all_output_types_for_entity(asset)
-            casting_dict = self._cast_dict_append(cast, output_type, asset, task_type)
+            output_types = gazu.files.all_output_types_for_entity(asset)
+            casting_dict = self._cast_dict_append(cast, output_types, asset, task_type)
             casting_info_list.append(casting_dict)
-        shot_list = gazu.casting.get_asset_cast_in(task_asset)
         for shot in shot_list:
-            undi_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Undistortion_img')))  ####output type 이름 바꿔야 함
-            camera_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Camera')))
+            undi_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('UndistortionJpg')))
+            camera_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Alembic')))
 
         return casting_info_list, undi_info_list, camera_info_list
 
-    def get_task_info(self, task):
-        """
-        작업 유형, 연결된 엔티티, 프로젝트, 시퀀스, 샷 및 할당된 사용자 뿐만 아니라
-        시작 날짜, 기한, 상태 및 우선 순위와 같은 다양한 기타 속성을 포함하여 작업에 대한 관련 정보를 검색합니다.
-
-        Args:
-            task (dict): 작업 개체를 나타내는 사전입니다.
-
-        Returns:
-            dict: 작업에 대한 관련 정보가 들어 있는 사전입니다.
-        """
-        task_type = gazu.task.get_task_type(task['task_type_id'])
-        entity = gazu.entity.get_entity(task['entity_id'])
-        project = gazu.project.get_project(entity['project_id'])
-        sequence = gazu.shot.get_sequence(entity['parent_id'])
-        shot = gazu.shot.get_shot(entity['id'])
-        assignee = gazu.person.get_person(task['assigned_to_id'])
-
-        task_info = {
-            'id': task['id'],
-            'name': task['name'],
-            'task_type': task_type['name'],
-            'entity': entity['name'],
-            'project': project['name'],
-            'sequence': sequence['name'],
-            'shot': shot['name'],
-            'assignee': assignee['name'],
-            'start_date': task['start_date'],
-            'due_date': task['due_date'],
-            'status': task['status'],
-            'priority': task['priority'],
-            'description': task['description'],
-            'comment': task['comment']
-        }
-
-        return task_info
+    # def get_task_info(self, task):
+    #     """
+    #     작업 유형, 연결된 엔티티, 프로젝트, 시퀀스, 샷 및 할당된 사용자 뿐만 아니라
+    #     시작 날짜, 기한, 상태 및 우선 순위와 같은 다양한 기타 속성을 포함하여 작업에 대한 관련 정보를 검색합니다.
+    #
+    #     Args:
+    #         task (dict): 작업 개체를 나타내는 사전입니다.
+    #
+    #     Returns:
+    #         dict: 작업에 대한 관련 정보가 들어 있는 사전입니다.
+    #     """
+    #     task_type = gazu.task.get_task_type(task['task_type_id'])
+    #     entity = gazu.entity.get_entity(task['entity_id'])
+    #     project = gazu.project.get_project(entity['project_id'])
+    #     sequence = gazu.shot.get_sequence(entity['parent_id'])
+    #     shot = gazu.shot.get_shot(entity['id'])
+    #     assignee = gazu.person.get_person(task['assigned_to_id'])
+    #
+    #     task_info = {
+    #         'id': task['id'],
+    #         'name': task['name'],
+    #         'task_type': task_type['name'],
+    #         'entity': entity['name'],
+    #         'project': project['name'],
+    #         'sequence': sequence['name'],
+    #         'shot': shot['name'],
+    #         'assignee': assignee['name'],
+    #         'start_date': task['start_date'],
+    #         'due_date': task['due_date'],
+    #         'status': task['status'],
+    #         'priority': task['priority'],
+    #         'description': task['description'],
+    #         'comment': task['comment']
+    #     }
+    #
+    #     return task_info
 
     def _filter_info(self, proj_num=0, seq_num=0):
         """
@@ -268,33 +284,3 @@ class Filter:
         tup = thumbnail_control(task, task_num, casting_info_list, undi_info_list)
 
         return task, task_info, casting_info_list, undi_info_list, camera_info_list, tup
-
-    def select_shot(self, shot_list, shot_num):
-        """
-        에셋 목록 중 선택한 샷에 캐스팅된 에셋, 언디스토션 이미지, 카메라만 노출하도록 하는 매서드
-
-        Args:
-            shot_list(list): 시퀀스에 속한 모든 샷 딕셔너리의 집합
-            shot_num(int): 작업할 샷의 인덱스 번호
-
-        Returns:
-            dict: 선택한 샷의 딕셔너리가 들어있는 리스트
-        """
-        undi_info_list = []
-        camera_info_list = []
-        casting_info_dict = []
-        shot = shot_list[shot_num]
-        all_casts = gazu.casting.get_shot_casting(shot)
-        all_casting_list = all_casts.values()
-        for casting_list in all_casting_list:
-            for cast in casting_list:
-                asset = gazu.asset.get_asset(cast['asset_id'])
-                casting_dict = {'asset_name': cast['asset_name'],
-                                'description': asset['description'],
-                                'asset_type_name': cast['asset_type_name'],
-                                'nb_occurences': cast['nb_occurences'],
-                                'revision': cast['revision'],
-                                'comment': cast['comment']}
-                casting_info_dict.append(casting_dict)
-        undi_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Undistortion_img')))  ####output type 이름 바꿔야 함
-        camera_info_list.append(self._list_append(shot, gazu.files.get_output_type_by_name('Camera')))

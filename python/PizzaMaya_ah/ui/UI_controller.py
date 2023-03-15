@@ -2,12 +2,10 @@
 
 import os
 import sys
-import gazu
 
 from PizzaMaya_ah.code.login import LogIn
 from PizzaMaya_ah.code.filter import Filter
 from PizzaMaya_ah.code.thumbnail import thumbnail_control
-
 
 from PizzaMaya_ah.ui.UI_view_save import Save
 from PizzaMaya_ah.ui.UI_view_load import Load
@@ -133,6 +131,7 @@ class MainWindow(QMainWindow):
 
     def load_button(self):
         self.ui.hide()  # 메인 윈도우 숨김
+        self.load.my_task = self.my_task
         self.load.ui.show()
 
     # ----------------------------------------------------------------------------------------------
@@ -187,7 +186,6 @@ class MainWindow(QMainWindow):
 
     def table_clicked2(self, event):
         clicked_cast = self.casting_info_list[event.row()]
-
         _, asset_thumbnail_list, _ = thumbnail_control(self.my_task, self.task_clicked_index, self.casting_info_list)
         png = bytes(asset_thumbnail_list[event.row()])
 

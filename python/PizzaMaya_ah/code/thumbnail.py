@@ -57,13 +57,13 @@ def thumbnail_control(task_list_or_dict, task_num=None, casting_info_list=None, 
         layout_asset = gazu.entity.get_entity(task_list_or_dict['entity_id'])
         preview = gazu.files.get_preview_file(layout_asset['preview_file_id'])
         png = _get_thumbnail(preview)
-
         for info in casting_info_list:
             # 캐스팅된 에셋들의 썸네일
             proj = gazu.project.get_project(task_list_or_dict['project_id'])
             asset = gazu.asset.get_asset_by_name(proj, info['asset_name'])
-            preview = gazu.files.get_preview_file(asset['preview_file_id'])
-            asset_thumbnail_list.append(_get_thumbnail(preview))
+            preview_cast = gazu.files.get_preview_file(asset['preview_file_id'])
+            data = _get_thumbnail(preview_cast)
+            asset_thumbnail_list.append(data)
 
         # for info in undi_info_list:
         #     # 언디스토션 이미지의 썸네일

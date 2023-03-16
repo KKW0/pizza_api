@@ -34,11 +34,14 @@ class Save(QtWidgets.QMainWindow):
         self.ui.Final_Save_Button.clicked.connect(self.final_save_button)
         self.ui.Back_Button.clicked.connect(self.back_button)
 
+
         self.pb = PublishThings()
 
 
     def final_save_button(self):
         self.hide()  # 메인 윈도우 숨김
+        # print("저장했어 그만눌러")
+        # 여기도 데이터값만 넣으면 알아서 적용이 되지 않을까 하는 의문이 드네요
 
 
 

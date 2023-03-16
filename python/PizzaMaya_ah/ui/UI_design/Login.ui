@@ -105,7 +105,7 @@ color: white;</string>
 color: white;</string>
       </property>
       <property name="text">
-       <string>Host</string>
+       <string>Pizza</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -129,6 +129,9 @@ color: white;</string>
       </property>
       <property name="layoutDirection">
        <enum>Qt::RightToLeft</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: white;</string>
       </property>
       <property name="text">
        <string>Auto Login</string>

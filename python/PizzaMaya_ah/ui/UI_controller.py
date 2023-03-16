@@ -4,6 +4,8 @@ import os
 import sys
 import pprint as pp
 
+import gazu.project
+
 from PizzaMaya_ah.code.login import LogIn
 from PizzaMaya_ah.code.filter import Filter
 from PizzaMaya_ah.code.thumbnail import thumbnail_control
@@ -204,10 +206,16 @@ class MainWindow(QMainWindow):
         self.table2_model.load_data2(self.read_data2())
         self.table2_model.layoutChanged.emit()
 
+        # print(task_info)
+        project_dict = gazu.project.get_project_by_name(task_info['project_name'])
+        seq_dict = gazu.shot.get_sequence_by_name(project_dict, task_info['sequence_name'])
+        self.shot_list = gazu.shot.all_shots_for_sequence(seq_dict)
+
+
     def table_clicked2(self, event):
         clicked_cast = self.casting_info_list[event.row()]
 
-        _, asset_thumbnail_list, _, _ = thumbnail_control(self.my_task, self.task_clicked_index,
+        _, asset_thumbnail_list, _, shot_list = thumbnail_control(self.my_task, self.task_clicked_index,
                                                           self.casting_info_list, undi_info_list=[])
         png = bytes(asset_thumbnail_list[event.row()])
 
@@ -223,6 +231,7 @@ class MainWindow(QMainWindow):
         self.ui.InfoTextBox.appendPlainText('Occurence: {0}'.format(str(clicked_cast['nb_occurences'])))
         self.ui.InfoTextBox.appendPlainText('Output File: {0}'.format(str(len(clicked_cast['output']))))
         self.ui.InfoTextBox.appendPlainText('Newest or Not: Not')   # 모든 아웃풋 파일들이 전부 최신 리비전이면 YES로 표기
+        print(shot_list)
 
     # ----------------------------------------------------------------------------------------------
     # TableView 두개에 띄울 각각의 정보를 넣어둠

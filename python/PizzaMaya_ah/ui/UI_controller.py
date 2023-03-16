@@ -18,12 +18,12 @@ from PizzaMaya_ah.ui.UI_model import CustomTableModel
 from PizzaMaya_ah.ui.UI_model import CustomTableModel2
 
 from PySide2 import QtWidgets, QtCore, QtUiTools
-from PySide2.QtWidgets import QMainWindow
+from PySide2.QtWidgets import QMainWindow, QSizePolicy
 from PySide2.QtGui import QPixmap
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, values=None, parent=None):
+    def __init__(self, values=None, parent=None, size_policy=None):
         super(MainWindow, self).__init__()
         # 현재 작업 디렉토리 경로를 가져옴
 
@@ -119,13 +119,18 @@ class MainWindow(QMainWindow):
 
         self.table2.selectionModel().selectionChanged.connect(self.selection_changed)
 
+
     def selection_changed(self, selected, deselected):
         selection_model = self.table2.selectionModel()
         selected_rows = selection_model.selectedRows()
         selected_indexes = selection_model.selectedIndexes()
         row_count = self.table2_model.row_count
 
-        print(selected_indexes[0].row())
+        # print(selected_indexes[0].row())
+        sel_ids = set()
+        for sel_idx in selected_indexes:
+            sel_ids.add(sel_idx.row())
+        print(list(sel_ids))
         self.row_index_list.append(selected_indexes[0].row())
 
         self.ui.Selection_Lable.setText('Selected Files %d / %d' % (len(selected_rows), row_count))

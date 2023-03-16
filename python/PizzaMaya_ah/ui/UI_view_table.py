@@ -11,7 +11,7 @@ from PizzaMaya_ah.code.filter import Filter
 class HorizontalHeader(QtWidgets.QHeaderView):
     def __init__(self, parent=None):
         super(HorizontalHeader, self).__init__(QtCore.Qt.Horizontal, parent)
-        self.setSectionsMovable(True)
+        self.setSectionsMovable(False)
         self.combo = None
         self.combo2 = None
         self.seq_set = None
@@ -23,6 +23,9 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         self.ft = Filter()
         self.table = None
         self.model = None
+        self.setSectionResizeMode(QHeaderView.Fixed)
+
+
 
     def showEvent(self, event):
         _, _, proj_set, self.seq_set, self.sort_dict = self.ft._collect_info_task()
@@ -70,9 +73,9 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         else:
             self.table.setModel(self.proxy_model)
 
-    def handleSortButtonClicked(self):
-        # 마지막 헤더 클릭 시 정렬
-        self.parent().sortByColumn(self.count() - 1, Qt.AscendingOrder)
+    # def handleSortButtonClicked(self):
+    #     # 마지막 헤더 클릭 시 정렬
+    #     self.parent().sortByColumn(self.count() - 1, Qt.AscendingOrder)
 
     # def handleSectionResized(self, i):
     #     for i in range(self.count()):
@@ -102,29 +105,29 @@ class HorizontalHeader(QtWidgets.QHeaderView):
     #         self.setSortIndicator(self.count() - 2, Qt.AscendingOrder)
     #         self.sortByColumn(self.count() - 2, Qt.AscendingOrder)
 
-    def set_header_labels(self, labels):
-        model = QtGui.QStandardItemModel()
-        model.setHorizontalHeaderLabels(labels)
-        self.setModel(model)
-        self.comboboxes = []  # comboboxes 리스트 초기화
-        self.fixComboPositions()
-
-    def fixComboPositions(self):
-        for i in range(self.count()):
-            if i < len(self.comboboxes):
-                combo = self.comboboxes[i]
-            else:
-                combo = QtWidgets.QComboBox(self)
-                combo.addItems(['All', 'Option 1', 'Option 2'])
-                self.comboboxes.append(combo)
-
-            combo.setGeometry(self.sectionViewportPosition(i), 0, self.sectionSize(i) - 4, self.height())
-            combo.show()
-
-        if len(self.comboboxes) > self.count():
-            for i in range(self.count(), len(self.comboboxes)):
-                self.comboboxes[i].deleteLater()
-            self.comboboxes = self.comboboxes[:self.count()]
+    # def set_header_labels(self, labels):
+    #     model = QtGui.QStandardItemModel()
+    #     model.setHorizontalHeaderLabels(labels)
+    #     self.setModel(model)
+    #     self.comboboxes = []  # comboboxes 리스트 초기화
+    #     self.fixComboPositions()
+    #
+    # def fixComboPositions(self):
+    #     for i in range(self.count()):
+    #         if i < len(self.comboboxes):
+    #             combo = self.comboboxes[i]
+    #         else:
+    #             combo = QtWidgets.QComboBox(self)
+    #             combo.addItems(['All', 'Option 1', 'Option 2'])
+    #             self.comboboxes.append(combo)
+    #
+    #         combo.setGeometry(self.sectionViewportPosition(i), 0, self.sectionSize(i) - 4, self.height())
+    #         combo.show()
+    #
+    #     if len(self.comboboxes) > self.count():
+    #         for i in range(self.count(), len(self.comboboxes)):
+    #             self.comboboxes[i].deleteLater()
+    #         self.comboboxes = self.comboboxes[:self.count()]
 
 
 class Table(QTableView):
@@ -134,7 +137,7 @@ class Table(QTableView):
     def __init__(self):
         QTableView.__init__(self)
 
-        self.setSortingEnabled(True)
+        # self.setSortingEnabled(True)
 
         font = QFont()
         font.setFamily("Arial")
@@ -161,6 +164,8 @@ class Table(QTableView):
         self.horizontalHeader().setSectionsClickable(True)
 
 
+
+
 class Table2(QtWidgets.QTableView):
     """
     asset 선택하는 TableView
@@ -177,6 +182,14 @@ class Table2(QtWidgets.QTableView):
         # QTableView Headers
         self.horizontal_header = self.horizontalHeader()
         self.vertical_header = self.verticalHeader()
+
+        # 고정된 헤더 모드 설정
+        self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+
+        # # 고정된 행과 열 모드 설정
+        # self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        # self.setCornerButtonEnabled(False)
 
         self.horizontal_header.setMinimumSectionSize(100)
         self.vertical_header.setMinimumSectionSize(100)

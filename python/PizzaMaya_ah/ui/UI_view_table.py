@@ -28,22 +28,21 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         self.table = None
         self.model = None
         self.setSectionResizeMode(QHeaderView.Fixed)
-
-
+        self.setStretchLastSection(True)
 
     def showEvent(self, event):
         _, _, proj_set, _, self.sort_dict = self.ft._collect_info_task()
         self.combo = QtWidgets.QComboBox(self)
         self.combo.addItems(['Project'] + proj_set)
         self.combo.currentTextChanged.connect(self.combobox_changed1)
-        self.combo.setGeometry(self.sectionViewportPosition(0), 0, self.sectionSize(0) - 4, self.height())
+        self.combo.setGeometry(self.sectionViewportPosition(0), 0, self.sectionSize(0) - 0, self.height())
         self.combo.setStyleSheet(self.enable_color)
         self.combo.show()
 
         self.combo2 = QtWidgets.QComboBox(self)
         self.combo2.addItems(['Sequence'])
         self.combo2.currentTextChanged.connect(self.combobox_changed2)
-        self.combo2.setGeometry(self.sectionViewportPosition(1), 0, self.sectionSize(1) - 4, self.height())
+        self.combo2.setGeometry(self.sectionViewportPosition(1), 0, self.sectionSize(1) - 0, self.height())
         self.combo2.setDisabled(True)
         self.combo2.setStyleSheet(self.disable_color)
         self.combo2.show()
@@ -87,20 +86,20 @@ class HorizontalHeader(QtWidgets.QHeaderView):
     # def handleSortButtonClicked(self):
     #     # 마지막 헤더 클릭 시 정렬
     #     self.parent().sortByColumn(self.count() - 1, Qt.AscendingOrder)
-
+    #
     # def handleSectionResized(self, i):
     #     for i in range(self.count()):
     #         j = self.visualIndex(i)
     #         logical = self.logicalIndex(j)
     #         if i < len(self.comboboxes):
     #             self.comboboxes[i].setGeometry(self.sectionViewportPosition(logical), 0,
-    #                                            self.sectionSize(logical) - 4, self.height())
+    #                                            self.sectionSize(logical) - 0, self.height())
     #
     #     # 정렬 버튼 위치 조정
     #     if self.sort_button:
     #         self.sort_button.setGeometry(self.sectionViewportPosition(self.count() - 1), 0,
-    #                                      self.sectionSize(self.count() - 1) - 4, self.height())
-
+    #                                      self.sectionSize(self.count() - 1) - 0, self.height())
+    #
     # def handleSectionMoved(self, i, oldVisualIndex, newVisualIndex):
     #     for i in range(min(oldVisualIndex, newVisualIndex), self.count()):
     #         logical = self.logicalIndex(i)
@@ -156,24 +155,23 @@ class Table(QTableView):
         font.setBold(True)
         self.setFont(font)
 
-        self.horizontalHeader().setDefaultAlignment(Qt.AlignHCenter)
-        self.verticalHeader().setDefaultAlignment(Qt.AlignVCenter)
-
+        self.horizontal_header = self.horizontalHeader()
         self.vertical_header = self.verticalHeader()
+        self.horizontal_header.setDefaultAlignment(Qt.AlignHCenter)
+        self.vertical_header.setDefaultAlignment(Qt.AlignVCenter)
 
-        self.horizontalHeader().setMinimumSectionSize(50)
-        self.verticalHeader().setMinimumSectionSize(50)
-
-        self.horizontalHeader().setStretchLastSection(True)
+        self.horizontal_header.setMinimumSectionSize(50)
+        self.vertical_header.setMinimumSectionSize(50)
+        self.vertical_header.setSectionResizeMode(QHeaderView.Fixed)
 
         self.setStyleSheet("background-color: #353535; selection-background-color: gray;")
         self.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
         self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
-        self.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.horizontalHeader().setSortIndicatorShown(True)
-        self.horizontalHeader().setSectionsClickable(True)
-
+        # self.horizontal_header.setSectionResizeMode(QHeaderView.Stretch)
+        self.horizontal_header.setSortIndicatorShown(True)
+        self.horizontal_header.setSectionsClickable(True)
+        self.horizontal_header.setStretchLastSection(True)
 
 
 
@@ -197,10 +195,6 @@ class Table2(QtWidgets.QTableView):
         # 고정된 헤더 모드 설정
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
-
-        # # 고정된 행과 열 모드 설정
-        # self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        # self.setCornerButtonEnabled(False)
 
         self.horizontal_header.setMinimumSectionSize(100)
         self.vertical_header.setMinimumSectionSize(100)
@@ -250,6 +244,10 @@ class Table3(QtWidgets.QTableView):
         # 고정된 헤더 모드 설정
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+
+        header = self.horizontalHeader()
+        header.setDefaultAlignment(QtCore.Qt.AlignLeft)
+        header.setFont(font)  # 헤더에 폰트 설정
 
         # # 고정된 행과 열 모드 설정
         # self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)

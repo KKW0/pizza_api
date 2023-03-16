@@ -48,7 +48,7 @@ class CustomTableModel(QAbstractTableModel):
             return None
 
         elif role == Qt.TextAlignmentRole:
-            return Qt.AlignRight
+            return Qt.AlignCenter
 
         return None
 
@@ -98,7 +98,7 @@ class CustomTableModel2(QAbstractTableModel):
                 return pixmap
 
         elif role == Qt.TextAlignmentRole:
-            return Qt.AlignRight
+            return Qt.AlignCenter
 
         return None
 
@@ -139,7 +139,7 @@ class CustomTableModel3(QAbstractTableModel):
         if role != Qt.DisplayRole:
             return None
         if orientation == Qt.Horizontal:
-            return ("", "Select Working Shot")[section]
+            return ("", "Select Working Shot", "")[section]
         else:
             return str(section)
 
@@ -158,7 +158,7 @@ class CustomTableModel3(QAbstractTableModel):
                 return pixmap
 
         elif role == Qt.TextAlignmentRole:
-            return Qt.AlignRight
+            return Qt.AlignCenter
 
         return None
 

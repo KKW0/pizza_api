@@ -117,10 +117,6 @@ class MainWindow(QMainWindow):
         self.ui.Save_Button.clicked.connect(self.save_button)
         self.save = Save()
 
-        # Load 클릭시 Load ui로 전환
-        self.ui.Load_Button.clicked.connect(self.load_button)
-        self.load = Load()
-
         self.table2.selectionModel().selectionChanged.connect(self.selection_changed)
 
 
@@ -149,10 +145,7 @@ class MainWindow(QMainWindow):
 
     def load_button(self):
         # self.ui.hide()  # 메인 윈도우 숨김
-        self.load.my_task = self.my_task
-        self.load.my_shots = self.my_shots
-        self.load.selected_index_list = list(set(self.row_index_list))
-        self.load.ui.show()
+        pass
 
     # ----------------------------------------------------------------------------------------------
     # 정보 입력 후 로그인 버튼을 클릭하면 Kitsu에 로그인을 하고, 오토로그인이 체크되어있는지 판별

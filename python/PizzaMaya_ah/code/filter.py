@@ -1,4 +1,4 @@
-#coding:utf8
+# coding:utf8
 
 import gazu
 import pprint as pp
@@ -10,7 +10,7 @@ class Filter:
         # gazu.log_in("keiel0326@gmail.com", "tmvpdltm")
         # gazu.client.set_host("http://192.168.3.116/api")
         # gazu.log_in("pipeline@rapa.org", "netflixacademy")
-        self.seq = None
+        pass
 
     def _get_information_dict(self, task):
         """
@@ -31,10 +31,10 @@ class Filter:
         asset = gazu.asset.get_asset(task['entity_id'])
         shots = gazu.casting.get_asset_cast_in(asset)
         shot = gazu.shot.get_shot(shots[0]['shot_id'])
-        self.seq = gazu.shot.get_sequence_from_shot(shot)
-        task_info['sequence_name'] = self.seq['name']
+        seq = gazu.shot.get_sequence_from_shot(shot)
+        task_info['sequence_name'] = seq['name']
 
-        return task_info, self.seq['name']
+        return task_info, seq['name']
 
     def _collect_info_task(self):
         """
@@ -57,7 +57,10 @@ class Filter:
             if task['task_type_name'] == 'LayoutPizza':
                 proj_list.append(task['project_name'])
                 task_info, seq_name = self._get_information_dict(task)
-                sort_dict[task['project_name']] = seq_name
+                if type(sort_dict.get(task['project_name'])) is list:
+                    sort_dict[task['project_name']].append(seq_name)
+                else:
+                    sort_dict[task['project_name']] = [seq_name]
                 task_info_list.append(task_info)
                 task_list.append(task)
                 seq_list.append(seq_name)
@@ -79,12 +82,26 @@ class Filter:
         """
         info_list = []
         task_type = gazu.task.get_task_type_by_name('Matchmove')
-        aa = gazu.files.get_last_output_files_for_entity(shot['id'], output_type, task_type)
-        output_list = gazu.files.get_last_output_files_for_entity(shot['id'], output_type, task_type)
+        output_list_tmp = gazu.files.get_last_output_files_for_entity(shot['shot_id'], output_type, task_type)
+        output_list_tmp2 = output_list_tmp
+        output_list = []
+        if len(output_list_tmp) > 1:
+            for index in range(len(output_list_tmp)):
+                del output_list_tmp2[index]
+                if len(output_list_tmp2) == 0:
+                    break
+                for index2 in range(len(output_list_tmp2)):
+                    if output_list_tmp[index]['source_file_id'] == output_list_tmp2[index2]['source_file_id']:
+                        break
+                    else:
+                        output_list.append(output_list_tmp[index])
+        else:
+            output_list = output_list_tmp
+
         output_dict = dict()
         output_dict['output_type_name'] = output_type['name']
         if len(output_list) is 0:
-            raise ValueError("해당하는 output file이 존재하지 않습니다.")
+            raise ValueError("해당하는 output file이 존재하지 않습니다. Shot: {0}".format(shot['shot_name']))
         for output in output_list:
             output_dict['output_name'] = output['name']
             output_dict['comment'] = output['comment']
@@ -145,8 +162,9 @@ class Filter:
         undi_info_list = []
         camera_info_list = []
         task_type = gazu.task.get_task_type(task['task_type_id'])
-        shot_list = gazu.shot.all_shots_for_sequence(self.seq['id'])
+
         asset = gazu.entity.get_entity(task['entity_id'])
+        shot_list = gazu.casting.get_asset_cast_in(asset)
         all_casting_list = gazu.casting.get_asset_casting(asset)
         for cast in all_casting_list:
             casted_asset = gazu.asset.get_asset(cast['asset_id'])
@@ -184,26 +202,24 @@ class Filter:
         filtered_seq_set = []
 
         # 프로젝트 이름 필터링
-        if proj_num is 0:
-            proj = proj_set
+        if proj_num == 0 or proj_num == None:
             return task_list, task_info_list
         else:
             proj = proj_set[proj_num-1]
+            proj_dict = gazu.project.get_project_by_name(proj)
             for index, task in enumerate(task_list):
-                if task['project_name'] is proj:
+                if task['project_name'] == proj:
                     filtered_task_list.append(task)
                     filtered_task_info_list.append(task_info_list[index])
             for seq_name in seq_set:
-                try:
-                    gazu.shot.get_sequence_by_name(proj, seq_name)
-                except Exception as exc:
+                if gazu.shot.get_sequence_by_name(proj_dict, seq_name):
+                    filtered_seq_set.append(seq_name)
+                else:
                     continue
-                filtered_seq_set.append(seq_name)
             seq_set = filtered_seq_set
 
         # 프로젝트를 필터링할 시 시퀀스 이름으로도 필터링 가능
-        if seq_num is 0:
-            seq = seq_set
+        if seq_num == 0:
             return filtered_task_list, filtered_task_info_list
         seq = seq_set[seq_num-1]
         for index, task in enumerate(filtered_task_list):

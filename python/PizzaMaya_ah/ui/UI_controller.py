@@ -56,12 +56,8 @@ class MainWindow(QMainWindow):
         # 메인 윈도우의 레이아웃에 TableView 2개 추가
         self.table = Table()
         self.ui.verticalLayout2.addWidget(self.table, 0)
-        self.horizontalHeader = HorizontalHeader()
-        self.table.setHorizontalHeader(self.horizontalHeader)
-
-        # self.table.horizontalHeader().sectionClicked.connect(self.filter_list)
-        # self.horizontalHeader.combo.currentTextChanged.connect(self.combobox_changed1)
-        # self.horizontalHeader.combo2.currentTextChanged.connect(self.combobox_changed2)
+        self.horizontal_header = HorizontalHeader()
+        self.table.setHorizontalHeader(self.horizontal_header)
 
         self.table2 = Table2()
         self.ui.verticalLayout.addWidget(self.table2, 0)
@@ -80,7 +76,6 @@ class MainWindow(QMainWindow):
 
         value = self.login.load_setting()
         if value and value['auto_login'] and value['valid_host'] and value['valid_user'] is True:
-
             self.login.host = value['host']
             self.login.user_id = value['user_id']
             self.login.user_pw = value['user_pw']
@@ -140,13 +135,6 @@ class MainWindow(QMainWindow):
         self.ui.Selection_Lable.setText('Selected Files %d / %d' % (len(selected_rows), row_count))
         print(self.ui.Selection_Lable.text())
 
-    # def combobox_changed1(self, event):
-    #     print(event)
-    #
-    # def combobox_changed2(self, event):
-    #     print(event)
-
-
     # ----------------------------------------------------------------------------------------------
     # save 또는 load 버튼 누르면 save 또는 load 윈도우를 호출
 
@@ -194,7 +182,9 @@ class MainWindow(QMainWindow):
     def table_clicked(self, event):
         self.task_clicked_index = event.row()
         self.my_task, task_info, self.casting_info_list,\
-            self.undi_info_list, self.camera_info_list = self.ft.select_task(task_num=self.task_clicked_index)
+            self.undi_info_list, self.camera_info_list = self.ft.select_task(self.horizontal_header.proj_index,
+                                                                             self.horizontal_header.seq_index,
+                                                                             self.task_clicked_index)
         tup, _, _, _ = thumbnail_control(self.my_task, self.task_clicked_index,
                                          self.casting_info_list, self.undi_info_list)
         png = bytes(tup)

@@ -14,9 +14,13 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         self.setSectionsMovable(False)
         self.combo = None
         self.combo2 = None
-        self.seq_set = None
         self.sort_dict = None
+        self.seq_index = 0
+        self.proj_index = 0
         self.proxy_model = None
+        self.proxy_model2 = None
+        self.disable_color = "background-color: #333333;"
+        self.enable_color = "background-color: #444444;"
         self.sort_button = None  # 정렬 버튼
         # self.sectionResized.connect(self.handleSectionResized)
         # self.sectionMoved.connect(self.handleSectionMoved)
@@ -28,19 +32,21 @@ class HorizontalHeader(QtWidgets.QHeaderView):
 
 
     def showEvent(self, event):
-        _, _, proj_set, self.seq_set, self.sort_dict = self.ft._collect_info_task()
+        _, _, proj_set, _, self.sort_dict = self.ft._collect_info_task()
         self.combo = QtWidgets.QComboBox(self)
         self.combo.addItems(['Project'] + proj_set)
         self.combo.currentTextChanged.connect(self.combobox_changed1)
-        self.combo.setGeometry(self.sectionViewportPosition(0), 0, self.sectionSize(0) - 0, self.height())
+        self.combo.setGeometry(self.sectionViewportPosition(0), 0, self.sectionSize(0) - 4, self.height())
+        self.combo.setStyleSheet(self.enable_color)
         self.combo.show()
 
         self.combo2 = QtWidgets.QComboBox(self)
-        self.combo2.addItems(['Sequence'] + self.seq_set)
+        self.combo2.addItems(['Sequence'])
         self.combo2.currentTextChanged.connect(self.combobox_changed2)
-        self.combo2.setGeometry(self.sectionViewportPosition(1), 0, self.sectionSize(1) - 0, self.height())
+        self.combo2.setGeometry(self.sectionViewportPosition(1), 0, self.sectionSize(1) - 4, self.height())
+        self.combo2.setDisabled(True)
+        self.combo2.setStyleSheet(self.disable_color)
         self.combo2.show()
-
         self.table = self.parent()
         self.model = self.table.model()
         super(HorizontalHeader, self).showEvent(event)
@@ -48,30 +54,35 @@ class HorizontalHeader(QtWidgets.QHeaderView):
     def combobox_changed1(self, option):
         self.proxy_model = QtCore.QSortFilterProxyModel()
         self.proxy_model.setSourceModel(self.model)
-        self.combo2.setDisabled(True)
         if option != 'Project':
+            self.proj_index = self.combo.currentIndex()
             self.proxy_model.setFilterRegExp('^{}$'.format(option))
             self.proxy_model.setFilterKeyColumn(0)
             self.table.setModel(self.proxy_model)
             self.combo2.clear()
-            # seq_set =
-            # self.combo2.addItems(['Sequence'] + seq_set)
+            self.combo2.addItems(['Sequence'] + self.sort_dict[option])
             self.combo2.setDisabled(False)
+            self.combo2.setStyleSheet(self.enable_color)
         else:
+            self.seq_index = 0
+            self.proj_index = 0
             self.table.setModel(self.model)
             self.combo2.setCurrentIndex(0)
-            option2 = 'Sequence'
             self.combo2.setDisabled(True)
+            self.combo2.setStyleSheet(self.disable_color)
 
     def combobox_changed2(self, option2):
-        if option2 != 'Sequence':
-            proxy_model2 = QtCore.QSortFilterProxyModel()
-            proxy_model2.setSourceModel(self.proxy_model)
-            proxy_model2.setFilterRegExp('^{}$'.format(option2))
-            proxy_model2.setFilterKeyColumn(1)
-            self.table.setModel(proxy_model2)
-        else:
-            self.table.setModel(self.proxy_model)
+        if self.combo.currentIndex != 0:
+            if option2 != 'Sequence':
+                self.seq_index = self.combo2.currentIndex()
+                self.proxy_model2 = QtCore.QSortFilterProxyModel()
+                self.proxy_model2.setSourceModel(self.proxy_model)
+                self.proxy_model2.setFilterRegExp('^{}$'.format(option2))
+                self.proxy_model2.setFilterKeyColumn(1)
+                self.table.setModel(self.proxy_model2)
+            else:
+                self.seq_index = 0
+                self.table.setModel(self.proxy_model)
 
     # def handleSortButtonClicked(self):
     #     # 마지막 헤더 클릭 시 정렬

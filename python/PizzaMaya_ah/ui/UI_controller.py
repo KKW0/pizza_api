@@ -18,10 +18,10 @@ from PizzaMaya_ah.ui.UI_view_login import LoginWindow
 from PizzaMaya_ah.ui.UI_model import CustomTableModel
 from PizzaMaya_ah.ui.UI_model import CustomTableModel2
 from PizzaMaya_ah.ui.UI_model import CustomTableModel3
-
 from PySide2 import QtWidgets, QtCore, QtUiTools
-from PySide2.QtWidgets import QMainWindow, QSizePolicy
+from PySide2.QtWidgets import QMainWindow
 from PySide2.QtGui import QPixmap
+from PySide2.QtCore import Qt
 
 
 class MainWindow(QMainWindow):
@@ -130,11 +130,10 @@ class MainWindow(QMainWindow):
         selected_indexes = selection_model.selectedIndexes()
         row_count = self.table2_model.row_count
 
-        # print(selected_indexes[0].row())
-        sel_ids = set()
+        sel_asset_ids = set()
         for sel_idx in selected_indexes:
-            sel_ids.add(sel_idx.row())
-        print(list(sel_ids))
+            sel_asset_ids.add(sel_idx.row())
+        self.load.selected_index_list = sel_asset_ids
         self.row_index_list.append(selected_indexes[0].row())
 
         self.ui.Selection_Lable.setText('Selected Files %d / %d' % (len(selected_rows), row_count))
@@ -193,17 +192,16 @@ class MainWindow(QMainWindow):
         tup, _, _, _ = thumbnail_control(self.my_task, self.task_clicked_index,
                                          self.casting_info_list, self.undi_info_list)
         png = bytes(tup)
-        self.preview_pixmap = QPixmap()
 
+        self.preview_pixmap = QPixmap()
         self.preview_pixmap.loadFromData(png)
-        self.preview_pixmap = self.preview_pixmap.scaled(360, 300)
         label = self.ui.Preview
-        label.setPixmap(self.preview_pixmap)
+        label.setPixmap(self.preview_pixmap.scaled(label.size(), Qt.KeepAspectRatio))
 
         self.ui.InfoTextBox.setPlainText('Project Name: {}'.format(task_info['project_name'] + '\n'))
         self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(task_info['description']))
         self.ui.InfoTextBox.appendPlainText('Due Date: {0}'.format(task_info['due_date']))
-        self.ui.InfoTextBox.appendPlainText('Comment: {0}'.format(str(task_info['last_comment'])))
+        self.ui.InfoTextBox.appendPlainText('Comment: {0}'.format(str(task_info['last_comment']['text'])))
 
         self.table2_model.load_data2(self.read_data2())
         self.table2_model.layoutChanged.emit()
@@ -218,11 +216,16 @@ class MainWindow(QMainWindow):
                                                           self.casting_info_list, undi_info_list=[])
         png = bytes(asset_thumbnail_list[event.row()])
 
+        # self.preview_pixmap = QPixmap()
+        # self.preview_pixmap.loadFromData(png)
+        # # self.preview_pixmap = self.preview_pixmap.scaled(360, 300)
+        # pixmap_width = 360
+        # scaled_width = min(self.preview_pixmap.width(), pixmap_width)
+        # self.preview_pixmap.scaledToWidth(scaled_width)
         self.preview_pixmap = QPixmap()
         self.preview_pixmap.loadFromData(png)
-        self.preview_pixmap = self.preview_pixmap.scaled(360, 300)
         label = self.ui.Preview
-        label.setPixmap(self.preview_pixmap)
+        label.setPixmap(self.preview_pixmap.scaled(label.size(), Qt.KeepAspectRatio))
 
         self.ui.InfoTextBox.setPlainText('Asset Name: {}'.format(clicked_cast['asset_name']+'\n'))
         self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(clicked_cast['description']))
@@ -240,10 +243,11 @@ class MainWindow(QMainWindow):
 
         self.preview_pixmap = QPixmap()
         self.preview_pixmap.loadFromData(png)
-        self.preview_pixmap = self.preview_pixmap.scaled(360, 300)
         label = self.ui.Preview
-        label.setPixmap(self.preview_pixmap)
+        label.setPixmap(self.preview_pixmap.scaled(label.size(), Qt.KeepAspectRatio))
 
+
+        self.load.my_shot_index_list
         self.ui.InfoTextBox.setPlainText('[Shot Info]')
         self.ui.InfoTextBox.appendPlainText('Shot Name: {}'.format(clicked_undi['shot_name'] + '\n'))
         self.ui.InfoTextBox.appendPlainText('[Undistortion Image Info]')

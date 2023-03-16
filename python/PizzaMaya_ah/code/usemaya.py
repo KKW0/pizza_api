@@ -1,6 +1,7 @@
 #coding:utf8
 import os
 import gazu
+import pprint as pp
 import maya.cmds as mc
 from usekitsu import KitsuThings
 
@@ -46,7 +47,7 @@ class MayaThings:
             asset(dict): 로드하고자 하는 에셋 아웃풋 파일의 nb_elements, path 정보가 담긴 딕셔너리
         """
         # 시퀀스 길이(씬의 프레임레인지) 를 가장 길게 설정
-        if 'Undistortion_img' in path:
+        if 'UndistortionImg' in path:
             file_list = os.listdir(path)
             frame_range = len(file_list)
             end_frame = mc.playbackOptions(query=True, max=True)
@@ -63,14 +64,12 @@ class MayaThings:
             returnNewNodes=True
         )
 
-        if asset is not None:
+        if asset:
             # 에셋이라면 nb_elements에 맞게 인스턴싱 진행
             for index in range(asset['nb_elements']-1):
                 full_filename = os.path.basename(asset['path'])
-                filename = full_filename.split('_')[2]
-                mc.instance(filename)
-                # <Project>_<AssetType>_<Asset>_<OutputType>_v<Revision>.representation
-                #### Asset이름과 씬파일 안의 실제 파일명이 동일하다는 전제 하에...
+                print(full_filename)
+                mc.instance(full_filename)
 
     def _connect_image(self, undi_path, camera_path):
         """
@@ -101,6 +100,8 @@ class MayaThings:
         """
         undi_seq_path = self.kit.get_undistortion_img(shot)
         camera_path = self.kit.get_camera(shot)
+        print('B', undi_seq_path)
+        print('C', camera_path)
         self._load_output(undi_seq_path)
         self._load_output(camera_path)
         self._connect_image(undi_seq_path, camera_path)

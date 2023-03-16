@@ -32,13 +32,13 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         self.combo = QtWidgets.QComboBox(self)
         self.combo.addItems(['Project'] + proj_set)
         self.combo.currentTextChanged.connect(self.combobox_changed1)
-        self.combo.setGeometry(self.sectionViewportPosition(0), 0, self.sectionSize(0) - 4, self.height())
+        self.combo.setGeometry(self.sectionViewportPosition(0), 0, self.sectionSize(0) - 0, self.height())
         self.combo.show()
 
         self.combo2 = QtWidgets.QComboBox(self)
         self.combo2.addItems(['Sequence'] + self.seq_set)
         self.combo2.currentTextChanged.connect(self.combobox_changed2)
-        self.combo2.setGeometry(self.sectionViewportPosition(1), 0, self.sectionSize(1) - 4, self.height())
+        self.combo2.setGeometry(self.sectionViewportPosition(1), 0, self.sectionSize(1) - 0, self.height())
         self.combo2.show()
 
         self.table = self.parent()

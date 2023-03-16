@@ -131,7 +131,9 @@ class MainWindow(QMainWindow):
         # print(selected_indexes[0].row())
         sel_ids = set()
         for sel_idx in selected_indexes:
-            sel_ids.add(sel_idx.row())
+            print(sel_idx)
+            print(dir(sel_idx))
+            sel_ids.add(sel_idx)
         print(list(sel_ids))
         self.row_index_list.append(selected_indexes[0].row())
 
@@ -223,7 +225,7 @@ class MainWindow(QMainWindow):
         _, asset_thumbnail_list, _, shot_list = thumbnail_control(self.my_task, self.task_clicked_index,
                                                           self.casting_info_list, undi_info_list=[])
         png = bytes(asset_thumbnail_list[event.row()])
-
+        clicked_casting_info_list = []
         self.preview_pixmap = QPixmap()
         self.preview_pixmap.loadFromData(png)
         self.preview_pixmap = self.preview_pixmap.scaled(360, 300)
@@ -236,7 +238,9 @@ class MainWindow(QMainWindow):
         self.ui.InfoTextBox.appendPlainText('Occurence: {0}'.format(str(clicked_cast['nb_occurences'])))
         self.ui.InfoTextBox.appendPlainText('Output File: {0}'.format(str(len(clicked_cast['output']))))
         self.ui.InfoTextBox.appendPlainText('Newest or Not: Not')   # 모든 아웃풋 파일들이 전부 최신 리비전이면 YES로 표기
-        print(shot_list)
+        if clicked_cast:
+            clicked_casting_info_list.append(clicked_cast)
+        print(clicked_casting_info_list)
 
     # ----------------------------------------------------------------------------------------------
     # TableView 두개에 띄울 각각의 정보를 넣어둠

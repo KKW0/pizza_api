@@ -2,14 +2,15 @@
 
 import os
 import sys
+import gazu
 import pprint as pp
 
 from PizzaMaya_ah.code.login import LogIn
 from PizzaMaya_ah.code.filter import Filter
+from PizzaMaya_ah.code.usemaya import MayaThings
 from PizzaMaya_ah.code.thumbnail import thumbnail_control
 
 from PizzaMaya_ah.ui.UI_view_save import Save
-from PizzaMaya_ah.ui.UI_view_load import Load
 from PizzaMaya_ah.ui.UI_view_table import Table
 from PizzaMaya_ah.ui.UI_view_table import Table2
 from PizzaMaya_ah.ui.UI_view_table import Table3
@@ -19,10 +20,9 @@ from PizzaMaya_ah.ui.UI_model import CustomTableModel
 from PizzaMaya_ah.ui.UI_model import CustomTableModel2
 from PizzaMaya_ah.ui.UI_model import CustomTableModel3
 from PySide2 import QtWidgets, QtCore, QtUiTools
-from PySide2.QtWidgets import QMainWindow
-from PySide2.QtGui import QPixmap
+from PySide2.QtWidgets import QMainWindow, QMessageBox
+from PySide2.QtGui import QPixmap, QImage
 from PySide2.QtCore import Qt
-
 
 class MainWindow(QMainWindow):
     def __init__(self, values=None, parent=None, size_policy=None):
@@ -34,12 +34,14 @@ class MainWindow(QMainWindow):
         self.task_num = None
         self.my_shots = None
         self.task_info = None
-        self.row_index_list = []
+        # self.row_index_list = []
         self.preview_pixmap = None
         self.undi_info_list = None
         self.camera_info_list = None
         self.casting_info_list = None
         self.task_clicked_index = None
+        self.my_shot_index_list = []
+        self.selected_index_list = []  # 선택한 에셋들의 인덱스 번호
         cwd = os.path.dirname(os.path.abspath(__file__))
         # ui 파일 경로 생성
         ui_path = os.path.join(cwd, 'UI_design', 'Main.ui')
@@ -96,6 +98,7 @@ class MainWindow(QMainWindow):
             self.login_window.ui.show()
 
         self.ft = Filter()
+        self.ma = MayaThings()
 
         # ----------------------------------------------------------------------------------------------
 
@@ -111,14 +114,13 @@ class MainWindow(QMainWindow):
         self.table2.clicked.connect(self.table_clicked2)
         self.table3.clicked.connect(self.table_clicked3)
 
-
-
-        # Save 클릭시 Save ui로 전환
+        # Save 클릭시 Save ui로 전환, Load 클릭시 로드됨
         self.ui.Save_Button.clicked.connect(self.save_button)
+        self.ui.Load_Button.clicked.connect(self.load_button)
         self.save = Save()
 
+        # 에셋 여러개 선택
         self.table2.selectionModel().selectionChanged.connect(self.selection_changed)
-
 
     def selection_changed(self, selected, deselected):
         selection_model = self.table2.selectionModel()
@@ -129,8 +131,8 @@ class MainWindow(QMainWindow):
         sel_asset_ids = set()
         for sel_idx in selected_indexes:
             sel_asset_ids.add(sel_idx.row())
-        self.load.selected_index_list = sel_asset_ids
-        self.row_index_list.append(selected_indexes[0].row())
+        self.selected_index_list = sel_asset_ids
+        # self.row_index_list.append(selected_indexes[0].row())
 
         self.ui.Selection_Lable.setText('Selected Files %d / %d' % (len(selected_rows), row_count))
         print(self.ui.Selection_Lable.text())
@@ -143,8 +145,25 @@ class MainWindow(QMainWindow):
         self.save.ui.show()
 
     def load_button(self):
-        # self.ui.hide()  # 메인 윈도우 숨김
-        pass
+        if not self.my_task:
+            return
+        else:
+            # screen_resolution = QtWidgets.QDesktopWidget().screenGeometry()
+            # screen_center = screen_resolution.center()
+
+            reply = QMessageBox.question(self, 'Confirmation', '{0}개의 에셋과 {1}개의 샷을 로드하시겠습니까?' \
+                                         .format(len(self.selected_index_list), (len(self.my_shot_index_list))),
+                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            # reply.move(screen_center - reply.rect().center())
+            if reply == QMessageBox.Yes:
+                my_layout_asset = gazu.asset.get_asset(self.my_task['entity_id'])
+                self.ma.import_casting_asset(my_layout_asset, self.selected_index_list)
+                for index in self.my_shot_index_list:
+                    shot_list = gazu.casting.get_asset_cast_in(self.my_task['entity_id'])
+                    self.ma.import_cam_seq(shot_list[index])
+                self.ui.close()
+                QMessageBox.information(self, 'Completed', '로드되었습니다!', QMessageBox.Ok)
+                # QMessageBox.move(screen_center - QMessageBox.rect().center())
 
     # ----------------------------------------------------------------------------------------------
     # 정보 입력 후 로그인 버튼을 클릭하면 Kitsu에 로그인을 하고, 오토로그인이 체크되어있는지 판별
@@ -209,12 +228,6 @@ class MainWindow(QMainWindow):
                                                           self.casting_info_list, undi_info_list=[])
         png = bytes(asset_thumbnail_list[event.row()])
 
-        # self.preview_pixmap = QPixmap()
-        # self.preview_pixmap.loadFromData(png)
-        # # self.preview_pixmap = self.preview_pixmap.scaled(360, 300)
-        # pixmap_width = 360
-        # scaled_width = min(self.preview_pixmap.width(), pixmap_width)
-        # self.preview_pixmap.scaledToWidth(scaled_width)
         self.preview_pixmap = QPixmap()
         self.preview_pixmap.loadFromData(png)
         label = self.ui.Preview
@@ -239,13 +252,18 @@ class MainWindow(QMainWindow):
         label = self.ui.Preview
         label.setPixmap(self.preview_pixmap.scaled(label.size(), Qt.KeepAspectRatio))
 
+        selection_model = self.table3.selectionModel()
+        selected_indexes = selection_model.selectedIndexes()
+        sel_shot_idexes = set()
+        for sel_idx in selected_indexes:
+            sel_shot_idexes.add(sel_idx.row())
+        self.my_shot_index_list = sel_shot_idexes
 
-        self.load.my_shot_index_list
         self.ui.InfoTextBox.setPlainText('[Shot Info]')
         self.ui.InfoTextBox.appendPlainText('Shot Name: {}'.format(clicked_undi['shot_name'] + '\n'))
         self.ui.InfoTextBox.appendPlainText('[Undistortion Image Info]')
-        self.ui.InfoTextBox.appendPlainText('Undistortion Img: {}'.format(clicked_cam['output_type_name']))
-        self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(clicked_cam['description']))
+        self.ui.InfoTextBox.appendPlainText('Frame Range: {}'.format(clicked_undi['frame_range']))
+        self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(clicked_undi['description']))
         st = '\n'
         new_str = st.lstrip()
         self.ui.InfoTextBox.appendPlainText(new_str)
@@ -290,7 +308,10 @@ class MainWindow(QMainWindow):
                 thumbnail_control(self.my_task, 0, self.casting_info_list, self.undi_info_list)
             # 캐스팅된 에셋목록 추가
             for index, cast in enumerate(self.casting_info_list):
-                data.append([asset_thumbnail_list[index], cast['asset_name'], cast['asset_type_name']])
+                if len(cast['output']) == 0:
+                    data.append([asset_thumbnail_list[index], cast['asset_name'], 'No Output File to Load'])
+                else:
+                    data.append([asset_thumbnail_list[index], cast['asset_name'], cast['asset_type_name']])
             return data
         else:
             return data

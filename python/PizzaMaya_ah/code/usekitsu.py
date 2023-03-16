@@ -19,8 +19,9 @@ class KitsuThings:
         Args:
             shot(dict): 선택한 테스크 에셋이 캐스팅된 시퀀스 아래에 잇는 샷들 중 로드하길 원하는 샷
         """
-        padding_info = shot.get('nb_frames') - 1
-        if padding_info is False:
+        if shot['nb_frames'] and len(str(shot['nb_frames'])) > 4:
+            padding_info = len(str(shot['nb_frames'])) - 1
+        else:
             padding_info = 3
         padding = '_' + ('0' * padding_info) + '1'
 
@@ -39,7 +40,9 @@ class KitsuThings:
             str: 첫번째 언디스토션 이미지의 path
         """
         padding = self._get_frame_padding(shot)
-        undi_path = gazu.files.build_entity_output_file_path(shot, 'Undistortion_img', 'Matchmove') ####output type 이름 바꿔야 함
+        output_type = gazu.files.get_output_type_by_name('UndistortionJpg')
+        task_type = gazu.task.get_task_type_by_name('Matchmove')
+        undi_path = gazu.files.build_entity_output_file_path(shot['id'], output_type, task_type)
         full_path = undi_path + padding + '.jpg'
 
         return full_path
@@ -57,9 +60,12 @@ class KitsuThings:
         Returns:
             str: 카메라(fbx 등) 아웃풋 파일이 저장된 path
         """
-        camera_files = gazu.files.get_last_output_files_for_entity(shot, 'Camera', 'Matchmove')
-        camera_path = gazu.files.build_entity_output_file_path(shot, 'Camera', 'Matchmove')
-        full_path = camera_path + '.' + camera_files[0]['representation']
+        output_type = gazu.files.get_output_type_by_name('FBX')
+        task_type = gazu.task.get_task_type_by_name('Camera')
+        camera_files = gazu.files.get_last_output_files_for_entity(shot, output_type, task_type)
+        camera_path = gazu.files.build_entity_output_file_path(shot, output_type, task_type)
+        # full_path = camera_path + '.' + camera_files[0]['representation']
+        full_path = camera_path + '.fbx'
 
         return full_path
 
@@ -78,25 +84,30 @@ class KitsuThings:
         Returns:
             str: 아웃풋 파일들의 패스(확장자 포함), 개수가 담긴 dict를 수집한 리스트
         """
-        file_list = []
         file_dict = {
             'path': "",
             'nb_elements': 0,
         }
         asset = gazu.asset.get_asset(casting['asset_id'])
-        output_file_list = gazu.files.get_last_output_files_for_entity(asset)
-        pp.pprint(output_file_list)
-        for out_file in output_file_list:
-            # 각 output file의 패스를 생성하고, 리스트에 append
+        task_type = gazu.task.get_task_type_by_name('Modeling')
+        output_file_list = gazu.files.get_last_output_files_for_entity(asset, task_type=task_type)
+        # 각 output file의 패스를 생성하고, 리스트에 append
+        if len(output_file_list) != 0:
+            out_file = output_file_list[0]
             out_path = gazu.files.build_entity_output_file_path(asset,
                                                                 out_file['output_type_id'],
                                                                 out_file['task_type_id'],
                                                                 revision=out_file['revision'])
-            # path = out_path + '.' + out_file['representation']
-            path = out_path + '.' + 'fbx'       ##########################################
+            if out_file['nb_elements'] > 1:
+                # path = out_path + '_' + '[1-' + str(out_file['nb_elements']) + ']' + '.' + out_file['representation']
+                path = out_path + '_' + '[1-' + str(out_file['nb_elements']) + ']' + '.fbx'
+            else:
+                path = out_path + '.fbx'
             file_dict['path'] = path
             file_dict['nb_elements'] = out_file['nb_elements']
-            file_list.append(file_dict)
-            pp.pprint(out_file)
 
-        return file_list
+            return file_dict
+        else:
+            print('* No Output! Asset Name: {0}'.format(asset['name']))
+
+            return file_dict

@@ -60,7 +60,9 @@ def thumbnail_control(task_dict, task_num=None, casting_info_list=None, undi_inf
                 # 캐스팅된 에셋들의 썸네일
                 proj = gazu.project.get_project(task_dict['project_id'])
                 asset = gazu.asset.get_asset_by_name(proj, info['asset_name'])
-                if asset['preview_file_id']:
+                task_type = gazu.task.get_task_type_by_name('Modeling')
+                is_output = gazu.files.get_last_output_files_for_entity(asset, task_type=task_type)
+                if asset['preview_file_id'] and len(is_output) != 0:
                     preview_cast = gazu.files.get_preview_file(asset['preview_file_id'])
                     data = _get_thumbnail(preview_cast)
                 else:

@@ -70,7 +70,7 @@ class Filter:
 
         return task_info_list, task_list, proj_set, seq_set, sort_dict
 
-    def _list_append(self, shot, output_type):
+    def _list_append(self, shot, output_type, task_type):
         """
         리스트에 아웃풋 파일(언디스토션 이미지, camera)의 정보를 담는다
 
@@ -82,7 +82,6 @@ class Filter:
             list: output file의 모델에서 필요한 정보들만 담은 리스트의 집합
         """
         info_list = []
-        task_type = gazu.task.get_task_type_by_name('Matchmove')
         output_list_tmp = gazu.files.get_last_output_files_for_entity(shot['shot_id'], output_type, task_type)
         output_list_tmp2 = output_list_tmp
         output_list = []
@@ -105,6 +104,7 @@ class Filter:
             raise ValueError("해당하는 output file이 존재하지 않습니다. Shot: {0}".format(shot['shot_name']))
         for output in output_list:
             shot = gazu.shot.get_shot(output['entity_id'])
+            output_dict['frame_range'] = shot['nb_frames']
             output_dict['output_name'] = output['name']
             output_dict['comment'] = output['comment']
             output_dict['description'] = output['description']
@@ -118,24 +118,22 @@ class Filter:
         캐스팅 정보가 담긴 딕셔너리의 집합을 리턴하는 매서드
 
         Args:
-            cast:
+            cast: 에셋의 캐스팅 info
             output_type(list): 에셋에서 쓰이는 아웃풋 타입의 집합
-            asset:
-            task_type:
+            asset: a casted asset
+            task_type: for get output file (Modeling)
 
         Return:
         """
         output_list = []
-        output_dict = {'output_type': None,
-                       'revision': None,
-                       'representation': None,
-                       'description': None
-                       }
+        output_dict = dict()
         for item in output_type:
-            revision = gazu.files.get_last_entity_output_revision(asset, item, task_type)
-            output_dict['output_type'] = item['name']
-            output_dict['revision'] = revision
-            output_list.append(output_dict)
+            is_output = gazu.files.get_last_output_files_for_entity(asset, task_type=task_type)
+            if len(is_output) != 0:
+                revision = gazu.files.get_last_entity_output_revision(asset, item, task_type)
+                output_dict['output_type'] = item['name']
+                output_dict['revision'] = revision
+                output_list.append(output_dict)
         casting_dict = {'asset_name': asset['name'],
                         'description': asset['description'],
                         'asset_type_name': asset['asset_type_name'],
@@ -164,8 +162,9 @@ class Filter:
         casting_info_list = []
         undi_info_list = []
         camera_info_list = []
-        task_type = gazu.task.get_task_type(task['task_type_id'])
-
+        task_type = gazu.task.get_task_type_by_name('Modeling')
+        task_match = gazu.task.get_task_type_by_name('Matchmove')
+        task_cam = gazu.task.get_task_type_by_name('Camera')
         asset = gazu.entity.get_entity(task['entity_id'])
         shot_list = gazu.casting.get_asset_cast_in(asset)
         all_casting_list = gazu.casting.get_asset_casting(asset)
@@ -176,11 +175,11 @@ class Filter:
             casting_info_list.append(casting_dict)
         for shot in shot_list:
             jpgs = gazu.files.get_output_type_by_name('UndistortionJpg')
-            abc = gazu.files.get_output_type_by_name('Alembic')
-            if self._list_append(shot, jpgs):
-                undi_info_list.append(self._list_append(shot, jpgs))
-            if self._list_append(shot, abc):
-                camera_info_list.append(self._list_append(shot, abc))
+            abc = gazu.files.get_output_type_by_name('FBX')     ##### Alembic...
+            if self._list_append(shot, jpgs, task_match):
+                undi_info_list.append(self._list_append(shot, jpgs, task_match))
+            if self._list_append(shot, abc, task_cam):
+                camera_info_list.append(self._list_append(shot, abc, task_cam))
 
         return casting_info_list, undi_info_list, camera_info_list
 
@@ -262,13 +261,3 @@ class Filter:
             task_info = final_task_info_list[task_num]
             casting_info_list, undi_info_list, camera_info_list = self._collect_info_casting(task)
         return task, task_info, casting_info_list, undi_info_list, camera_info_list
-
-# gazu.client.set_host("http://192.168.3.116/api")
-# gazu.log_in("keiel0326@gmail.com", "tmvpdltm")
-# proj = gazu.project.get_project_by_name('Project1')
-# seq = gazu.shot.get_sequence_by_name(proj, 'seq1')
-# shots = gazu.shot.get_shot_by_name(seq, 'sh1')
-# ft = Filter()
-# jpg = gazu.files.get_output_type_by_name('UndistortionJpg')
-# a = ft._list_append(shots, jpg)
-# pp.pprint(a)

@@ -192,7 +192,7 @@ color: white;</string>
 color: white;</string>
           </property>
           <property name="text">
-           <string>Save</string>
+           <string>Publish</string>
           </property>
          </widget>
         </item>

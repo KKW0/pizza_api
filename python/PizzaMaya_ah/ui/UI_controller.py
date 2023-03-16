@@ -14,10 +14,12 @@ from PizzaMaya_ah.ui.UI_view_save import Save
 from PizzaMaya_ah.ui.UI_view_load import Load
 from PizzaMaya_ah.ui.UI_view_table import Table
 from PizzaMaya_ah.ui.UI_view_table import Table2
+from PizzaMaya_ah.ui.UI_view_table import Table3
 from PizzaMaya_ah.ui.UI_view_table import HorizontalHeader
 from PizzaMaya_ah.ui.UI_view_login import LoginWindow
 from PizzaMaya_ah.ui.UI_model import CustomTableModel
 from PizzaMaya_ah.ui.UI_model import CustomTableModel2
+from PizzaMaya_ah.ui.UI_model import CustomTableModel3
 
 from PySide2 import QtWidgets, QtCore, QtUiTools
 from PySide2.QtWidgets import QMainWindow, QSizePolicy
@@ -62,6 +64,8 @@ class MainWindow(QMainWindow):
         self.table2 = Table2()
         self.ui.verticalLayout.addWidget(self.table2, 0)
 
+        self.table3 = Table3()
+        self.ui.verticalLayout3.addWidget(self.table3, 0)
 
         # Getting the Model
         self.table1_model = CustomTableModel()
@@ -69,6 +73,9 @@ class MainWindow(QMainWindow):
 
         self.table2_model = CustomTableModel2()
         self.table2.setModel(self.table2_model)
+
+        self.table3_model = CustomTableModel3()
+        self.table3.setModel(self.table3_model)
 
         # 프로그램 시작 시 auto login이 체크되어 있는지 확인하며, 체크되어 있으면 바로 main window 띄움
         self.login_window = LoginWindow()
@@ -101,9 +108,11 @@ class MainWindow(QMainWindow):
         self.login_window.ui.Login_Button.clicked.connect(self.login_button)
         self.ui.Logout_Button.clicked.connect(self.logout_button)
 
-        # TableView 2개 연결
+        # TableView 3개 연결
         self.table.clicked.connect(self.table_clicked)
         self.table2.clicked.connect(self.table_clicked2)
+        self.table3.clicked.connect(self.table_clicked3)
+
 
 
         # Save 클릭시 Save ui로 전환
@@ -209,6 +218,9 @@ class MainWindow(QMainWindow):
         self.shot_list = gazu.shot.all_shots_for_sequence(seq_dict)
 
 
+        self.table3_model.load_data3(self.read_data3())
+        self.table3_model.layoutChanged.emit()
+
     def table_clicked2(self, event):
         clicked_cast = self.casting_info_list[event.row()]
 
@@ -229,6 +241,30 @@ class MainWindow(QMainWindow):
         self.ui.InfoTextBox.appendPlainText('Output File: {0}'.format(str(len(clicked_cast['output']))))
         self.ui.InfoTextBox.appendPlainText('Newest or Not: Not')   # 모든 아웃풋 파일들이 전부 최신 리비전이면 YES로 표기
 
+    def table_clicked3(self, event):
+        clicked_undi = self.undi_info_list[event.row()][0]
+        clicked_cam = self.camera_info_list[event.row()][0]
+        _, _, undi_thumbnail_list, _ = thumbnail_control(self.my_task, self.task_clicked_index,
+                                                         [], self.undi_info_list)
+        png = bytes(undi_thumbnail_list[event.row()])
+
+        self.preview_pixmap = QPixmap()
+        self.preview_pixmap.loadFromData(png)
+        self.preview_pixmap = self.preview_pixmap.scaled(360, 300)
+        label = self.ui.Preview
+        label.setPixmap(self.preview_pixmap)
+
+        self.ui.InfoTextBox.setPlainText('[Shot Info]')
+        self.ui.InfoTextBox.appendPlainText('Shot Name: {}'.format(clicked_undi['shot_name'] + '\n'))
+        self.ui.InfoTextBox.appendPlainText('[Undistortion Image Info]')
+        self.ui.InfoTextBox.appendPlainText('Undistortion Img: {}'.format(clicked_cam['output_type_name']))
+        self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(clicked_cam['description']))
+        st = '\n'
+        new_str = st.lstrip()
+        self.ui.InfoTextBox.appendPlainText(new_str)
+        self.ui.InfoTextBox.appendPlainText('[Camera Info]')
+        self.ui.InfoTextBox.appendPlainText('Asset Type: {0}'.format(clicked_cam['output_type_name']))
+        self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(str(clicked_cam['description'])))
 
     # ----------------------------------------------------------------------------------------------
     # TableView 두개에 띄울 각각의 정보를 넣어둠
@@ -263,48 +299,29 @@ class MainWindow(QMainWindow):
         # 썸네일을 얻기 위해 받아와야 하는 정보
         data = []
         if self.my_task is not None:
-            _, asset_thumbnail_list, undi_thumbnail_list, shot_list = \
+            _, asset_thumbnail_list, _, shot_list = \
                 thumbnail_control(self.my_task, 0, self.casting_info_list, self.undi_info_list)
             # 캐스팅된 에셋목록 추가
             for index, cast in enumerate(self.casting_info_list):
                 data.append([asset_thumbnail_list[index], cast['asset_name'], cast['asset_type_name']])
-            # 샷 목록 추가
-            for index, info_list in enumerate(self.undi_info_list):
-                data.append([undi_thumbnail_list[index], shot_list[index]['shot_name'], 'Shot'])
             return data
         else:
             return data
 
-    # ----------------------------------------------------------------------------------------------
-    # 테이블 모델 필터링
-    # def filter_list(self, index):
-    #     option = self.table.combo_box.currentText()
-    #     option2 = self.table.combo_box2.currentText()
-    #
-    #     proxy_model = QtCore.QSortFilterProxyModel()
-    #     proxy_model.setSourceModel(self.table1_model)
-    #
-    #     if option != 'All':
-    #         proxy_model.setFilterRegExp('^{}$'.format(option))
-    #         proxy_model.setFilterKeyColumn(0)
-    #         self.table.combo_box2.setDisabled(False)
-    #     else:
-    #         self.table.combo_box2.setCurrentIndex(0)
-    #         option2 = 'All'
-    #         self.table.combo_box2.setDisabled(True)
-    #
-    #     if option2 != 'All':
-    #         proxy_model2 = QtCore.QSortFilterProxyModel()
-    #         proxy_model2.setSourceModel(proxy_model)
-    #         proxy_model2.setFilterRegExp('^{}$'.format(option2))
-    #         proxy_model2.setFilterKeyColumn(1)
-    #         self.setModel(proxy_model2)
-    #     else:
-    #         self.setModel(proxy_model)
+    def read_data3(self):
+        data = []
+        if self.my_task is not None:
+            _, _, undi_thumbnail_list, shot_list = \
+                thumbnail_control(self.my_task, 0, self.casting_info_list, self.undi_info_list)
+            # 샷 목록 추가
+            for index, info_list in enumerate(self.undi_info_list):
+                data.append([undi_thumbnail_list[index], shot_list[index]['shot_name']])
+            return data
+        else:
+            return data
 
 
     # ----------------------------------------------------------------------------------------------
-
 
 def main():
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)

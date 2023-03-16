@@ -103,9 +103,11 @@ class Filter:
         if len(output_list) is 0:
             raise ValueError("해당하는 output file이 존재하지 않습니다. Shot: {0}".format(shot['shot_name']))
         for output in output_list:
+            shot = gazu.shot.get_shot(output['entity_id'])
             output_dict['output_name'] = output['name']
             output_dict['comment'] = output['comment']
             output_dict['description'] = output['description']
+            output_dict['shot_name'] = shot['name']
             info_list.append(output_dict)
 
         return info_list

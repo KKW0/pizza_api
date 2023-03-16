@@ -267,16 +267,6 @@ color: white;</string>
         </property>
        </layout>
       </item>
-      <item row="1" column="1" rowspan="7">
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-       </layout>
-      </item>
       <item row="4" column="4" rowspan="4">
        <widget class="QPlainTextEdit" name="InfoTextBox">
         <property name="minimumSize">
@@ -323,6 +313,19 @@ color: white;</string>
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="1" column="1" rowspan="3">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+       </layout>
+      </item>
+      <item row="4" column="1" rowspan="4">
+       <layout class="QVBoxLayout" name="verticalLayout3"/>
       </item>
      </layout>
     </item>

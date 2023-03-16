@@ -219,8 +219,8 @@ class Table2(QtWidgets.QTableView):
         테이블 데이터를 설정합니다.
         """
         model = QtGui.QStandardItemModel()
-        model.setHorizontalHeaderLabels(['Asset', 'Camera', 'Undistorted Image'])
 
+        model.setHorizontalHeaderLabels(['A', 'B', 'C'])
         for row in data:
             items = [QtGui.QStandardItem(str(item)) for item in row]
             model.appendRow(items)
@@ -229,5 +229,57 @@ class Table2(QtWidgets.QTableView):
         self.resizeColumnsToContents()
         self.horizontal_header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
 
+
+class Table3(QtWidgets.QTableView):
+    """
+    asset 선택하는 TableView
+    """
+    def __init__(self, data=None):
+        super(Table3, self).__init__()
+
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(10)
+        font.setBold(True)
+        self.setFont(font)
+
+        # QTableView Headers
+        self.horizontal_header = self.horizontalHeader()
+        self.vertical_header = self.verticalHeader()
+
+        # 고정된 헤더 모드 설정
+        self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+
+        # # 고정된 행과 열 모드 설정
+        # self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        # self.setCornerButtonEnabled(False)
+
+        self.horizontal_header.setMinimumSectionSize(100)
+        self.vertical_header.setMinimumSectionSize(100)
+
+        self.horizontal_header.setStretchLastSection(True)
+
+        self.setStyleSheet("background-color: #353535; selection-background-color: gray;")
+        self.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
+        self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+
+        if data is not None:
+            self.set_data(data)
+
+    def set_data(self, data):
+        """
+        테이블 데이터를 설정합니다.
+        """
+        model = QtGui.QStandardItemModel()
+        model.setHorizontalHeaderLabels(['A'])
+
+        for row in data:
+            items = [QtGui.QStandardItem(str(item)) for item in row]
+            model.appendRow(items)
+
+        self.setModel(model)
+        self.resizeColumnsToContents()
+        self.horizontal_header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
 
 

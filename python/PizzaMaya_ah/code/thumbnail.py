@@ -53,16 +53,19 @@ def thumbnail_control(task_dict, task_num=None, casting_info_list=None, undi_inf
         layout_asset = gazu.entity.get_entity(task_dict['entity_id'])
         preview = gazu.files.get_preview_file(layout_asset['preview_file_id'])
         png = _get_thumbnail(preview)
-        for info in casting_info_list:
-            # 캐스팅된 에셋들의 썸네일
-            proj = gazu.project.get_project(task_dict['project_id'])
-            asset = gazu.asset.get_asset_by_name(proj, info['asset_name'])
-            if asset['preview_file_id']:
-                preview_cast = gazu.files.get_preview_file(asset['preview_file_id'])
-                data = _get_thumbnail(preview_cast)
-            else:
-                data = None
-            asset_thumbnail_list.append(data)
+        if len(casting_info_list) == 0 and len(undi_info_list) == 0:
+            return png, asset_thumbnail_list, undi_thumbnail_list, None
+        else:
+            for info in casting_info_list:
+                # 캐스팅된 에셋들의 썸네일
+                proj = gazu.project.get_project(task_dict['project_id'])
+                asset = gazu.asset.get_asset_by_name(proj, info['asset_name'])
+                if asset['preview_file_id']:
+                    preview_cast = gazu.files.get_preview_file(asset['preview_file_id'])
+                    data = _get_thumbnail(preview_cast)
+                else:
+                    data = None
+                asset_thumbnail_list.append(data)
         # 언디스토션 이미지의 프리뷰. Matchmove 팀이 올린 프리뷰들 중 가장 최근 것.
         if len(undi_info_list) == 0:
             return png, asset_thumbnail_list, undi_thumbnail_list, None

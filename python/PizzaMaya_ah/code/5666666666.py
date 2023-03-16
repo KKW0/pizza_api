@@ -63,7 +63,9 @@ class SET():
         # pp.pprint(www)
         # a1 = gazu.files.new_entity_output_file(self.shot2, self.output_type_ujpg, task_type, 'sss', www['main'])
         c = gazu.files.get_last_output_files_for_entity(self.shot2['id'], self.output_type_ujpg, task_type)
-        print("aaa", c)
+        pp.pprint(c)
+        g = gazu.shot.get_shot('c5395426-6068-4deb-b55b-99d76817eabb')
+        pp.pprint(g)
 
 
 s = SET()

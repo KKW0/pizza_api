@@ -58,7 +58,10 @@ class Filter:
             if task['task_type_name'] == 'LayoutPizza':
                 proj_list.append(task['project_name'])
                 task_info, seq_name = self._get_information_dict(task)
-                sort_dict[task['project_name']] = seq_name
+                if type(sort_dict.get([task['project_name']])) is list:
+                    sort_dict[task['project_name']].append(seq_name)
+                else:
+                    sort_dict[task['project_name']] = [seq_name]
                 task_info_list.append(task_info)
                 task_list.append(task)
                 seq_list.append(seq_name)

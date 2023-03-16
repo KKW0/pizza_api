@@ -51,13 +51,13 @@ class HorizontalHeader(QtWidgets.QHeaderView):
             self.proxy_model.setFilterKeyColumn(0)
             self.table.setModel(self.proxy_model)
             self.combo2.clear()
-            # seq_set =
-            # self.combo2.addItems(['Sequence'] + seq_set)
+            self.combo2.addItems(['Sequence'] + self.sort_dict[option])
             self.combo2.setDisabled(False)
         else:
             self.table.setModel(self.model)
             self.combo2.setCurrentIndex(0)
-            option2 = 'Sequence'
+            self.combo2.clear()
+            self.combo2.addItems('Sequence')
             self.combo2.setDisabled(True)
 
     def combobox_changed2(self, option2):

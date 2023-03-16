@@ -1,6 +1,7 @@
 # README
 
 
+
 ![—Pngtree—pizza house delicious shiitake pizza_5570337.png](README/Pngtreepizza_house_delicious_shiitake_pizza_5570337.png)
 
 # **Team Pizza**
@@ -16,16 +17,22 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## **Demo**
 
-ui 사용법 사진 추가 / ui screen shot 추가
+![—main_window.png](README/main_window.png)
+UI 전체 스크린샷
 
-## **설치방법**
+[//]: # ()
+[//]: # (## **설치방법**)
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install Pizza.
+[//]: # ()
+[//]: # (Use the package manager [pip]&#40;https://pip.pypa.io/en/stable/&#41; to install Pizza.)
 
-```
-pip install PizzaAPI
+[//]: # ()
+[//]: # (```)
 
-```
+[//]: # (pip install Pizza샷API)
+
+[//]: # ()
+[//]: # (```)
 
 ## **기본정보**
 
@@ -43,7 +50,7 @@ pip install PizzaAPI
 ## **특 징**
 
 - 로깅 & 로그인 설정 및 관리
-- 작업에 필요한 파일 전반(에셋/카메라/언디스토션 이미지) 로드
+- 작업에 필요한 파일 전반(camera/undistortion image/asset) 로드
 - 작업 결과 파일 저장
 - 작업한 샷의 프리뷰 영상 생성 및 저장
 
@@ -54,13 +61,10 @@ pip install PizzaAPI
     (자동로그인 선택 가능)
     
 2. task 선택 (필요 시 샷으로 필터링 가능)
-3. task가 소속된 asset에 캐스팅되어 있는 asset data import
+3. Maya Scene 파일 및 casting 되어 있는 asset data import
+4. Maya에서 Load 및 Save 작업 진행
     
-    (마야 씬 파일 or 캐스팅된 요소)
-    
-4. 마야에서 Load/Save 및 작업 진행
-    
-    (씬 파일, 프리뷰 영상을 각각 올바른 폴더 트리에 맞춰 저장)
+    (Scene, Preview 파일을 각각 올바른 폴더 트리에 맞춰 저장)
     
 5. Kitsu에 작업 내역 퍼블리시
 

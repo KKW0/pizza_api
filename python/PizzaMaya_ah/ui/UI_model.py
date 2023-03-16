@@ -94,8 +94,10 @@ class CustomTableModel2(QAbstractTableModel):
             if column == 0:
                 pixmap = QPixmap()
                 pixmap.loadFromData(self.input_data[row][0])
-                pixmap = pixmap.scaled(100, 100)
-                return pixmap
+                pixmap_width = 100
+                scaled_width = min(pixmap.width(), pixmap_width)
+                pixmap_image = pixmap.scaledToWidth(scaled_width)
+                return pixmap_image
 
         elif role == Qt.TextAlignmentRole:
             return Qt.AlignCenter
@@ -154,8 +156,11 @@ class CustomTableModel3(QAbstractTableModel):
             if column == 0:
                 pixmap = QPixmap()
                 pixmap.loadFromData(self.input_data[row][0])
-                pixmap = pixmap.scaled(100, 100)
-                return pixmap
+                pixmap_width = 100
+                scaled_width = min(pixmap.width(), pixmap_width)
+                scaled_height = int(pixmap.height() * (scaled_width / pixmap.width()))
+                pixmap_image = pixmap.scaledToWidth(scaled_width)
+                return pixmap_image
 
         elif role == Qt.TextAlignmentRole:
             return Qt.AlignCenter

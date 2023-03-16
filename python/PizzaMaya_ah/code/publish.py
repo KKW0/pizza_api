@@ -17,7 +17,7 @@ class PublishThings:
         self._task_status = gazu.task.get_task_status_by_name('Todo')
         self._preview_type = None
 
-    def _publish_file_data(self, task, comment):
+    def _publish_file_data(self, task, comment='올라갑니다'):
         """
         Kitsu에 task에 대한 working file, output file 모델을 생성하는 매서드
 
@@ -189,7 +189,7 @@ class PublishThings:
         self._upload_files(task, working_path, working_file)
         self._upload_files(task, preview_path, comment=comment)
 
-    def save_publish_previews(self, shot_list, comment='Layout mb파일 퍼블리시 완료'):
+    def save_publish_previews(self, shot_list, comment = None):
         """
         각 샷에 해당하는 레이아웃의 preview file과 mb 파일을 저장하고 업로드하는 매서드
 

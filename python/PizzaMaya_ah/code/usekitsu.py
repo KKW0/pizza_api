@@ -1,5 +1,6 @@
 #coding:utf8
 import gazu
+import pprint as pp
 
 
 class KitsuThings:
@@ -82,17 +83,20 @@ class KitsuThings:
             'path': "",
             'nb_elements': 0,
         }
-        asset = gazu.asset.get_asset(casting['id'])
+        asset = gazu.asset.get_asset(casting['asset_id'])
         output_file_list = gazu.files.get_last_output_files_for_entity(asset)
+        pp.pprint(output_file_list)
         for out_file in output_file_list:
             # 각 output file의 패스를 생성하고, 리스트에 append
             out_path = gazu.files.build_entity_output_file_path(asset,
                                                                 out_file['output_type_id'],
                                                                 out_file['task_type_id'],
                                                                 revision=out_file['revision'])
-            path = out_path + '.' + out_file['representation']
+            # path = out_path + '.' + out_file['representation']
+            path = out_path + '.' + 'fbx'       ##########################################
             file_dict['path'] = path
             file_dict['nb_elements'] = out_file['nb_elements']
             file_list.append(file_dict)
+            pp.pprint(out_file)
 
         return file_list

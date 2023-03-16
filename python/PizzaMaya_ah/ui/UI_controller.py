@@ -4,7 +4,7 @@ import os
 import sys
 import pprint as pp
 
-import gazu.project
+import gazu.shot
 
 from PizzaMaya_ah.code.login import LogIn
 from PizzaMaya_ah.code.filter import Filter
@@ -20,10 +20,11 @@ from PizzaMaya_ah.ui.UI_view_login import LoginWindow
 from PizzaMaya_ah.ui.UI_model import CustomTableModel
 from PizzaMaya_ah.ui.UI_model import CustomTableModel2
 from PizzaMaya_ah.ui.UI_model import CustomTableModel3
-
+from PizzaMaya_ah.code.publish import PublishThings
 from PySide2 import QtWidgets, QtCore, QtUiTools
-from PySide2.QtWidgets import QMainWindow, QSizePolicy
+from PySide2.QtWidgets import QMainWindow
 from PySide2.QtGui import QPixmap
+from PySide2.QtCore import Qt
 
 
 class MainWindow(QMainWindow):
@@ -42,6 +43,9 @@ class MainWindow(QMainWindow):
         self.camera_info_list = None
         self.casting_info_list = None
         self.task_clicked_index = None
+        self.shot_dict = None
+        self.my_task = None
+
         cwd = os.path.dirname(os.path.abspath(__file__))
         # ui 파일 경로 생성
         ui_path = os.path.join(cwd, 'UI_design', 'Main.ui')
@@ -98,6 +102,7 @@ class MainWindow(QMainWindow):
             self.login_window.ui.show()
 
         self.ft = Filter()
+        self.pt = PublishThings()
 
         # ----------------------------------------------------------------------------------------------
 
@@ -121,20 +126,16 @@ class MainWindow(QMainWindow):
 
         self.table2.selectionModel().selectionChanged.connect(self.selection_changed)
 
-
     def selection_changed(self, selected, deselected):
         selection_model = self.table2.selectionModel()
         selected_rows = selection_model.selectedRows()
         selected_indexes = selection_model.selectedIndexes()
         row_count = self.table2_model.row_count
 
-        # print(selected_indexes[0].row())
-        sel_ids = set()
+        sel_asset_ids = set()
         for sel_idx in selected_indexes:
-            # print(sel_idx)
-            # print(dir(sel_idx))
-            sel_ids.add(sel_idx)
-        # print(list(sel_ids))
+            sel_asset_ids.add(sel_idx.row())
+        self.load.selected_index_list = sel_asset_ids
         self.row_index_list.append(selected_indexes[0].row())
 
         self.ui.Selection_Lable.setText('Selected Files %d / %d' % (len(selected_rows), row_count))
@@ -190,17 +191,16 @@ class MainWindow(QMainWindow):
         tup, _, _, _ = thumbnail_control(self.my_task, self.task_clicked_index,
                                          self.casting_info_list, self.undi_info_list)
         png = bytes(tup)
-        self.preview_pixmap = QPixmap()
 
+        self.preview_pixmap = QPixmap()
         self.preview_pixmap.loadFromData(png)
-        self.preview_pixmap = self.preview_pixmap.scaled(360, 300)
         label = self.ui.Preview
-        label.setPixmap(self.preview_pixmap)
+        label.setPixmap(self.preview_pixmap.scaled(label.size(), Qt.KeepAspectRatio))
 
         self.ui.InfoTextBox.setPlainText('Project Name: {}'.format(task_info['project_name'] + '\n'))
         self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(task_info['description']))
         self.ui.InfoTextBox.appendPlainText('Due Date: {0}'.format(task_info['due_date']))
-        self.ui.InfoTextBox.appendPlainText('Comment: {0}'.format(str(task_info['last_comment'])))
+        self.ui.InfoTextBox.appendPlainText('Comment: {0}'.format(str(task_info['last_comment']['text'])))
 
         self.table2_model.load_data2(self.read_data2())
         self.table2_model.layoutChanged.emit()
@@ -215,6 +215,16 @@ class MainWindow(QMainWindow):
         self.table3_model.load_data3(self.read_data3())
         self.table3_model.layoutChanged.emit()
 
+        # print(task_info)
+        project_dict = gazu.project.get_project_by_name(task_info['project_name'])
+        seq_dict = gazu.shot.get_sequence_by_name(project_dict, task_info['sequence_name'])
+        # print(task_info['project_name'], task_info['sequence_name'])
+        self.shot_dict = gazu.shot.all_shots_for_sequence(seq_dict)
+        self.my_task = task_type = gazu.task.get_task_type_by_name('layout')
+        # print(self.my_task)
+
+        self.save.my_task = self.my_task
+        self.save.shot_dict = self.shot_dict
 
     def table_clicked2(self, event):
         clicked_cast = self.casting_info_list[event.row()]
@@ -222,12 +232,17 @@ class MainWindow(QMainWindow):
         _, asset_thumbnail_list, _, shot_list = thumbnail_control(self.my_task, self.task_clicked_index,
                                                           self.casting_info_list, undi_info_list=[])
         png = bytes(asset_thumbnail_list[event.row()])
-        clicked_casting_info_list = []
+
+        # self.preview_pixmap = QPixmap()
+        # self.preview_pixmap.loadFromData(png)
+        # # self.preview_pixmap = self.preview_pixmap.scaled(360, 300)
+        # pixmap_width = 360
+        # scaled_width = min(self.preview_pixmap.width(), pixmap_width)
+        # self.preview_pixmap.scaledToWidth(scaled_width)
         self.preview_pixmap = QPixmap()
         self.preview_pixmap.loadFromData(png)
-        self.preview_pixmap = self.preview_pixmap.scaled(360, 300)
         label = self.ui.Preview
-        label.setPixmap(self.preview_pixmap)
+        label.setPixmap(self.preview_pixmap.scaled(label.size(), Qt.KeepAspectRatio))
 
         self.ui.InfoTextBox.setPlainText('Asset Name: {}'.format(clicked_cast['asset_name']+'\n'))
         self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(clicked_cast['description']))
@@ -245,10 +260,10 @@ class MainWindow(QMainWindow):
 
         self.preview_pixmap = QPixmap()
         self.preview_pixmap.loadFromData(png)
-        self.preview_pixmap = self.preview_pixmap.scaled(360, 300)
         label = self.ui.Preview
-        label.setPixmap(self.preview_pixmap)
+        label.setPixmap(self.preview_pixmap.scaled(label.size(), Qt.KeepAspectRatio))
 
+        self.load.my_shot_index_list
         self.ui.InfoTextBox.setPlainText('[Shot Info]')
         self.ui.InfoTextBox.appendPlainText('Shot Name: {}'.format(clicked_undi['shot_name'] + '\n'))
         self.ui.InfoTextBox.appendPlainText('[Undistortion Image Info]')

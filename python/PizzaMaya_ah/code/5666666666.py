@@ -1,10 +1,9 @@
 #coding:utf8
 import gazu
 import pprint as pp
-from unittest import TestCase
 
 
-class TestFilter(TestCase):
+class SET():
     def test_setUp(self):
         gazu.client.set_host("http://192.168.3.116/api")
         gazu.log_in("pipeline@rapa.org", "netflixacademy")
@@ -51,7 +50,6 @@ class TestFilter(TestCase):
         # self.path2 = '/home/rapa/foldertree_test/a/b/c/d/e/f/g/output/output_file'
         task_type = gazu.task.get_task_type_by_name('Matchmove')
         task = gazu.task.get_task_by_entity(self.shot2['id'], task_type)
-        # pp.pprint(task)
         # ww = gazu.files.get_working_files_for_task(task)
         # pp.pprint(ww)
         # w1 = gazu.files.new_working_file(task)
@@ -64,22 +62,9 @@ class TestFilter(TestCase):
         # www = gazu.files.get_last_working_files(task)
         # pp.pprint(www)
         # a1 = gazu.files.new_entity_output_file(self.shot2, self.output_type_ujpg, task_type, 'sss', www['main'])
-        # print(a1)
+        c = gazu.files.get_last_output_files_for_entity(self.shot2['id'], self.output_type_ujpg, task_type)
+        print("aaa", c)
 
-    # def test__get_information_dict(self):
-    #     pass
-    #
-    # def test__collect_info_task(self):
-    #     self.fail()
-    #
-    # def test__list_append(self):
-    #     self.fail()
-    #
-    # def test__collect_info_casting(self):
-    #     self.fail()
-    #
-    # def test__filter_info(self):
-    #     self.fail()
-    #
-    # def test_select_task(self):
-    #     self.fail()
+
+s = SET()
+s.test_setUp()

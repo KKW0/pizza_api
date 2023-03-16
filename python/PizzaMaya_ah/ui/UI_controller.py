@@ -218,8 +218,10 @@ class MainWindow(QMainWindow):
         self.shot_list = gazu.shot.all_shots_for_sequence(seq_dict)
 
 
+
         self.table3_model.load_data3(self.read_data3())
         self.table3_model.layoutChanged.emit()
+
 
     def table_clicked2(self, event):
         clicked_cast = self.casting_info_list[event.row()]
@@ -265,6 +267,10 @@ class MainWindow(QMainWindow):
         self.ui.InfoTextBox.appendPlainText('[Camera Info]')
         self.ui.InfoTextBox.appendPlainText('Asset Type: {0}'.format(clicked_cam['output_type_name']))
         self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(str(clicked_cam['description'])))
+
+        gazu.shot
+        print(clicked_undi['shot_name'])
+
 
     # ----------------------------------------------------------------------------------------------
     # TableView 두개에 띄울 각각의 정보를 넣어둠

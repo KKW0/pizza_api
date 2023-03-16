@@ -4,6 +4,8 @@ import os
 import sys
 import pprint as pp
 
+import gazu.shot
+
 from PizzaMaya_ah.code.login import LogIn
 from PizzaMaya_ah.code.filter import Filter
 from PizzaMaya_ah.code.thumbnail import thumbnail_control
@@ -18,6 +20,7 @@ from PizzaMaya_ah.ui.UI_view_login import LoginWindow
 from PizzaMaya_ah.ui.UI_model import CustomTableModel
 from PizzaMaya_ah.ui.UI_model import CustomTableModel2
 from PizzaMaya_ah.ui.UI_model import CustomTableModel3
+from PizzaMaya_ah.code.publish import PublishThings
 
 from PySide2 import QtWidgets, QtCore, QtUiTools
 from PySide2.QtWidgets import QMainWindow, QSizePolicy
@@ -40,6 +43,10 @@ class MainWindow(QMainWindow):
         self.camera_info_list = None
         self.casting_info_list = None
         self.task_clicked_index = None
+
+        self.shot_dict = None
+        self.my_task = None
+
         cwd = os.path.dirname(os.path.abspath(__file__))
         # ui 파일 경로 생성
         ui_path = os.path.join(cwd, 'UI_design', 'Main.ui')
@@ -96,6 +103,7 @@ class MainWindow(QMainWindow):
             self.login_window.ui.show()
 
         self.ft = Filter()
+        self.pt = PublishThings()
 
         # ----------------------------------------------------------------------------------------------
 
@@ -119,7 +127,6 @@ class MainWindow(QMainWindow):
 
         self.table2.selectionModel().selectionChanged.connect(self.selection_changed)
 
-
     def selection_changed(self, selected, deselected):
         selection_model = self.table2.selectionModel()
         selected_rows = selection_model.selectedRows()
@@ -142,6 +149,7 @@ class MainWindow(QMainWindow):
     def save_button(self):
         # self.ui.hide()  ##### 메인 윈도우를 숨길 필요 있는지? 그냥 겹쳐서 띄우면 안되나 exec로
         self.save.ui.show()
+        # self.pt.save_publish_previews(self.shot_dict)
 
     def load_button(self):
         # self.ui.hide()  # 메인 윈도우 숨김
@@ -203,6 +211,17 @@ class MainWindow(QMainWindow):
 
         self.table3_model.load_data3(self.read_data3())
         self.table3_model.layoutChanged.emit()
+
+        # print(task_info)
+        project_dict = gazu.project.get_project_by_name(task_info['project_name'])
+        seq_dict = gazu.shot.get_sequence_by_name(project_dict, task_info['sequence_name'])
+        # print(task_info['project_name'], task_info['sequence_name'])
+        self.shot_dict = gazu.shot.all_shots_for_sequence(seq_dict)
+        self.my_task = task_type = gazu.task.get_task_type_by_name('layout')
+        # print(self.my_task)
+
+        self.save.my_task = self.my_task
+        self.save.shot_dict = self.shot_dict
 
     def table_clicked2(self, event):
         clicked_cast = self.casting_info_list[event.row()]

@@ -2,9 +2,11 @@
 
 import os
 import sys
+import gazu
 
 from PizzaMaya_ah.code.filter import Filter
 from PizzaMaya_ah.code.publish import PublishThings
+
 
 from PySide2 import QtWidgets, QtCore, QtUiTools
 
@@ -15,6 +17,8 @@ class Save(QtWidgets.QMainWindow):
 
         self.save = None
         self.user_list_start = None
+        self.shot_dict = None
+        self.my_task = None
 
         # 현재 작업 디렉토리 경로를 가져옴
         cwd = os.path.dirname(os.path.abspath(__file__))
@@ -33,10 +37,16 @@ class Save(QtWidgets.QMainWindow):
         self.ui.Final_Save_Button.clicked.connect(self.final_save_button)
         self.ui.Back_Button.clicked.connect(self.back_button)
 
+        self.ft = Filter()
+        self.pt = PublishThings()
+
     def final_save_button(self):
         self.hide()  # 메인 윈도우 숨김
-        # print("저장했어 그만눌러")
-        # 여기도 데이터값만 넣으면 알아서 적용이 되지 않을까 하는 의문이 드네요
+        # output_path, working_file, working_path, preview_path = self.pt._publish_file_data(self.my_task)
+
+        comment = self.ui.Save_Path_View_2.toPlainText()
+        print(comment)
+        self.pt.save_publish_previews(self.shot_dict, comment=comment)
 
     def back_button(self):
         self.hide()  # 메인 윈도우 숨김

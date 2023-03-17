@@ -8,6 +8,7 @@ import pprint as pp
 from PizzaMaya_ah.code.login import LogIn
 from PizzaMaya_ah.code.filter import Filter
 from PizzaMaya_ah.code.usemaya import MayaThings
+from PizzaMaya_ah.code.publish import PublishThings
 from PizzaMaya_ah.code.thumbnail import thumbnail_control
 
 from PizzaMaya_ah.ui.UI_view_save import Save
@@ -21,7 +22,7 @@ from PizzaMaya_ah.ui.UI_model import CustomTableModel2
 from PizzaMaya_ah.ui.UI_model import CustomTableModel3
 from PySide2 import QtWidgets, QtCore, QtUiTools
 from PySide2.QtWidgets import QMainWindow, QMessageBox
-from PySide2.QtGui import QPixmap, QImage
+from PySide2.QtGui import QPixmap
 from PySide2.QtCore import Qt
 
 class MainWindow(QMainWindow):
@@ -32,7 +33,6 @@ class MainWindow(QMainWindow):
         self.task = None
         self.my_task = None
         self.task_num = None
-        self.my_shots = None
         self.task_info = None
         # self.row_index_list = []
         self.preview_pixmap = None
@@ -99,6 +99,7 @@ class MainWindow(QMainWindow):
 
         self.ft = Filter()
         self.ma = MayaThings()
+        self.pub = PublishThings()
 
         # ----------------------------------------------------------------------------------------------
 
@@ -142,7 +143,12 @@ class MainWindow(QMainWindow):
 
     def save_button(self):
         # self.ui.hide()  ##### 메인 윈도우를 숨길 필요 있는지? 그냥 겹쳐서 띄우면 안되나 exec로
-        self.save.ui.show()
+        if self.my_task == None:
+            QMessageBox.warning(self, 'Error', 'Select Task you want to pulish First', QMessageBox.Ok)
+        else:
+            self.pub.save_publish_real_data(self.my_task)
+            self.pub.save_publish_previews()
+            self.save.ui.show()
 
     def load_button(self):
         if not self.my_task:

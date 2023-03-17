@@ -8,7 +8,7 @@ import maya.cmds as mc
 from PizzaMaya_ah.code.filter import Filter
 from PizzaMaya_ah.code.publish import PublishThings
 
-from PySide2 import QtWidgets, QtCore, QtUiTools
+from PySide2 import QtWidgets, QtCore, QtUiTools, QtGui
 
 
 class Save(QtWidgets.QMainWindow):
@@ -29,6 +29,14 @@ class Save(QtWidgets.QMainWindow):
         loader = QtUiTools.QUiLoader()
         self.ui = loader.load(self.ui_file)
         self.ui_file.close()
+        self.ui.setGeometry(
+            QtWidgets.QStyle.alignedRect(
+                QtCore.Qt.LeftToRight,
+                QtCore.Qt.AlignCenter,
+                self.ui.size(),
+                QtGui.QGuiApplication.primaryScreen().availableGeometry(),
+            ),
+        )
 
         self.ui.Final_Save_Button.clicked.connect(self.final_save_button)
         self.ui.Back_Button.clicked.connect(self.back_button)
@@ -37,7 +45,6 @@ class Save(QtWidgets.QMainWindow):
         self.pub = PublishThings()
 
     def final_save_button(self):
-        self.hide()  # 메인 윈도우 숨김
         comment = self.ui.Save_Path_View_2.toPlainText()
         shot_dict_list = []
         startup_cameras = []
@@ -60,7 +67,8 @@ class Save(QtWidgets.QMainWindow):
                 
         self.pub.save_publish_real_data(self.my_task, comment)
         self.pub.save_publish_previews(shot_dict_list, custom_camera, comment)
-
+        self.hide()  # 메인 윈도우 숨김
+        self.ui.close()
 
     def back_button(self):
         self.hide()  # 메인 윈도우 숨김

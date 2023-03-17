@@ -22,8 +22,6 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         self.disable_color = "background-color: #333333;"
         self.enable_color = "background-color: #444444;"
         self.sort_button = None  # 정렬 버튼
-        # self.sectionResized.connect(self.handleSectionResized)
-        # self.sectionMoved.connect(self.handleSectionMoved)
         self.ft = Filter()
         self.table = None
         self.model = None
@@ -216,19 +214,10 @@ class Table2(QtWidgets.QTableView):
         for row in data:
             items = [QtGui.QStandardItem(str(item)) for item in row]
             model.appendRow(items)
-            # if items[0] == None:
-            #     # 클릭 안되되 되되싶다..
 
         self.setModel(model)
         self.resizeColumnsToContents()
         self.horizontal_header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
-
-    def mousePressEvent(self, event):
-        index = self.indexAt(event.pos())
-        if index.row() == 0:
-            event.ignore()
-        else:
-            super(Table2, self).mousePressEvent(event)
 
 
 class Table3(QtWidgets.QTableView):
@@ -255,10 +244,6 @@ class Table3(QtWidgets.QTableView):
         header = self.horizontalHeader()
         header.setDefaultAlignment(QtCore.Qt.AlignLeft)
         header.setFont(font)  # 헤더에 폰트 설정
-
-        # # 고정된 행과 열 모드 설정
-        # self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        # self.setCornerButtonEnabled(False)
 
         self.horizontal_header.setMinimumSectionSize(100)
         self.vertical_header.setMinimumSectionSize(100)

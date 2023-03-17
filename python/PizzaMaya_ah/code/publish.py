@@ -207,6 +207,8 @@ class PublishThings:
         for shot in shot_list:
             pre_path = gazu.files.build_entity_output_file_path(shot, self._preview_type,
                                                                 task_type, revision=revision)
+            if not os.path.exists(pre_path):
+                os.makedirs(pre_path)
             mb_path = gazu.files.build_entity_output_file_path(shot, output_type, task_type, revision=revision)
             while os.path.exists(pre_path) is True:
                 revision += 1

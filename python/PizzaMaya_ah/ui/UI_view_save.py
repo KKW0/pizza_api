@@ -6,6 +6,7 @@ import gazu
 
 from PizzaMaya_ah.code.filter import Filter
 from PizzaMaya_ah.code.publish import PublishThings
+from PizzaMaya_ah.code.thumbnail import thumbnail_control
 
 
 from PySide2 import QtWidgets, QtCore, QtUiTools
@@ -46,7 +47,10 @@ class Save(QtWidgets.QMainWindow):
 
         comment = self.ui.Save_Path_View_2.toPlainText()
         print(comment)
+        print(self.shot_dict)
         self.pt.save_publish_previews(self.shot_dict, comment=comment)
+
+
 
     def back_button(self):
         self.hide()  # 메인 윈도우 숨김

@@ -19,7 +19,6 @@ class Filter:
         Args:
             task(dict): 유저에게 할당된 task
 
-        Returns:
             dict(task_info): task에서 필요한 정보만 추출하여 모은 딕셔너리
             str(seq['name']: task asset이 속한 시퀀스의 이름
         """

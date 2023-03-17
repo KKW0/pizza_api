@@ -70,6 +70,7 @@ class MainWindow(QMainWindow):
 
         # 메인 윈도우의 레이아웃에 TableView 2개 추가
         self.table = Table()
+        self.table.setSelectionMode(QtWidgets.QTableView.SingleSelection)
         self.ui.verticalLayout2.addWidget(self.table, 0)
         self.horizontal_header = HorizontalHeader()
         self.table.setHorizontalHeader(self.horizontal_header)
@@ -78,6 +79,7 @@ class MainWindow(QMainWindow):
         self.ui.verticalLayout.addWidget(self.table2, 0)
 
         self.table3 = Table3()
+        self.table3.setSelectionMode(QtWidgets.QTableView.SingleSelection)
         self.ui.verticalLayout3.addWidget(self.table3, 0)
 
         # Getting the Model

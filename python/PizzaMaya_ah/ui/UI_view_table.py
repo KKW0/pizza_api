@@ -20,9 +20,9 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         self.proxy_model = None
         self.proxy_model2 = None
         self.sort_button = None  # 정렬 버튼
-        self.ft = Filter()
         self.table = None
         self.model = None
+        self.ft = Filter()
         self.setSectionResizeMode(QHeaderView.Fixed)
         self.setStretchLastSection(True)
 
@@ -64,6 +64,8 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         _, _, proj_set, _, self.sort_dict = self.ft.collect_info_task()
 
         self.combo = QtWidgets.QComboBox(self)
+        if proj_set:
+            proj_set.sort()
         self.combo.addItems(['Project'] + proj_set)
         self.combo.currentTextChanged.connect(self.combobox_changed1)
         self.combo.setGeometry(self.sectionViewportPosition(0), 0, self.sectionSize(0) - 0, self.height())
@@ -74,7 +76,6 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         self.combo2.currentTextChanged.connect(self.combobox_changed2)
         self.combo2.setGeometry(self.sectionViewportPosition(1), 0, self.sectionSize(1) - 0, self.height())
         self.combo2.setDisabled(True)
-        # self.combo2.setStyleSheet(self.disable_color)
         self.combo2.show()
 
         self.table = self.parent()
@@ -91,16 +92,16 @@ class HorizontalHeader(QtWidgets.QHeaderView):
             self.proxy_model.setFilterKeyColumn(0)
             self.table.setModel(self.proxy_model)
             self.combo2.clear()
+            if self.sort_dict[option]:
+                self.sort_dict[option].sort()
             self.combo2.addItems(['Sequence'] + self.sort_dict[option])
             self.combo2.setDisabled(False)
-            self.combo2.setStyleSheet(self.enable_color)
         else:
             self.seq_index = 0
             self.proj_index = 0
             self.table.setModel(self.model)
             self.combo2.setCurrentIndex(0)
             self.combo2.setDisabled(True)
-            self.combo2.setStyleSheet(self.disable_color)
 
     def combobox_changed2(self, option2):
         if self.combo.currentIndex != 0:
@@ -148,7 +149,6 @@ class Table(QTableView):
         self.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
         self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
-        # self.horizontal_header.setSectionResizeMode(QHeaderView.Stretch)
         self.horizontal_header.setSortIndicatorShown(True)
         self.horizontal_header.setSectionsClickable(True)
         self.horizontal_header.setStretchLastSection(True)
@@ -209,6 +209,7 @@ class Table2(QtWidgets.QTableView):
         self.setModel(model)
         self.resizeColumnsToContents()
         self.horizontal_header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
+
 
 class Table3(QtWidgets.QTableView):
     """

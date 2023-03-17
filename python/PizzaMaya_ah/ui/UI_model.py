@@ -112,6 +112,7 @@ class CustomTableModel2(QAbstractTableModel):
 
         return False
 
+
 class CustomTableModel3(QAbstractTableModel):
     """
     asset, camera, undi_img 선택하는 TableView의 모델
@@ -155,7 +156,6 @@ class CustomTableModel3(QAbstractTableModel):
                 pixmap.loadFromData(self.input_data[row][0])
                 pixmap_width = 100
                 scaled_width = min(pixmap.width(), pixmap_width)
-                # scaled_height = int(pixmap.height() * (scaled_width / pixmap.width()))
                 pixmap_image = pixmap.scaledToWidth(scaled_width)
                 return pixmap_image
 

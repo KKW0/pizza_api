@@ -152,6 +152,9 @@ class MayaThings:
             representation(str): "ma"또는 "mb" 확장자
         """
         full_path = path+'.'+representation
+        maya_path = os.path.dirname(full_path)
+        if os.path.exists(maya_path) == False:
+            os.makedirs(maya_path)
         mc.file(rename=full_path)
         if representation == 'mb':
             mc.file(save=True, type='mayaBinary', force=True)

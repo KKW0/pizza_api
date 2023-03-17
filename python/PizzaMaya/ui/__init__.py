@@ -1,3 +1,7 @@
+#coding:utf-8
+
+"""
+
 *** Pizza API ***
 
 *** How to use Pizza ? ***

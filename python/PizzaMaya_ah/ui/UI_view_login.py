@@ -2,9 +2,7 @@
 
 import os
 import sys
-
-from PizzaMaya_ah.code.login import LogIn
-from PySide2 import QtWidgets, QtCore, QtUiTools
+from PySide2 import QtWidgets, QtCore, QtUiTools, QtGui
 
 
 class LoginWindow(QtWidgets.QMainWindow):
@@ -25,8 +23,16 @@ class LoginWindow(QtWidgets.QMainWindow):
         ui_file.open(QtCore.QFile.ReadOnly)
         loader = QtUiTools.QUiLoader()
         self.ui = loader.load(ui_file)
-
         ui_file.close()
+
+        self.ui.setGeometry(
+            QtWidgets.QStyle.alignedRect(
+                QtCore.Qt.LeftToRight,
+                QtCore.Qt.AlignCenter,
+                self.ui.size(),
+                QtGui.QGuiApplication.primaryScreen().availableGeometry(),
+            ),
+        )
 
     # ----------------------------------------------------------------------------------------------
 

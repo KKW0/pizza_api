@@ -34,7 +34,8 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         font.setBold(True)
         self.setFont(font)
 
-        _, _, proj_set, _, self.sort_dict = self.ft._collect_info_task()
+        _, _, proj_set, _, self.sort_dict = self.ft.collect_info_task()
+
         self.combo = QtWidgets.QComboBox(self)
         self.combo.addItems(['Project'] + proj_set)
         self.combo.currentTextChanged.connect(self.combobox_changed1)
@@ -46,10 +47,12 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         self.combo2.currentTextChanged.connect(self.combobox_changed2)
         self.combo2.setGeometry(self.sectionViewportPosition(1), 0, self.sectionSize(1) - 0, self.height())
         self.combo2.setDisabled(True)
-        self.combo2.setStyleSheet(self.disable_color)
+        # self.combo2.setStyleSheet(self.disable_color)
         self.combo2.show()
+
         self.table = self.parent()
         self.model = self.table.model()
+
         super(HorizontalHeader, self).showEvent(event)
 
     def combobox_changed1(self, option):
@@ -122,7 +125,7 @@ class Table(QTableView):
         self.horizontal_header.setSortIndicatorShown(True)
         self.horizontal_header.setSectionsClickable(True)
         self.horizontal_header.setStretchLastSection(True)
-# 섹렉샨 백그아운드 컬러로 한줄로 뽑으면 안되나여?
+
 
 
 class Table2(QtWidgets.QTableView):

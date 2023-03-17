@@ -23,7 +23,7 @@ from PizzaMaya_ah.ui.UI_model import CustomTableModel2
 from PizzaMaya_ah.ui.UI_model import CustomTableModel3
 from PySide2 import QtWidgets, QtCore, QtUiTools
 from PySide2.QtWidgets import QMainWindow, QMessageBox
-from PySide2.QtGui import QPixmap
+from PySide2.QtGui import QPixmap, QPixmapCache
 from PySide2.QtCore import Qt
 
 class MainWindow(QMainWindow):
@@ -122,6 +122,7 @@ class MainWindow(QMainWindow):
 
         # 에셋 여러개 선택
         self.table2.selectionModel().selectionChanged.connect(self.selection_changed)
+        QPixmapCache.setCacheLimit(500*1024)
 
     def selection_changed(self, selected, deselected):
         selection_model = self.table2.selectionModel()
@@ -229,14 +230,28 @@ class MainWindow(QMainWindow):
     def table_clicked2(self, event):
         clicked_cast = self.casting_info_list[event.row()]
 
-        _, asset_thumbnail_list, _, shot_list = thumbnail_control(self.my_task, self.task_clicked_index,
-                                                          self.casting_info_list, undi_info_list=[])
-        png = bytes(asset_thumbnail_list[event.row()])
+        # _, asset_thumbnail_list, _, shot_list = thumbnail_control(self.my_task, self.task_clicked_index,
+        #                                                   self.casting_info_list, undi_info_list=[])
+        # png = bytes(asset_thumbnail_list[event.row()])
+        #
+        # self.preview_pixmap = QPixmap()
+        # self.preview_pixmap.loadFromData(png)
+        # label = self.ui.Preview
+        # label.setPixmap(self.preview_pixmap.scaled(label.size(), Qt.KeepAspectRatio))
+        print(clicked_cast)
+        key = clicked_cast['asset_name']
+        print(key)
+        pixmap = QPixmapCache.find(key)
+        if not pixmap:
+            _, asset_thumbnail_list, _, shot_list = thumbnail_control(self.my_task, self.task_clicked_index,
+                                                                      self.casting_info_list, undi_info_list=[])
+            png = bytes(asset_thumbnail_list[event.row()])
+            pixmap = QPixmap()
+            pixmap.loadFromData(png)
+            QPixmapCache.insert(key, pixmap)
 
-        self.preview_pixmap = QPixmap()
-        self.preview_pixmap.loadFromData(png)
         label = self.ui.Preview
-        label.setPixmap(self.preview_pixmap.scaled(label.size(), Qt.KeepAspectRatio))
+        label.setPixmap(pixmap.scaled(label.size(), Qt.KeepAspectRatio))
 
         self.ui.InfoTextBox.setPlainText('Asset Name: {}'.format(clicked_cast['asset_name']+'\n'))
         self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(clicked_cast['description']))
@@ -248,14 +263,35 @@ class MainWindow(QMainWindow):
     def table_clicked3(self, event):
         clicked_undi = self.undi_info_list[event.row()][0]
         clicked_cam = self.camera_info_list[event.row()][0]
-        _, _, undi_thumbnail_list, _ = thumbnail_control(self.my_task, self.task_clicked_index,
-                                                         [], self.undi_info_list)
-        png = bytes(undi_thumbnail_list[event.row()])
+        # _, _, undi_thumbnail_list, _ = thumbnail_control(self.my_task, self.task_clicked_index,
+        #                                                  [], self.undi_info_list)
+        # png = bytes(undi_thumbnail_list[event.row()])
 
-        self.preview_pixmap = QPixmap()
-        self.preview_pixmap.loadFromData(png)
+        # 안녕하세요? 박지섭입니다.
+        # 아래의 코드는 이미지를 캐쉬화 하여 어플리케이션의 속도를 비약적으로 올리기 위해 QPixmapCache를 사용한 예입니다.
+        # 기존 매번 undi_thumbnail_list를 생성하여 모든 썸네일 이미지를 다운받고 사용하는 방식과 달리
+        # 먼저 key를 통해 QPixmapCache에서 찾고, 없을 경우만 기존과 같은 방식으로 이미지를 가져오게 하였습니다.
+        # 개선해야할 부분은 여기에서도 모든 이미지 리스트를 받아오는 것이 아닌, 우리가 원하는 이미지만 받아올 수 있게
+        # undi_thumbnail_list 이 부분을 수정하시면 더욱 더 향상된 속도를 가진 어플리케이션을 만들 수 있으실거라 생각됩니다.
+        # 이 부분 외에도 썸네일을 사용하는 모든 위치에서 아래의 코드를 사용해 주세요.
+        # 전체적으로 썸네일을 가져오는 함수를 외부로 분리하여 활용하는 것도 좋은 방법일 것입니다.
+        # 감사합니다. 박지섭 드림
+        key = str(self.my_task['id'] + str(event.row()))
+        pixmap = QPixmapCache.find(key)
+        if not pixmap:
+            _, _, undi_thumbnail_list, _ = thumbnail_control(self.my_task, self.task_clicked_index,
+                                                             [], self.undi_info_list)
+            png = bytes(undi_thumbnail_list[event.row()])
+            pixmap = QPixmap()
+            pixmap.loadFromData(png)
+            QPixmapCache.insert(key, pixmap)
         label = self.ui.Preview
-        label.setPixmap(self.preview_pixmap.scaled(label.size(), Qt.KeepAspectRatio))
+        label.setPixmap(pixmap.scaled(label.size(), Qt.KeepAspectRatio))
+
+        # self.preview_pixmap = QPixmap()
+        # self.preview_pixmap.loadFromData(png)
+        # label = self.ui.Preview
+        # label.setPixmap(self.preview_pixmap.scaled(label.size(), Qt.KeepAspectRatio))
 
         selection_model = self.table3.selectionModel()
         selected_indexes = selection_model.selectedIndexes()

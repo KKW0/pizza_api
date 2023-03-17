@@ -12,7 +12,14 @@ from PySide2 import QtWidgets, QtCore, QtUiTools, QtGui
 
 
 class Save(QtWidgets.QMainWindow):
+    """
+    이 클래스는 작업한 내용을 퍼블리시 하기 위한 기능을 실행시키는 UI를 생성하는 뷰이다.
+    """
     def __init__(self):
+        """
+        UI파일을 불러오고 mainWindow를 상속받으며, 현재 UI를 화면 중앙에 띄운다.
+        사용할 기능에 대한 instance를 만들고 버튼을 연결해준다.
+        """
         super(Save, self).__init__()
         self.my_task = None
 
@@ -45,6 +52,15 @@ class Save(QtWidgets.QMainWindow):
         self.pub = PublishThings()
 
     def final_save_button(self):
+        """
+        최종 퍼블리시 승인 버튼이다.
+        이  버튼을 클릭하면 현재 작업하는 씬에 존재하는 카메라의 목록을 불러와 리스트에 추가하고 그 리스트에서 디폴트
+        카메라를 제외한 유저가 작업한 샷의 카메라만 남겨서 pub.save_publish_previews()에 넘겨준다.
+        text박스 안에 작성한 문장은 퍼블리시하는 파일들의 comment로 작성된다.
+        또한 카메라의 이름으로부터 시퀀스의 정보들을 얻어낸다.
+        pub.save_publish_real_data 이 함수를 통해 작업한 파일들을 실제로 폴더안에 저장한다.
+        이때 사용하는 my task 변수는 UI컨트롤러에서 정보를 받아온다.
+        """
         comment = self.ui.Save_Path_View_2.toPlainText()
         shot_dict_list = []
         startup_cameras = []
@@ -71,6 +87,9 @@ class Save(QtWidgets.QMainWindow):
         self.ui.close()
 
     def back_button(self):
+        """
+        퍼블리시를 취소하고 뒤로 돌아간다.
+        """
         self.hide()  # 메인 윈도우 숨김
         self.ui.close()
 

@@ -9,7 +9,13 @@ from PizzaMaya_ah.code.filter import Filter
 
 
 class HorizontalHeader(QtWidgets.QHeaderView):
+    """
+    헤더에 콤보박스를 추가하는 클래스이다.
+    """
     def __init__(self, parent=None):
+        """
+        변수들을 정의하고 모듈의 인스턴스를 생성하고 sort버튼의 값을 생성한다.
+        """
         super(HorizontalHeader, self).__init__(QtCore.Qt.Horizontal, parent)
         self.setSectionsMovable(False)
         self.combo = None
@@ -37,12 +43,18 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         self.sort_button.show()
 
     def sort_clicked(self):
+        """
+        sort버튼을 클릭하면 proxy model을 오름차순 또는 내림차순으로 정렬한다.
+        """
         if self.seq_index != 0:
             self.proxy_model2.sort(self.seq_index, self.sortOrder())
         elif self.proj_index != 0:
             self.proxy_model.sort(self.proj_index, self.sortOrder())
 
     def sortIndicatorChanged(self, logicalIndex, order):
+        """
+        
+        """
         if logicalIndex == 2:
             self.seq_index = 0
             self.proj_index = 0

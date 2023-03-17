@@ -28,11 +28,12 @@ from PySide2.QtWidgets import QMainWindow, QMessageBox
 from PySide2.QtGui import QPixmap
 from PySide2.QtCore import Qt
 
+
 class MainWindow(QMainWindow):
     def __init__(self, values=None, parent=None, size_policy=None):
         super(MainWindow, self).__init__()
-        # 현재 작업 디렉토리 경로를 가져옴
 
+        # 현재 작업 디렉토리 경로를 가져옴
         self.task = None
         self.my_task = None
         self.task_num = None
@@ -142,6 +143,7 @@ class MainWindow(QMainWindow):
 
         self.ui.Selection_Lable.setText('Selected Files %d / %d' % (len(selected_rows), row_count))
         print(self.ui.Selection_Lable.text())
+        print(sel_asset_ids)
 
     # ----------------------------------------------------------------------------------------------
     # save 또는 load 버튼 누르면 save 또는 load 윈도우를 호출
@@ -191,7 +193,7 @@ class MainWindow(QMainWindow):
         self.login.auto_login = self.login_window.ui.Auto_Login_Check.isChecked()
 
         if self.login.connect_host() and self.login.log_in():
-            self.login_window.ui.hide()     ###### close가 아니라 hide 해야 하는지?
+            self.login_window.ui.hide()  ###### close가 아니라 hide 해야 하는지?
             self.ui.show()
 
             # Set table1 data
@@ -208,7 +210,7 @@ class MainWindow(QMainWindow):
 
     def table_clicked(self, event):
         self.task_clicked_index = event.row()
-        self.my_task, task_info, self.casting_info_list,\
+        self.my_task, task_info, self.casting_info_list, \
             self.undi_info_list, self.camera_info_list = self.ft.select_task(self.horizontal_header.proj_index,
                                                                              self.horizontal_header.seq_index,
                                                                              self.task_clicked_index)
@@ -237,7 +239,7 @@ class MainWindow(QMainWindow):
         seq_dict = gazu.shot.get_sequence_by_name(project_dict, task_info['sequence_name'])
         # print(task_info['project_name'], task_info['sequence_name'])
         self.shot_dict = gazu.shot.all_shots_for_sequence(seq_dict)
-        self.my_task = task_type = gazu.task.get_task_type_by_name('layout')
+        # self.my_task = task_type = gazu.task.get_task_type_by_name('layout')
         # print(self.my_task)
 
         self.save.my_task = self.my_task
@@ -255,12 +257,12 @@ class MainWindow(QMainWindow):
         label = self.ui.Preview
         label.setPixmap(self.preview_pixmap.scaled(label.size(), Qt.KeepAspectRatio))
 
-        self.ui.InfoTextBox.setPlainText('Asset Name: {}'.format(clicked_cast['asset_name']+'\n'))
+        self.ui.InfoTextBox.setPlainText('Asset Name: {}'.format(clicked_cast['asset_name'] + '\n'))
         self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(clicked_cast['description']))
         self.ui.InfoTextBox.appendPlainText('Asset Type: {0}'.format(clicked_cast['asset_type_name']))
         self.ui.InfoTextBox.appendPlainText('Occurence: {0}'.format(str(clicked_cast['nb_occurences'])))
         self.ui.InfoTextBox.appendPlainText('Output File: {0}'.format(str(len(clicked_cast['output']))))
-        self.ui.InfoTextBox.appendPlainText('Newest or Not: Not')   # 모든 아웃풋 파일들이 전부 최신 리비전이면 YES로 표기
+        self.ui.InfoTextBox.appendPlainText('Newest or Not: Not')  # 모든 아웃풋 파일들이 전부 최신 리비전이면 YES로 표기
 
     def table_clicked3(self, event):
         clicked_undi = self.undi_info_list[event.row()][0]
@@ -331,7 +333,7 @@ class MainWindow(QMainWindow):
             # 캐스팅된 에셋목록 추가
             for index, cast in enumerate(self.casting_info_list):
                 if len(cast['output']) == 0:
-                    data.append([asset_thumbnail_list[index], cast['asset_name'], 'No Output File to Load'])
+                    data.append([None, cast['asset_name'], 'No Output File to Load'])
                 else:
                     data.append([asset_thumbnail_list[index], cast['asset_name'], cast['asset_type_name']])
             return data
@@ -350,8 +352,8 @@ class MainWindow(QMainWindow):
         else:
             return data
 
-
     # ----------------------------------------------------------------------------------------------
+
 
 def main():
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)

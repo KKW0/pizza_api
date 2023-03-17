@@ -112,9 +112,6 @@ class CustomTableModel2(QAbstractTableModel):
 
         return False
 
-    def flags(self, index):
-        return Qt.ItemIsEditable | Qt.ItemIsEnabled | Qt.ItemIsSelectable
-
 class CustomTableModel3(QAbstractTableModel):
     """
     asset, camera, undi_img 선택하는 TableView의 모델
@@ -174,6 +171,3 @@ class CustomTableModel3(QAbstractTableModel):
             return True
 
         return False
-
-    def flags(self, index):
-        return Qt.ItemIsEditable | Qt.ItemIsEnabled | Qt.ItemIsSelectable

@@ -19,11 +19,7 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         self.proj_index = 0
         self.proxy_model = None
         self.proxy_model2 = None
-        self.disable_color = "background-color: #333333;"
-        self.enable_color = "background-color: #444444;"
         self.sort_button = None  # 정렬 버튼
-        # self.sectionResized.connect(self.handleSectionResized)
-        # self.sectionMoved.connect(self.handleSectionMoved)
         self.ft = Filter()
         self.table = None
         self.model = None
@@ -31,12 +27,18 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         self.setStretchLastSection(True)
 
     def showEvent(self, event):
+
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(10)
+        font.setBold(True)
+        self.setFont(font)
+
         _, _, proj_set, _, self.sort_dict = self.ft._collect_info_task()
         self.combo = QtWidgets.QComboBox(self)
         self.combo.addItems(['Project'] + proj_set)
         self.combo.currentTextChanged.connect(self.combobox_changed1)
         self.combo.setGeometry(self.sectionViewportPosition(0), 0, self.sectionSize(0) - 0, self.height())
-        self.combo.setStyleSheet(self.enable_color)
         self.combo.show()
 
         self.combo2 = QtWidgets.QComboBox(self)
@@ -83,62 +85,6 @@ class HorizontalHeader(QtWidgets.QHeaderView):
                 self.seq_index = 0
                 self.table.setModel(self.proxy_model)
 
-    # def handleSortButtonClicked(self):
-    #     # 마지막 헤더 클릭 시 정렬
-    #     self.parent().sortByColumn(self.count() - 1, Qt.AscendingOrder)
-    #
-    # def handleSectionResized(self, i):
-    #     for i in range(self.count()):
-    #         j = self.visualIndex(i)
-    #         logical = self.logicalIndex(j)
-    #         if i < len(self.comboboxes):
-    #             self.comboboxes[i].setGeometry(self.sectionViewportPosition(logical), 0,
-    #                                            self.sectionSize(logical) - 0, self.height())
-    #
-    #     # 정렬 버튼 위치 조정
-    #     if self.sort_button:
-    #         self.sort_button.setGeometry(self.sectionViewportPosition(self.count() - 1), 0,
-    #                                      self.sectionSize(self.count() - 1) - 0, self.height())
-    #
-    # def handleSectionMoved(self, i, oldVisualIndex, newVisualIndex):
-    #     for i in range(min(oldVisualIndex, newVisualIndex), self.count()):
-    #         logical = self.logicalIndex(i)
-    #         if i < len(self.comboboxes):
-    #             self.comboboxes[i].setGeometry(self.sectionViewportPosition(logical), 0, self.sectionSize(logical) - 5,
-    #                                            self.height())
-    #
-    #     # 마지막 헤더인 경우
-    #     if newVisualIndex == self.count() - 1:
-    #         self.setSortIndicator(self.count() - 2, Qt.AscendingOrder)
-    #         self.sortByColumn(self.count() - 2, Qt.AscendingOrder)
-    #     elif oldVisualIndex == self.count() - 1:
-    #         self.setSortIndicator(self.count() - 2, Qt.AscendingOrder)
-    #         self.sortByColumn(self.count() - 2, Qt.AscendingOrder)
-
-    # def set_header_labels(self, labels):
-    #     model = QtGui.QStandardItemModel()
-    #     model.setHorizontalHeaderLabels(labels)
-    #     self.setModel(model)
-    #     self.comboboxes = []  # comboboxes 리스트 초기화
-    #     self.fixComboPositions()
-    #
-    # def fixComboPositions(self):
-    #     for i in range(self.count()):
-    #         if i < len(self.comboboxes):
-    #             combo = self.comboboxes[i]
-    #         else:
-    #             combo = QtWidgets.QComboBox(self)
-    #             combo.addItems(['All', 'Option 1', 'Option 2'])
-    #             self.comboboxes.append(combo)
-    #
-    #         combo.setGeometry(self.sectionViewportPosition(i), 0, self.sectionSize(i) - 4, self.height())
-    #         combo.show()
-    #
-    #     if len(self.comboboxes) > self.count():
-    #         for i in range(self.count(), len(self.comboboxes)):
-    #             self.comboboxes[i].deleteLater()
-    #         self.comboboxes = self.comboboxes[:self.count()]
-
 
 class Table(QTableView):
     """
@@ -160,6 +106,10 @@ class Table(QTableView):
         self.horizontal_header.setDefaultAlignment(Qt.AlignHCenter)
         self.vertical_header.setDefaultAlignment(Qt.AlignVCenter)
 
+        header = self.horizontalHeader()
+        header.setDefaultAlignment(QtCore.Qt.AlignCenter)
+        header.setFont(font)  # 헤더에 폰트 설정
+
         self.horizontal_header.setMinimumSectionSize(50)
         self.vertical_header.setMinimumSectionSize(50)
         self.vertical_header.setSectionResizeMode(QHeaderView.Fixed)
@@ -172,6 +122,7 @@ class Table(QTableView):
         self.horizontal_header.setSortIndicatorShown(True)
         self.horizontal_header.setSectionsClickable(True)
         self.horizontal_header.setStretchLastSection(True)
+# 섹렉샨 백그아운드 컬러로 한줄로 뽑으면 안되나여?
 
 
 class Table2(QtWidgets.QTableView):
@@ -195,12 +146,21 @@ class Table2(QtWidgets.QTableView):
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
 
+        header = self.horizontalHeader()
+        header.setDefaultAlignment(QtCore.Qt.AlignCenter)
+        header.setFont(font)  # 헤더에 폰트 설정
+
         self.horizontal_header.setMinimumSectionSize(100)
         self.vertical_header.setMinimumSectionSize(100)
 
         self.horizontal_header.setStretchLastSection(True)
 
-        self.setStyleSheet("background-color: #353535; selection-background-color: gray;")
+        self.setStyleSheet(
+            "background-color: #353535; selection-background-color: gray;};")
+
+        corner_button = self.findChild(QtWidgets.QAbstractButton)
+        corner_button.setStyleSheet("background-color: #ABABAB; color: black;")
+
         self.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
         self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
@@ -216,20 +176,10 @@ class Table2(QtWidgets.QTableView):
         for row in data:
             items = [QtGui.QStandardItem(str(item)) for item in row]
             model.appendRow(items)
-            # if items[0] == None:
-            #     # 클릭 안되되 되되싶다..
 
         self.setModel(model)
         self.resizeColumnsToContents()
         self.horizontal_header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
-
-    def mousePressEvent(self, event):
-        index = self.indexAt(event.pos())
-        if index.row() == 0:
-            event.ignore()
-        else:
-            super(Table2, self).mousePressEvent(event)
-
 
 class Table3(QtWidgets.QTableView):
     """
@@ -248,20 +198,17 @@ class Table3(QtWidgets.QTableView):
         self.horizontal_header = self.horizontalHeader()
         self.vertical_header = self.verticalHeader()
 
+
         # 고정된 헤더 모드 설정
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
 
         header = self.horizontalHeader()
-        header.setDefaultAlignment(QtCore.Qt.AlignLeft)
+        header.setDefaultAlignment(QtCore.Qt.AlignCenter)
         header.setFont(font)  # 헤더에 폰트 설정
 
-        # # 고정된 행과 열 모드 설정
-        # self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        # self.setCornerButtonEnabled(False)
-
-        self.horizontal_header.setMinimumSectionSize(100)
-        self.vertical_header.setMinimumSectionSize(100)
+        self.horizontal_header.setMinimumSectionSize(110)
+        self.vertical_header.setMinimumSectionSize(95)
 
         self.horizontal_header.setStretchLastSection(True)
 

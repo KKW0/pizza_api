@@ -41,6 +41,8 @@ class HorizontalHeader(QtWidgets.QHeaderView):
             self.proxy_model2.sort(self.seq_index, self.sortOrder())
         elif self.proj_index != 0:
             self.proxy_model.sort(self.proj_index, self.sortOrder())
+        else:  # proj_index와 seq_index가 모두 0인 경우
+            self.model.sort(self.logicalIndexAt(0), self.sortOrder())
 
     def sortIndicatorChanged(self, logicalIndex, order):
         if logicalIndex == 2:

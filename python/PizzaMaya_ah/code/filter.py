@@ -5,6 +5,9 @@ import pprint as pp
 
 
 class Filter:
+    """
+    사용자의 선택에 따라 테스크, 에셋, 샷 등의 목록을 필터링하고, 필요한 정보를 정제해주는 클래스
+    """
     def __init__(self):
         pass
 
@@ -12,7 +15,7 @@ class Filter:
         """
         각 task에서 필터링에 필요한 정보들을 추출하여 딕셔너리에 추가하는 매서드
 
-        _collect_info_task 에서 사용된다.
+        collect_info_task 에서 사용된다.
 
         Args:
             task(dict): 유저에게 할당된 task
@@ -71,15 +74,16 @@ class Filter:
 
     def _list_append(self, shot, output_type, task_type):
         """
-       리스트에 아웃풋 파일(언디스토션 이미지, camera)의 정보를 담는 매서드
+       리스트에 아웃풋 파일(언디스토션 이미지, camera)의 정보 중 필요한 정보를 선별하여 담는 매서드
 
         Args:
             shot(dict): 언디스토션 이미지, 카메라의 아웃풋 파일이 속한 shot
             output_type(dict): 아웃풋 파일이 속한 아웃풋 타입(jpg, abc )
-            task_type:
+            task_type(dict): 아웃풋 파일이 속한 테스크 타입(Camera, Matchmove...)
 
         Returns:
-            list: output file의 모델에서 필요한 정보들만 담은 리스트의 집합드
+            list: output file의 모델 딕셔너리에서 필요한 정보들만 담은 리스트의 집합
+                 keys - output_type_name, frame_range, output_name, comment, description, shot_name
         """
         info_list = []
         output_list_tmp = gazu.files.get_last_output_files_for_entity(shot['shot_id'], output_type, task_type)
@@ -115,15 +119,18 @@ class Filter:
 
     def _cast_dict_append(self, cast, output_type, asset, task_type):
         """
-        캐스팅 정보가 담긴 딕셔너리의 집합을 리턴하는 매서드
+        캐스팅된 에셋의 정보 중 필요한 정보를 선별하여 딕셔너리에 담는 매서드
 
         Args:
-            cast: 에셋의 캐스팅 info
-            output_type(list): 에셋에서 쓰이는 아웃풋 타입의 집합
-            asset: a casted asset
-            task_type: for get output file (Modeling)
+            cast: 캐스팅된 에셋의 간략한 캐스팅 정보
+            output_type(list): 에셋에서 쓰이는 모든 아웃풋 타입 딕셔너리의 집합
+            asset(dict): 캐스팅된 에셋의 딕셔너리
+            task_type(dict): 아웃풋 파일 생성에 필요한 Modeling task type
 
         Return:
+            dict: 캐스팅된 에셋의 딕셔너리에서 필요한 정보들만 담은 리스트의 집합
+                  keys - asset_name, asset_type_name, nb_occurences, output, description
+                  output keys - output_type, revision
         """
         output_list = []
         output_dict = dict()
@@ -145,19 +152,23 @@ class Filter:
 
     def _collect_info_casting(self, task):
         """
-        선택한 task가 속한 asset(task asset)에 casting된 에셋들의 정보 중 필요한 내용을 추출하여 저장한다.
-        task asset이 캐스팅된 샷의 언디스토션 이미지와 camera output의 정보 중 필요한 내용을 추출한다.
+        선택한 layout task가 속한 작업 asset에 casting된 에셋들의 정보 중 필요한 내용을 추출하여 저장하는 매서드
+
+        output file의 정보를 수집하기 위해 모델링, 매치무브, 카메라의 테스크 타입을 구한 뒤,
+        작업 asset에 캐스팅된 다른 에셋들의 정보를 수집하여 저장한다.(_cast_dict_append)
+        그리고 작업 asset이 cast in 된 샷들에서 언디스토션 이미지와 camera output의 정보 중 필요한 내용을 추출한다.(_list_append)
 
         Args:
             task(dict): 선택한 task의 딕셔너리
 
         Returns:
             list(casting_info_list): 캐스팅된 에셋들의 정보를 담은 리스트의 집합
-                                     (asset name, description, asset type name, nb_occurences)
+                                     keys - asset_name, asset_type_name, nb_occurences, output, description
+                                     output keys - output_type, revision
             list(undi_info_list): task asset이 캐스팅된 샷의 언디스토션 이미지 정보를 담은 리스트의 집합
-                                 (output name, output type name, comment, description)
+                                  keys - output_type_name, frame_range, output_name, comment, description, shot_name
             list(camera_info_list): task asset이 캐스팅된 샷의 카메라 정보를 담은 리스트의 집합
-                                    (output name, output type name, comment, description)
+                                    keys - output_type_name, frame_range, output_name, comment, description, shot_name
         """
         casting_info_list = []
         undi_info_list = []
@@ -186,14 +197,14 @@ class Filter:
     def _filter_info(self, proj_num=0, seq_num=0):
         """
         유저가 필터링을 했는지 판별하여 해당하는 task들만 노출하는 매서드
-        유저가 클릭한 테스크의 dict를 task에 저장한다
+        유저가 클릭한 테스크의 dict를 저장한다
 
         Args:
             proj_num: 선택한 프로젝트의 인덱스 번호. 0은 All을 뜻한다
             seq_num: 선택한 시퀀스의 인덱스 번호. 0은 All을 뜻한다
 
         Returns:
-            list: 필터링된 task(dict)의 집합
+            list: 필터링된 task dict의 집합
             list: 필터링된 task 정보 중 필요한 내용만 담긴 dict의 집합
         """
         task_info_list, task_list, proj_set, seq_set, _ = self.collect_info_task()
@@ -242,12 +253,11 @@ class Filter:
             task_num: 선택한 테스크의 인덱스 번호. 테스크 선택 전에는 None
 
         Returns:
-            dict or list: 선택한 task의 딕셔너리 또는 task의 집합(선택 전)
-            list: 선택한 task의 정제된 정보를 담은 리스트
-            list: 캐스팅된 에셋의 리스트
-            list: 언디스토션 이미지의 리스트
-            list: 카메라의 리스트
-            list:
+            dict or list(task): 선택한 task의 딕셔너리 또는 모든 task 딕셔너리의 집합(선택 전)
+            list(task_info): 선택한 task의 정제된 정보를 담은 딕셔너리의 집합
+            list(casting_info_list): 캐스팅된 에셋의 정보가 담긴 딕셔너리의 집합
+            list(undi_info_list): 언디스토션 이미지의 정보가 담긴 딕셔너리의 집합
+            list(camera_info_list): 카메라 파일의 정보가 담긴 딕셔너리의 집합
         """
         casting_info_list = None
         undi_info_list = None

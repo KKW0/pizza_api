@@ -5,8 +5,6 @@ import sys
 import gazu
 import pprint as pp
 
-import gazu.shot
-
 from PizzaMaya_ah.code.login import LogIn
 from PizzaMaya_ah.code.filter import Filter
 from PizzaMaya_ah.code.usemaya import MayaThings
@@ -21,16 +19,18 @@ from PizzaMaya_ah.ui.UI_view_login import LoginWindow
 from PizzaMaya_ah.ui.UI_model import CustomTableModel
 from PizzaMaya_ah.ui.UI_model import CustomTableModel2
 from PizzaMaya_ah.ui.UI_model import CustomTableModel3
-from PySide2 import QtWidgets, QtCore, QtUiTools
+
+from PySide2 import QtWidgets, QtCore, QtUiTools, QtGui
 from PySide2.QtWidgets import QMainWindow, QMessageBox
 from PySide2.QtGui import QPixmap, QPixmapCache
 from PySide2.QtCore import Qt
 
+
 class MainWindow(QMainWindow):
     def __init__(self, values=None, parent=None, size_policy=None):
         super(MainWindow, self).__init__()
-        # 현재 작업 디렉토리 경로를 가져옴
 
+        # 현재 작업 디렉토리 경로를 가져옴
         self.task = None
         self.my_task = None
         self.task_num = None
@@ -40,6 +40,9 @@ class MainWindow(QMainWindow):
         self.camera_info_list = None
         self.casting_info_list = None
         self.task_clicked_index = None
+        self.asset_thumbnail_list = None
+        self.undi_thumbnail_list = None
+        self.shot_list = None
 
         self.my_shot_index_list = []
         self.selected_index_list = []  # 선택한 에셋들의 인덱스 번호
@@ -55,6 +58,15 @@ class MainWindow(QMainWindow):
         loader = QtUiTools.QUiLoader()
         self.ui = loader.load(ui_file)
         ui_file.close()
+
+        self.ui.setGeometry(
+            QtWidgets.QStyle.alignedRect(
+                QtCore.Qt.LeftToRight,
+                QtCore.Qt.AlignCenter,
+                self.ui.size(),
+                QtGui.QGuiApplication.primaryScreen().availableGeometry(),
+            ),
+        )
 
         # 메인 윈도우의 레이아웃에 TableView 2개 추가
         self.table = Table()
@@ -134,10 +146,9 @@ class MainWindow(QMainWindow):
         for sel_idx in selected_indexes:
             sel_asset_ids.add(sel_idx.row())
         self.selected_index_list = sel_asset_ids
-        # self.row_index_list.append(selected_indexes[0].row())
-
         self.ui.Selection_Lable.setText('Selected Files %d / %d' % (len(selected_rows), row_count))
         print(self.ui.Selection_Lable.text())
+        print(sel_asset_ids)
 
     # ----------------------------------------------------------------------------------------------
     # save 또는 load 버튼 누르면 save 또는 load 윈도우를 호출
@@ -146,22 +157,35 @@ class MainWindow(QMainWindow):
         # self.ui.hide()  ##### 메인 윈도우를 숨길 필요 있는지? 그냥 겹쳐서 띄우면 안되나 exec로
         if self.my_task == None:
             QMessageBox.warning(self, 'Error', '퍼블리시할 테스크를 먼저 선택해주세요.', QMessageBox.Ok)
+            QMessageBox.setGeometry(
+                QtWidgets.QStyle.alignedRect(
+                    QtCore.Qt.LeftToRight,
+                    QtCore.Qt.AlignCenter,
+                    QMessageBox.size(),
+                    QtGui.QGuiApplication.primaryScreen().availableGeometry(),
+                ),
+            )
         else:
             self.save.ui.show()
             self.save.my_task = self.my_task
-
 
     def load_button(self):
         if not self.my_task:
             return
         else:
-            # screen_resolution = QtWidgets.QDesktopWidget().screenGeometry()
-            # screen_center = screen_resolution.center()
+            load_ask = QMessageBox()
+            reply = load_ask.question(self, 'Confirmation', '{0}개의 에셋과 {1}개의 샷을 로드하시겠습니까?' \
+                                      .format(len(self.selected_index_list), (len(self.my_shot_index_list))),
+                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            load_ask.setGeometry(
+                QtWidgets.QStyle.alignedRect(
+                    QtCore.Qt.LeftToRight,
+                    QtCore.Qt.AlignCenter,
+                    load_ask.sizeHint(),
+                    QtGui.QGuiApplication.primaryScreen().availableGeometry(),
+                ),
+            )
 
-            reply = QMessageBox.question(self, 'Confirmation', '{0}개의 에셋과 {1}개의 샷을 로드하시겠습니까?' \
-                                         .format(len(self.selected_index_list), (len(self.my_shot_index_list))),
-                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-            # reply.move(screen_center - reply.rect().center())
             if reply == QMessageBox.Yes:
                 my_layout_asset = gazu.asset.get_asset(self.my_task['entity_id'])
                 self.ma.import_casting_asset(my_layout_asset, self.selected_index_list)
@@ -169,7 +193,16 @@ class MainWindow(QMainWindow):
                     shot_list = gazu.casting.get_asset_cast_in(self.my_task['entity_id'])
                     self.ma.import_cam_seq(shot_list[index])
                 self.ui.close()
-                QMessageBox.information(self, 'Completed', '로드되었습니다!', QMessageBox.Ok)
+                load_completed = QMessageBox()
+                load_completed.information(self, 'Completed', '로드되었습니다!', QMessageBox.Ok)
+                load_completed.setGeometry(
+                    QtWidgets.QStyle.alignedRect(
+                        QtCore.Qt.LeftToRight,
+                        QtCore.Qt.AlignCenter,
+                        load_completed.sizeHint(),
+                        QtGui.QGuiApplication.primaryScreen().availableGeometry(),
+                    ),
+                )
 
     # ----------------------------------------------------------------------------------------------
     # 정보 입력 후 로그인 버튼을 클릭하면 Kitsu에 로그인을 하고, 오토로그인이 체크되어있는지 판별
@@ -186,7 +219,7 @@ class MainWindow(QMainWindow):
         self.login.auto_login = self.login_window.ui.Auto_Login_Check.isChecked()
 
         if self.login.connect_host() and self.login.log_in():
-            self.login_window.ui.hide()     ###### close가 아니라 hide 해야 하는지?
+            self.login_window.ui.hide()
             self.ui.show()
 
             # Set table1 data
@@ -203,12 +236,12 @@ class MainWindow(QMainWindow):
 
     def table_clicked(self, event):
         self.task_clicked_index = event.row()
-        self.my_task, task_info, self.casting_info_list,\
+        self.my_task, task_info, self.casting_info_list, \
             self.undi_info_list, self.camera_info_list = self.ft.select_task(self.horizontal_header.proj_index,
                                                                              self.horizontal_header.seq_index,
                                                                              self.task_clicked_index)
-        tup, _, _, _ = thumbnail_control(self.my_task, self.task_clicked_index,
-                                         self.casting_info_list, self.undi_info_list)
+        tup, self.asset_thumbnail_list, self.undi_thumbnail_list, self.shot_list = \
+            thumbnail_control(self.my_task, self.task_clicked_index, self.casting_info_list, self.undi_info_list)
         png = bytes(tup)
 
         self.preview_pixmap = QPixmap()
@@ -229,62 +262,25 @@ class MainWindow(QMainWindow):
 
     def table_clicked2(self, event):
         clicked_cast = self.casting_info_list[event.row()]
-
-        # _, asset_thumbnail_list, _, shot_list = thumbnail_control(self.my_task, self.task_clicked_index,
-        #                                                   self.casting_info_list, undi_info_list=[])
-        # png = bytes(asset_thumbnail_list[event.row()])
-        #
-        # self.preview_pixmap = QPixmap()
-        # self.preview_pixmap.loadFromData(png)
-        # label = self.ui.Preview
-        # label.setPixmap(self.preview_pixmap.scaled(label.size(), Qt.KeepAspectRatio))
-        print(clicked_cast)
-        key = clicked_cast['asset_name']
-        print(key)
-        pixmap = QPixmapCache.find(key)
-        if not pixmap:
-            _, asset_thumbnail_list, _, shot_list = thumbnail_control(self.my_task, self.task_clicked_index,
-                                                                      self.casting_info_list, undi_info_list=[])
-            png = bytes(asset_thumbnail_list[event.row()])
-            pixmap = QPixmap()
-            pixmap.loadFromData(png)
-            QPixmapCache.insert(key, pixmap)
+        png = bytes(self.asset_thumbnail_list[event.row()])
 
         label = self.ui.Preview
         label.setPixmap(pixmap.scaled(label.size(), Qt.KeepAspectRatio))
 
-        self.ui.InfoTextBox.setPlainText('Asset Name: {}'.format(clicked_cast['asset_name']+'\n'))
+        self.ui.InfoTextBox.setPlainText('Asset Name: {}'.format(clicked_cast['asset_name'] + '\n'))
         self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(clicked_cast['description']))
         self.ui.InfoTextBox.appendPlainText('Asset Type: {0}'.format(clicked_cast['asset_type_name']))
         self.ui.InfoTextBox.appendPlainText('Occurence: {0}'.format(str(clicked_cast['nb_occurences'])))
         self.ui.InfoTextBox.appendPlainText('Output File: {0}'.format(str(len(clicked_cast['output']))))
-        self.ui.InfoTextBox.appendPlainText('Newest or Not: Not')   # 모든 아웃풋 파일들이 전부 최신 리비전이면 YES로 표기
+        self.ui.InfoTextBox.appendPlainText('Newest or Not: Not')  # 모든 아웃풋 파일들이 전부 최신 리비전이면 YES로 표기
 
     def table_clicked3(self, event):
         clicked_undi = self.undi_info_list[event.row()][0]
         clicked_cam = self.camera_info_list[event.row()][0]
-        # _, _, undi_thumbnail_list, _ = thumbnail_control(self.my_task, self.task_clicked_index,
-        #                                                  [], self.undi_info_list)
-        # png = bytes(undi_thumbnail_list[event.row()])
+        png = bytes(self.undi_thumbnail_list[event.row()])
 
-        # 안녕하세요? 박지섭입니다.
-        # 아래의 코드는 이미지를 캐쉬화 하여 어플리케이션의 속도를 비약적으로 올리기 위해 QPixmapCache를 사용한 예입니다.
-        # 기존 매번 undi_thumbnail_list를 생성하여 모든 썸네일 이미지를 다운받고 사용하는 방식과 달리
-        # 먼저 key를 통해 QPixmapCache에서 찾고, 없을 경우만 기존과 같은 방식으로 이미지를 가져오게 하였습니다.
-        # 개선해야할 부분은 여기에서도 모든 이미지 리스트를 받아오는 것이 아닌, 우리가 원하는 이미지만 받아올 수 있게
-        # undi_thumbnail_list 이 부분을 수정하시면 더욱 더 향상된 속도를 가진 어플리케이션을 만들 수 있으실거라 생각됩니다.
-        # 이 부분 외에도 썸네일을 사용하는 모든 위치에서 아래의 코드를 사용해 주세요.
-        # 전체적으로 썸네일을 가져오는 함수를 외부로 분리하여 활용하는 것도 좋은 방법일 것입니다.
-        # 감사합니다. 박지섭 드림
-        key = str(self.my_task['id'] + str(event.row()))
-        pixmap = QPixmapCache.find(key)
-        if not pixmap:
-            _, _, undi_thumbnail_list, _ = thumbnail_control(self.my_task, self.task_clicked_index,
-                                                             [], self.undi_info_list)
-            png = bytes(undi_thumbnail_list[event.row()])
-            pixmap = QPixmap()
-            pixmap.loadFromData(png)
-            QPixmapCache.insert(key, pixmap)
+        self.preview_pixmap = QPixmap()
+        self.preview_pixmap.loadFromData(png)
         label = self.ui.Preview
         label.setPixmap(pixmap.scaled(label.size(), Qt.KeepAspectRatio))
 
@@ -311,10 +307,6 @@ class MainWindow(QMainWindow):
         self.ui.InfoTextBox.appendPlainText('[Camera Info]')
         self.ui.InfoTextBox.appendPlainText('Asset Type: {0}'.format(clicked_cam['output_type_name']))
         self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(str(clicked_cam['description'])))
-
-        gazu.shot
-        print(clicked_undi['shot_name'])
-
 
     # ----------------------------------------------------------------------------------------------
     # TableView 두개에 띄울 각각의 정보를 넣어둠
@@ -349,14 +341,12 @@ class MainWindow(QMainWindow):
         # 썸네일을 얻기 위해 받아와야 하는 정보
         data = []
         if self.my_task is not None:
-            _, asset_thumbnail_list, _, shot_list = \
-                thumbnail_control(self.my_task, 0, self.casting_info_list, self.undi_info_list)
             # 캐스팅된 에셋목록 추가
             for index, cast in enumerate(self.casting_info_list):
                 if len(cast['output']) == 0:
-                    data.append([asset_thumbnail_list[index], cast['asset_name'], 'No Output File to Load'])
+                    data.append([None, cast['asset_name'], 'No Output File to Load'])
                 else:
-                    data.append([asset_thumbnail_list[index], cast['asset_name'], cast['asset_type_name']])
+                    data.append([self.asset_thumbnail_list[index], cast['asset_name'], cast['asset_type_name']])
             return data
         else:
             return data
@@ -364,17 +354,16 @@ class MainWindow(QMainWindow):
     def read_data3(self):
         data = []
         if self.my_task is not None:
-            _, _, undi_thumbnail_list, shot_list = \
-                thumbnail_control(self.my_task, 0, self.casting_info_list, self.undi_info_list)
             # 샷 목록 추가
             for index, info_list in enumerate(self.undi_info_list):
-                data.append([undi_thumbnail_list[index], shot_list[index]['shot_name']])
+                data.append([self.undi_thumbnail_list[index], self.shot_list[index]['shot_name']])
             return data
         else:
             return data
 
-
     # ----------------------------------------------------------------------------------------------
+
+
 
 def main():
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)

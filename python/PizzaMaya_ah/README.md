@@ -2,7 +2,7 @@
 
 
 
-![—Pngtree—pizza house delicious shiitake pizza_5570337.png](README/Pngtreepizza_house_delicious_shiitake_pizza_5570337.png)
+![—Pngtree—pizza house delicious shiitake pizza_5570337.png](code/README/Pngtreepizza_house_delicious_shiitake_pizza_5570337.png)
 
 # **Team Pizza**
 
@@ -17,7 +17,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## **Demo**
 
-![—main_window.png](README/main_window.png)
+![—main_window.png](code/README/main_window.png)
 UI 전체 스크린샷
 
 [//]: # ()

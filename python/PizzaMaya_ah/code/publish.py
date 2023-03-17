@@ -1,5 +1,7 @@
 #coding:utf8
 import os
+import pprint
+
 import gazu
 from usemaya import MayaThings
 
@@ -13,7 +15,6 @@ class PublishThings:
         모듈의 인스턴스를 생성하고, 전역변수를 정의한다.
         """
         self.maya = MayaThings()
-        self._software = None
         self._task_status = gazu.task.get_task_status_by_name('Todo')
         self._preview_type = None
 
@@ -44,30 +45,29 @@ class PublishThings:
         seq = casted_list[0]
         # working file 모델 생성
         working_file_list = gazu.files.get_working_files_for_task(task['id'])
+        software = gazu.files.get_software_by_name('Maya')
         if working_file_list is []:
             # task가 주어진 에셋에 working file 모델이 없으면 새로 생성
-            self._software = gazu.files.get_software_by_name('Maya')
             working_file = gazu.files.new_working_file(task['id'],
                                                        name=seq['name']+'_layout_working',
-                                                       software=self._software['id'],
+                                                       software=software['id'],
                                                        comment=comment,
                                                        person=gazu.client.get_current_user())
         else:
             # 이미 있으면 기존 정보 계승, 리비전은 이름이 같으면 자동으로 올라감
             old_working = working_file_list[0]
-            self._software = old_working['software_id']
             working_file = gazu.files.new_working_file(task['id'],
                                                        name=old_working['name'],
-                                                       software=self._software,
+                                                       software=software,
                                                        comment=comment,
                                                        person=gazu.client.get_current_user())
 
         # output file 모델 생성
-        output_type = gazu.files.get_output_type_by_name('Layout_mb')
+        output_type = gazu.files.get_output_type_by_name('MayaBinary')
         output_file_list = gazu.files.get_last_output_files_for_entity(task['entity_id'],
                                                                        output_type=output_type,
                                                                        task_type=task['task_type_id'])
-        if output_file_list is []:
+        if len(output_file_list) is 0:
             # task가 주어진 에셋에 Layout_mb 타입의 output file이 없으면 새로 생성
             output_file = gazu.files.new_entity_output_file(task['entity_id'],
                                                             output_type['id'],
@@ -78,9 +78,8 @@ class PublishThings:
                                                             name=seq['name'] + '_layout_output',
                                                             representation='mb')
         else:
-            # Layout_mb 타입의 output file이 이미 있으면 정보 계승함
+            # MayaBinary 타입의 output file이 이미 있으면 정보 계승함
             old_output = output_file_list[0]
-            output_type = old_output['output_type_id']
             output_file = gazu.files.new_entity_output_file(task['entity_id'],
                                                             output_type,
                                                             task['task_type_id'],
@@ -88,14 +87,14 @@ class PublishThings:
                                                             working_file=working_file,
                                                             person=gazu.client.get_current_user(),
                                                             name=old_output['name'],
-                                                            representation=old_output['representation'])
+                                                            representation='mb')
 
         # 마야에서 작업한 에셋을 저장하기 위한 폴더 패스 build
         working_path = gazu.files.build_working_file_path(task['id'], revision=working_file['revision'])
         output_path = gazu.files.build_entity_output_file_path(task['entity_id'],
                                                                output_type,
                                                                task['task_type_id'],
-                                                               representation=output_file['representation'],
+                                                               representation='mb',
                                                                revision=output_file['revision'])
         # main preview용 패스 build
         self._preview_type = gazu.files.get_output_type_by_name('PreviewMov')
@@ -138,10 +137,10 @@ class PublishThings:
             path(str): working file 또는 main preview file의 확장자를 제외한 path
             file_type(dict): 업로드할 working file의 딕셔너리. preview를 업로드할 경우 사용하지 않는다.
         """
-        full_path = None
-        if 'working' in path:
+        if file_type and 'working' in path:
             # working file 업로드
-            full_path = path + '.' + self._software['file_extension']
+            soft = gazu.files.get_software(file_type['software_id'])
+            full_path = path + '.' + soft['file_extension']
             gazu.files.upload_working_file(file_type, full_path)
         elif 'output' in path:
             # main preview file 업로드
@@ -149,7 +148,7 @@ class PublishThings:
             filenames = os.listdir(os.path.dirname(path))
             for filename in filenames:
                 if '.mov' in filename:
-                    full_path = os.path.dirname(path) + filename
+                    full_path = os.path.dirname(path) + '/' + filename
             if gazu.files.get_all_preview_files_for_task(task):
                 # preview가 이미 존재하면 add
                 preview = gazu.task.add_preview(task, comment, full_path)
@@ -184,12 +183,12 @@ class PublishThings:
 
         # 마야에서 각 폴더에 working, output, main preview를 save하고
         # working file과 main preveiw를 kitsu에 업로드
-        self.maya.save_scene_file(working_path, self._software['file_extension'])
+        self.maya.save_scene_file(working_path, 'ma')
         self.maya.export_output_n_main_preview_file(output_path, preview_path)
         self._upload_files(task, working_path, working_file)
         self._upload_files(task, preview_path, comment=comment)
 
-    def save_publish_previews(self, shot_list, comment = None):
+    def save_publish_previews(self, shot_list, custom_camera_list, comment=None):
         """
         각 샷에 해당하는 레이아웃의 preview file과 mb 파일을 저장하고 업로드하는 매서드
 
@@ -200,11 +199,13 @@ class PublishThings:
 
         Args:
             shot_list(list): 에셋이 캐스팅된 시퀀스 아래에 있는 모든 샷 딕셔너리들의 집합
+            custom_camera_list
+            comment
         """
         revision = 0
         task_type = gazu.task.get_task_type_by_name('Layout')
         output_type = gazu.files.get_output_type_by_name('MayaBinary')
-        for shot in shot_list:
+        for shot, cam in zip(shot_list, custom_camera_list):
             pre_path = gazu.files.build_entity_output_file_path(shot, self._preview_type,
                                                                 task_type, revision=revision)
             if not os.path.exists(pre_path):
@@ -215,8 +216,8 @@ class PublishThings:
                 pre_path = gazu.files.build_entity_output_file_path(shot, self._preview_type,
                                                                     task_type, revision=revision)
                 mb_path = gazu.files.build_entity_output_file_path(shot, output_type, task_type, revision=revision)
-            self.maya.export_shot_previews(pre_path, shot)
-            self.maya.export_shot_scene(mb_path, shot)
+            self.maya.export_shot_previews(pre_path, shot, cam)
+            self.maya.export_shot_scene(mb_path, shot, cam)
 
             # Kitsu shot에 Layout task의 preview file 업로드
             full_path = pre_path + '.mov'

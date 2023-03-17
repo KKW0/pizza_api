@@ -1,7 +1,6 @@
 #coding:utf8
 
 import gazu
-import pprint as pp
 
 """
 Kitsu에 로그인한 상태에서 task entity(레이아웃 에셋)의 메인 프리뷰 url을 구하고,
@@ -27,21 +26,20 @@ def _get_thumbnail(preview):
 
 def thumbnail_control(task_dict, task_num=None, casting_info_list=None, undi_info_list=None):
     """
-
     Args:
         task_dict(dict): 사용자가 선택한 테스크, 또는 필터링한 테스크 딕셔너리의 집합
-                                      task_num의 타입이 int면 딕셔너리, None이면 리스트 타입이다.
         task_num(int): 사용자가 선택한 테스크의 인덱스 번호. 사용자가 task를 선택하기 전에는 None
-        casting_info_list(list): 사용자가 task를 선택하기 전에는 None
-                                [asset_name, description, asset_type_name, nb_occurences]
-        undi_info_list(list): 사용자가 task를 선택하기 전에는 None
-                             [output file name, output type name, comment, description, entity_id]
+        casting_info_list(list): 캐스팅된 에셋들의 간략한 정보를 담은 딕셔너리의 집합
+                                keys - asset_name, asset_type_name, nb_occurences, output, description
+                                output keys - output_type, revision
+        undi_info_list(list): 언디스토션 이미지의 간략한 정보를 담은 딕셔너리의 집합
+                             keys - output_name, output_type_name, frame_range, comment, description, shot_name
 
     Returns:
-        png: 메인 썸네일의 png
-        list: 캐스팅된 에셋들의 썸네일 png의 집합
-        png: 언디스토션 이미지의 썸네일
-
+        tuple(png): 메인 썸네일의 png 데이터
+        list(asset_thumbnail_list): 캐스팅된 에셋들의 썸네일 png 데이터의 집합
+        list(undi_thumbnail_list): 언디스토션 이미지의 썸네일 png 데이터의 집합
+        list(shot_list): 레이아웃 에셋이 캐스팅된 샷 딕셔너리의 집합
     """
     if task_num is None:
         # 테스크 선택 전에는 아무것도 하지 않는다.

@@ -157,8 +157,14 @@ class MayaThings:
             path(str): 씬파일을 저장할 확장자를 제외한 이름까지의 경로
             representation(str): "ma"또는 "mb" 확장자
         """
-        mc.file(rename=path+'.'+representation)
-        mc.file(save=True, type=representation)
+        print(path)
+        full_path = path+'.'+representation
+        mc.file(rename=full_path)
+        if representation == 'mb':
+            mc.file(save=True, type='mayaBinary', force=True)
+        else:
+            mc.file(save=True, type='mayaAscii', force=True)
+
 
     def _make_main_preview_mov(self, path):
         """
@@ -214,17 +220,19 @@ class MayaThings:
         # 모든 카메라와 언디img를 안 보이게 꺼줌
         all_cameras = mc.ls(type='camera', l=True)
         for camera in all_cameras:
-            mc.setAttr("%s.visibility" % camera, False)
+            cam_name_parts = camera.split('|')
+            print('C', cam_name_parts)
+            mc.setAttr("%s.visibility" % cam_name_parts[2], False)
 
         # 플레이블라스트 mov출력
         mc.playblast(
-            format='movie',
+            format='qt',
             filename=path+filename,
             sequenceTime=False,
             clearCache=True, viewer=True,
             showOrnaments=True,
             fp=4, percent=50,
-            compression=extension,
+            compression='jpeg',
             quality=50,
             startTime=0,
             endTime=300
@@ -247,7 +255,7 @@ class MayaThings:
         # main preview file 저장
         self._make_main_preview_mov(preview_path)
         
-    def export_shot_previews(self, path, shot):
+    def export_shot_previews(self, path, shot, custom_camera):
         """
         각 샷에 해당하는 preview 영상을 저장하는 매서드
 
@@ -257,14 +265,15 @@ class MayaThings:
         Args:
             path(str): preview 파일의 확장자를 뺀 전체 경로
             shot(dict): preview 파일을 저장할 shot의 딕셔너리
+            custom_camera
         """
-        # 디폴트 카메라 필터링 후 사용자가 커스텀한 카메라 목록을 추출
-        startup_cameras = []
-        all_cameras = mc.ls(type='camera', l=True)
-        for camera in all_cameras:
-            if mc.camera(mc.listRelatives(camera, parent=True)[0], startupCamera=True, q=True):
-                startup_cameras.append(camera)
-        custom_camera = list(set(all_cameras) - set(startup_cameras))
+        # # 디폴트 카메라 필터링 후 사용자가 커스텀한 카메라 목록을 추출
+        # startup_cameras = []
+        # all_cameras = mc.ls(type='camera', l=True)
+        # for camera in all_cameras:
+        #     if mc.camera(mc.listRelatives(camera, parent=True)[0], startupCamera=True, q=True):
+        #         startup_cameras.append(camera)
+        # custom_camera = list(set(all_cameras) - set(startup_cameras))
 
         # shot의 언디스토션 이미지들을 저장한 폴더로부터 프레임 레인지를 추출
         undi_seq_path = self.kit.get_undistortion_img(shot)
@@ -275,27 +284,31 @@ class MayaThings:
         shot_name = shot['name']
         for camera in custom_camera:
             if shot_name not in camera:
-                mc.setAttr("%s.visibility" % camera, False)
+                cam_name_parts = camera.split('|')
+                print('A', cam_name_parts)
+                mc.setAttr("%s.visibility" % cam_name_parts[2], False)
                 continue
             else:
-                mc.setAttr("%s.visibility" % camera, True)
+                cam_name_parts = camera.split('|')
+                print('B', cam_name_parts)
+                mc.setAttr("%s.visibility" % cam_name_parts[2], True)
                 mc.lookThru(camera)
                 mc.playblast(
-                    format='movie',
+                    format='qt',
                     filename=path,
                     sequenceTime=False,
                     clearCache=True, viewer=True,
                     showOrnaments=True,
                     percent=50,
-                    compression="mov",
+                    compression="jpeg",
                     quality=50,
                     startTime=0,
                     endTime=frame_range
                 )
-                mc.setAttr("%s.visibility" % camera, False)
+                mc.setAttr("%s.visibility" % cam_name_parts[2], False)
                 # 켰던 카메라 다시 꺼줌
 
-    def export_shot_scene(self, path, shot):
+    def export_shot_scene(self, path, shot, custom_camera):
         """
         각 샷에 해당하는 .mb파일을 저장하는 매서드
 
@@ -305,28 +318,22 @@ class MayaThings:
             path(str): 샷 씬파일의 확장자를 뺀 전체 경로
             shot(dict): mb 파일을 저장할 shot의 딕셔너리
         """
-        # 디폴트 카메라 필터링 후 사용자가 커스텀한 카메라 목록을 추출
-        startup_cameras = []
-        all_cameras = mc.ls(type='camera', l=True)
-        for camera in all_cameras:
-            if mc.camera(mc.listRelatives(camera, parent=True)[0], startupCamera=True, q=True):
-                startup_cameras.append(camera)
-        custom_camera = list(set(all_cameras) - set(startup_cameras))
-
         # shot의 언디스토션 이미지들을 저장한 폴더로부터 프레임 레인지를 추출
         undi_seq_path = self.kit.get_undistortion_img(shot)
         file_list = os.listdir(os.path.dirname(undi_seq_path))
         frame_range = len(file_list)
 
-        # 다른 카메라랑 이미지플레인 다 끄고, 샷에 해당하는 카메라만 켜서 플레이블라스트 프리뷰 저장
+        # 다른 카메라랑 이미지플레인 다 끄고, 샷에 해당하는 카메라만 켜서 mb 파일 저장
         shot_name = shot['name']
         for camera in custom_camera:
             if shot_name not in camera:
-                mc.setAttr("%s.visibility" % camera, False)
+                cam_name_parts = camera.split('|')
+                mc.setAttr("%s.visibility" % cam_name_parts[2], False)
                 continue
             else:
-                mc.setAttr("%s.visibility" % camera, True)
+                cam_name_parts = camera.split('|')
+                mc.setAttr("%s.visibility" % cam_name_parts[2], True)
                 mc.lookThru(camera)
                 self.save_scene_file(path, 'mb')
-                mc.setAttr("%s.visibility" % camera, False)
+                mc.setAttr("%s.visibility" % cam_name_parts[2], False)
                 # 켰던 카메라 다시 꺼줌

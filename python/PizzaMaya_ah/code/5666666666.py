@@ -7,18 +7,18 @@ gazu.client.set_host("http://192.168.3.116/api")
 gazu.set_event_host("http://192.168.3.116")
 gazu.log_in("pipeline@rapa.org", "netflixacademy")
 
-# class SET():
-#     def test_setUp(self):
+class SET():
+    def test_setUp(self):
 #         # gazu.client.set_host("http://192.168.3.116/api")
 #         # gazu.log_in("pipeline@rapa.org", "netflixacademy")
 #         #
 #         # # 테스트용 클래스변수 정의
-#         # self.project = gazu.project.get_project_by_name('Project1')
-#         # self.asset = gazu.asset.get_asset_by_name(self.project, 'lecture')
-#         # self.user = gazu.person.get_person_by_full_name('ahyeon jo')
+        self.project = gazu.project.get_project_by_name('Project1')
+        self.asset = gazu.asset.get_asset_by_name(self.project, 'lecture')
+        # self.user = gazu.person.get_person_by_full_name('ahyeon jo')
 #         # self.task_status = gazu.task.get_task_status_by_name('Todo')
-#         # self.task_type = gazu.task.get_task_type_by_name('LayoutPizza')
-#         # self.task = gazu.task.get_task_by_entity(self.asset, self.task_type)
+        self.task_type = gazu.task.get_task_type_by_name('LayoutPizza')
+        self.task = gazu.task.get_task_by_entity(self.asset, self.task_type)
 #         # self.comment = 'Unit Test'
 #         # # gazu.task.add_comment(self.task, self.task_status, self.comment)
 #         # self.comment_dict = gazu.task.get_last_comment_for_task(self.task)
@@ -64,8 +64,11 @@ gazu.log_in("pipeline@rapa.org", "netflixacademy")
 #         # # c = gazu.files.get_last_output_files_for_entity(self.shot2, self.output_type_abc, task_type)
 #         # # pp.pprint(d)
 #         # # pp.pprint(c)
-#         # # www = gazu.files.get_last_working_files(task)
-#         # # pp.pprint(www)
+        www = gazu.files.get_last_working_files(self.task)
+        pp.pprint(www)
+        sof = gazu.files.get_software(www['main']['software_id'])
+        pp.pprint(sof)
+        sof['file_extension']
 #         # a1 = gazu.files.new_entity_output_file(self.shot2, self.output_type_ujpg, task_type, 'sss', www['main'])
 #         # c = gazu.files.get_last_output_files_for_entity(self.shot2['id'], self.output_type_ujpg, task_type)
 #         # pp.pprint(c)
@@ -135,33 +138,33 @@ gazu.log_in("pipeline@rapa.org", "netflixacademy")
 #         #
 #
 #
-# s = SET()
-# s.test_setUp()
+s = SET()
+s.test_setUp()
 
 
-project = gazu.project.get_project_by_name('Project1')
-asset_name = 'chair'
-asset_dict = gazu.asset.get_asset_by_name(project, asset_name)
-
-
-proj = gazu.project.all_projects()
-task_type = gazu.task.get_task_type_by_name('asdfasdfasf')
-for pro in proj:
-    tasks = gazu.task.all_tasks_for_task_type(pro, task_type)
-    print(tasks)
-    # pp.pprint(tasks)
-    for tas in tasks:
-        print(tas)
-        gazu.task.remove_task(tas)
-# gazu.task.remove_task_type(task_type)
-
-# print(gazu.task.get_task('cb3ab26d-75ec-4a31-b2da-d15fcfb598a4'))
-
-# aa = gazu.files.get_output_file('cb3ab26d-75ec-4a31-b2da-d15fcfb598a4')
+# project = gazu.project.get_project_by_name('Project1')
+# asset_name = 'chair'
+# asset_dict = gazu.asset.get_asset_by_name(project, asset_name)
+#
+#
+# proj = gazu.project.all_projects()
+# task_type = gazu.task.get_task_type_by_name('asdfasdfasf')
+# for pro in proj:
+#     tasks = gazu.task.all_tasks_for_task_type(pro, task_type)
+#     print(tasks)
+#     # pp.pprint(tasks)
+#     for tas in tasks:
+#         print(tas)
+#         gazu.task.remove_task(tas)
+# # gazu.task.remove_task_type(task_type)
+#
+# # print(gazu.task.get_task('cb3ab26d-75ec-4a31-b2da-d15fcfb598a4'))
+#
+# # aa = gazu.files.get_output_file('cb3ab26d-75ec-4a31-b2da-d15fcfb598a4')
+# # print(aa)
+#
+# aa = gazu.files.all_output_types_for_entity(asset_dict)
 # print(aa)
-
-aa = gazu.files.all_output_types_for_entity(asset_dict)
-print(aa)
-
-'93eb1da9-718f-4132-9461-5872577a4974'
+#
+# '93eb1da9-718f-4132-9461-5872577a4974'
 

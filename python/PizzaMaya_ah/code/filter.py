@@ -6,21 +6,20 @@ import pprint as pp
 
 class Filter:
     def __init__(self):
-        # gazu.client.set_host("http://192.168.3.116/api")
-        # gazu.log_in("keiel0326@gmail.com", "tmvpdltm")
-        # gazu.client.set_host("http://192.168.3.116/api")
-        # gazu.log_in("pipeline@rapa.org", "netflixacademy")
         pass
 
     def _get_information_dict(self, task):
         """
         각 task에서 필터링에 필요한 정보들을 추출하여 딕셔너리에 추가하는 매서드
 
+        _collect_info_task 에서 사용된다.
+
         Args:
             task(dict): 유저에게 할당된 task
 
-            dict(task_info): task에서 필요한 정보만 추출하여 모은 딕셔너리
-            str(seq['name']: task asset이 속한 시퀀스의 이름
+        Returns:
+            dict: task에서 필요한 정보만 추출하여 모은 딕셔너리
+            str: task asset이 속한 시퀀스의 이름
         """
         task_info = dict()
         task_info['project_name'] = task['project_name']
@@ -36,16 +35,17 @@ class Filter:
 
         return task_info, seq['name']
 
-    def _collect_info_task(self):
+    def collect_info_task(self):
         """
         필터링에 필요한 프로젝트 이름, 시퀀스 이름을 proj_set, seq_set에 중복 없이 모으고,
         각 task의 정보를 모아 반환하는 매서드
 
         Returns:
             list(task_info_list): task의 정보들 중 사용자에게 노출할 정보들만 모은 딕셔너리의 집합
-            list(task_list): 사용자에게 assign되었고, task status가 _Todo 또는 WIP인  모든 task 딕셔너리의 집합
+                                  keys - project_name, due_date, description, last_comment, sequence_name
+            list(task_list): 사용자에게 assign되었고, task status가 _Todo_ 또는 WIP인  모든 task 딕셔너리의 집합
             list(proj_set): 각 task가 속한 프로젝트의 이름들을 중복없이 모든 리스트
-            list(seq_set): 각 task asset이 사용되는 시퀀스의 이름들을 중복없이 모은 리스트
+            list(seq_set): 각각 task가 속한 프로젝트의 이름들을 중복없이 모은 리스트
         """
         seq_list = []
         proj_list = []
@@ -71,14 +71,15 @@ class Filter:
 
     def _list_append(self, shot, output_type, task_type):
         """
-        리스트에 아웃풋 파일(언디스토션 이미지, camera)의 정보를 담는다
+       리스트에 아웃풋 파일(언디스토션 이미지, camera)의 정보를 담는 매서드
 
         Args:
             shot(dict): 언디스토션 이미지, 카메라의 아웃풋 파일이 속한 shot
             output_type(dict): 아웃풋 파일이 속한 아웃풋 타입(jpg, abc )
+            task_type:
 
         Returns:
-            list: output file의 모델에서 필요한 정보들만 담은 리스트의 집합
+            list: output file의 모델에서 필요한 정보들만 담은 리스트의 집합드
         """
         info_list = []
         output_list_tmp = gazu.files.get_last_output_files_for_entity(shot['shot_id'], output_type, task_type)
@@ -195,7 +196,7 @@ class Filter:
             list: 필터링된 task(dict)의 집합
             list: 필터링된 task 정보 중 필요한 내용만 담긴 dict의 집합
         """
-        task_info_list, task_list, proj_set, seq_set, _ = self._collect_info_task()
+        task_info_list, task_list, proj_set, seq_set, _ = self.collect_info_task()
         filtered_task_list = []
         filtered_task_info_list = []
         double_filtered_task_list = []

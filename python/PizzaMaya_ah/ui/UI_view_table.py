@@ -31,7 +31,7 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         self.setStretchLastSection(True)
 
     def showEvent(self, event):
-        _, _, proj_set, _, self.sort_dict = self.ft._collect_info_task()
+        _, _, proj_set, _, self.sort_dict = self.ft.collect_info_task()
         self.combo = QtWidgets.QComboBox(self)
         self.combo.addItems(['Project'] + proj_set)
         self.combo.currentTextChanged.connect(self.combobox_changed1)

@@ -10,10 +10,9 @@ import gazu.shot
 from PizzaMaya_ah.code.login import LogIn
 from PizzaMaya_ah.code.filter import Filter
 from PizzaMaya_ah.code.usemaya import MayaThings
-from PizzaMaya_ah.code.publish import PublishThings
 from PizzaMaya_ah.code.thumbnail import thumbnail_control
 
-from PizzaMaya_ah.ui.UI_view_save import Save
+from PizzaMaya_ah.ui.UI_view_publish import Save
 from PizzaMaya_ah.ui.UI_view_table import Table
 from PizzaMaya_ah.ui.UI_view_table import Table2
 from PizzaMaya_ah.ui.UI_view_table import Table3
@@ -22,7 +21,6 @@ from PizzaMaya_ah.ui.UI_view_login import LoginWindow
 from PizzaMaya_ah.ui.UI_model import CustomTableModel
 from PizzaMaya_ah.ui.UI_model import CustomTableModel2
 from PizzaMaya_ah.ui.UI_model import CustomTableModel3
-from PizzaMaya_ah.code.publish import PublishThings
 from PySide2 import QtWidgets, QtCore, QtUiTools
 from PySide2.QtWidgets import QMainWindow, QMessageBox
 from PySide2.QtGui import QPixmap
@@ -37,13 +35,11 @@ class MainWindow(QMainWindow):
         self.my_task = None
         self.task_num = None
         self.task_info = None
-        # self.row_index_list = []
         self.preview_pixmap = None
         self.undi_info_list = None
         self.camera_info_list = None
         self.casting_info_list = None
         self.task_clicked_index = None
-        self.shot_dict = None
 
         self.my_shot_index_list = []
         self.selected_index_list = []  # 선택한 에셋들의 인덱스 번호
@@ -104,7 +100,6 @@ class MainWindow(QMainWindow):
 
         self.ft = Filter()
         self.ma = MayaThings()
-        self.pub = PublishThings()
 
         # ----------------------------------------------------------------------------------------------
 
@@ -149,11 +144,11 @@ class MainWindow(QMainWindow):
     def save_button(self):
         # self.ui.hide()  ##### 메인 윈도우를 숨길 필요 있는지? 그냥 겹쳐서 띄우면 안되나 exec로
         if self.my_task == None:
-            QMessageBox.warning(self, 'Error', 'Select Task you want to pulish First', QMessageBox.Ok)
+            QMessageBox.warning(self, 'Error', '퍼블리시할 테스크를 먼저 선택해주세요.', QMessageBox.Ok)
         else:
-            self.pub.save_publish_real_data(self.my_task)
-            self.pub.save_publish_previews()
             self.save.ui.show()
+            self.save.my_task = self.my_task
+
 
     def load_button(self):
         if not self.my_task:
@@ -174,7 +169,6 @@ class MainWindow(QMainWindow):
                     self.ma.import_cam_seq(shot_list[index])
                 self.ui.close()
                 QMessageBox.information(self, 'Completed', '로드되었습니다!', QMessageBox.Ok)
-                # QMessageBox.move(screen_center - QMessageBox.rect().center())
 
     # ----------------------------------------------------------------------------------------------
     # 정보 입력 후 로그인 버튼을 클릭하면 Kitsu에 로그인을 하고, 오토로그인이 체크되어있는지 판별
@@ -229,26 +223,8 @@ class MainWindow(QMainWindow):
         self.table2_model.load_data2(self.read_data2())
         self.table2_model.layoutChanged.emit()
 
-        # print(task_info)
-        project_dict = gazu.project.get_project_by_name(task_info['project_name'])
-        seq_dict = gazu.shot.get_sequence_by_name(project_dict, task_info['sequence_name'])
-        self.shot_list = gazu.shot.all_shots_for_sequence(seq_dict)
-
-
-
         self.table3_model.load_data3(self.read_data3())
         self.table3_model.layoutChanged.emit()
-
-        # print(task_info)
-        project_dict = gazu.project.get_project_by_name(task_info['project_name'])
-        seq_dict = gazu.shot.get_sequence_by_name(project_dict, task_info['sequence_name'])
-        # print(task_info['project_name'], task_info['sequence_name'])
-        self.shot_dict = gazu.shot.all_shots_for_sequence(seq_dict)
-        self.my_task = task_type = gazu.task.get_task_type_by_name('layout')
-        # print(self.my_task)
-
-        self.save.my_task = self.my_task
-        self.save.shot_dict = self.shot_dict
 
     def table_clicked2(self, event):
         clicked_cast = self.casting_info_list[event.row()]

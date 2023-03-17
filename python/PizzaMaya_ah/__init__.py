@@ -138,7 +138,7 @@ Layout 팀을 위한 api
         그 다음 지정된 shot 및 작업에 대한 기존 출력 파일이 있는지 확인하고, 없으면 새 출력 파일을 생성한다.
 
         .. doctest::
-            이 매서드는 kitsumaya.py 모듈의 SetThings 클래스 내에서 사용된다.
+            이 매서드는 모듈의 SetThings 클래스 내에서 사용된다.
             a = PublishThings()
             a.publish_file_data(self.shot, self.task, self.comment)
 
@@ -177,7 +177,7 @@ Layout 팀을 위한 api
         생성된 폴더에 따른 working file, output file 업로드
 
         .. doctest::
-            이 매서드는 kitsumaya.py 모듈의 SetThings 클래스 내에서 사용된다.
+            이 매서드는 모듈의 SetThings 클래스 내에서 사용된다.
             a = PublishThings()
             a.save_publish_real_data(self.shot, self.task, self.comment)
 

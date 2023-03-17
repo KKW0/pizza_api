@@ -35,6 +35,12 @@ class LoginWindow(QtWidgets.QMainWindow):
        """
 
     def __init__(self):
+        """
+
+        UI 파일을 로드하고 입력 상자를 설정하며 창을 화면 가운데에 정렬하여 로그인 창을 초기화합니다.
+
+        """
+
         super(LoginWindow, self).__init__()
 
         self.user_list_start = None
@@ -63,7 +69,7 @@ class LoginWindow(QtWidgets.QMainWindow):
         )
 
     # ----------------------------------------------------------------------------------------------
-
+        # 입력 상자 설정
         self.host_box = self.ui.findChild(QtWidgets.QLineEdit, "Host_Box")
         self.id_box = self.ui.findChild(QtWidgets.QLineEdit, "ID_Box")
         self.pw_box = self.ui.findChild(QtWidgets.QLineEdit, "PW_Box")

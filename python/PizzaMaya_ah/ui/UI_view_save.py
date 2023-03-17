@@ -47,6 +47,7 @@ class Save(QtWidgets.QMainWindow):
 
         comment = self.ui.Save_Path_View_2.toPlainText()
         print(comment)
+        print(self.shot_dict)
         self.pt.save_publish_previews(self.shot_dict, comment=comment)
 
 

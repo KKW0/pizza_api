@@ -26,6 +26,33 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         self.setSectionResizeMode(QHeaderView.Fixed)
         self.setStretchLastSection(True)
 
+        self.setSectionsMovable(False)
+        self.setSectionsClickable(True)  # add this line
+
+        self.setSortIndicator(-1, Qt.AscendingOrder)
+        self.sort_button = QtWidgets.QPushButton(self)
+        self.sort_button.setText("Sort")
+        self.sort_button.setGeometry(self.sectionViewportPosition(2), 0, self.sectionSize(2) - 0, self.height())
+        self.sort_button.clicked.connect(self.sort_clicked)
+        self.sort_button.show()
+
+    def sort_clicked(self):
+        if self.seq_index != 0:
+            self.proxy_model2.sort(self.seq_index, self.sortOrder())
+        elif self.proj_index != 0:
+            self.proxy_model.sort(self.proj_index, self.sortOrder())
+
+    def sortIndicatorChanged(self, logicalIndex, order):
+        if logicalIndex == 2:
+            self.seq_index = 0
+            self.proj_index = 0
+            self.combo2.setCurrentIndex(0)
+            if self.proxy_model2 is not None:
+                self.proxy_model2.invalidate()
+            elif self.proxy_model is not None:
+                self.proxy_model.invalidate()
+        super(HorizontalHeader, self).sortIndicatorChanged(logicalIndex, order)
+
     def showEvent(self, event):
 
         font = QtGui.QFont()
@@ -97,7 +124,7 @@ class Table(QTableView):
     def __init__(self):
         QTableView.__init__(self)
 
-        # self.setSortingEnabled(True)
+        self.setSortingEnabled(True)
 
         font = QFont()
         font.setFamily("Arial")

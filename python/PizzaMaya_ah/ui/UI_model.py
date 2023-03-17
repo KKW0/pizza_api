@@ -141,7 +141,7 @@ class CustomTableModel3(QAbstractTableModel):
         if role != Qt.DisplayRole:
             return None
         if orientation == Qt.Horizontal:
-            return ("", "Select Working Shot", "")[section]
+            return ("Thumbnail", "Select Shot to Load Camera")[section]
         else:
             return str(section)
 
@@ -158,7 +158,7 @@ class CustomTableModel3(QAbstractTableModel):
                 pixmap.loadFromData(self.input_data[row][0])
                 pixmap_width = 100
                 scaled_width = min(pixmap.width(), pixmap_width)
-                scaled_height = int(pixmap.height() * (scaled_width / pixmap.width()))
+                # scaled_height = int(pixmap.height() * (scaled_width / pixmap.width()))
                 pixmap_image = pixmap.scaledToWidth(scaled_width)
                 return pixmap_image
 

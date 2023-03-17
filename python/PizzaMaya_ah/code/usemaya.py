@@ -64,12 +64,14 @@ class MayaThings:
             returnNewNodes=True
         )
 
-        if asset:
+        if asset and asset['nb_elements'] > 1:
             # 에셋이라면 nb_elements에 맞게 인스턴싱 진행
             for index in range(asset['nb_elements']-1):
                 full_filename = os.path.basename(asset['path'])
-                print(full_filename)
-                mc.instance(full_filename)
+                file_name_parts = full_filename.split('_')
+                import_name = '_'.join(file_name_parts[:-1]) \
+                              + '__1_' + str(asset['nb_elements']) + '__' + file_name_parts[2]
+                mc.instance(import_name)
 
     def _connect_image(self, undi_path, camera_path):
         """
@@ -83,25 +85,33 @@ class MayaThings:
             undi_path(str): 확장자까지 포함된 첫번째 언디스토션 이미지의 파일경로
             camera_path(str): 카메라 파일의 전체 경로
         """
-        camera_name = (os.path.basename(camera_path)).split('.')
-        image_plane = mc.imagePlane(camera=camera_name[0])
+        camera_name_tmp = (os.path.basename(camera_path)).split('.')[0]
+        camera_name_parts = camera_name_tmp.split('_')
+        camera_name = camera_name_tmp + '_' + camera_name_parts[-3]
+        image_plane = mc.imagePlane(camera=camera_name)
         mc.setAttr(image_plane[0]+'.imageName', undi_path, type='string')
         mc.setAttr(image_plane[0]+'.useFrameExtension', True)
-        mc.connectAttr('%s.visibility' % camera_name, '%s.visibility' % image_plane)
+        mc.connectAttr('%s.visibility' % camera_name, '%s.visibility' % image_plane[0])
 
-    def import_cam_seq(self, shot):
+    def import_cam_seq(self, shot_simple):
         """
         선택한 샷에 소속된 언디스토션 시퀀스를 찾고(kit.get_undistort_img)
         샷에 소속된 카메라 output file도 찾아서(kit.get_camera)
         모두 import한 뒤(load_output), 언디스토션 시퀀스를 카메라와 연결시키는(connect_image) 매서드
 
         Args:
-            shot(dict): 선택한 테스크가 속한 시퀀스 아래의 샷들 중 import하길 원하는 샷
+            shot_simple(dict): 선택한 테스크가 속한 시퀀스 아래의 샷들 중 import하길 원하는 샷
+                                { episode_id': None',
+                                  episode_name': None,
+                                  nb_occurences': 1,
+                                  preview_file_id': None,
+                                  sequence_name': '',
+                                  shot_id':'',
+                                  shot_name': '' }
         """
+        shot = gazu.shot.get_shot(shot_simple['shot_id'])
         undi_seq_path = self.kit.get_undistortion_img(shot)
         camera_path = self.kit.get_camera(shot)
-        print('B', undi_seq_path)
-        print('C', camera_path)
         self._load_output(undi_seq_path)
         self._load_output(camera_path)
         self._connect_image(undi_seq_path, camera_path)
@@ -126,14 +136,15 @@ class MayaThings:
         all_cast_list = gazu.casting.get_asset_casting(asset)
 
         for casting in all_cast_list:
-            file_dict_list.append(self.kit.get_kitsu_path(casting))
-        if num_list is [0]:
+            output_path_nb_dict = self.kit.get_kitsu_path(casting)
+            if output_path_nb_dict:
+                file_dict_list.append(output_path_nb_dict)
+        if num_list is ['All']:
             # 캐스팅된 것들의 전체 선택인 경우
             num_list = range(len(all_cast_list))
         for index in num_list:
-            asset_output_list = file_dict_list[index]
-            for item in asset_output_list:
-                self._load_output(item['path'], item)
+            asset_output = file_dict_list[index]
+            self._load_output(asset_output['path'], asset_output)
 
     def save_scene_file(self, path, representation):
         """

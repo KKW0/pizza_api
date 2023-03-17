@@ -174,14 +174,13 @@ class Table(QTableView):
         self.horizontal_header.setStretchLastSection(True)
 
 
-
 class Table2(QtWidgets.QTableView):
     """
     asset 선택하는 TableView
     """
     def __init__(self, data=None):
         super(Table2, self).__init__()
-
+        self.pizza = None
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(10)
@@ -213,15 +212,23 @@ class Table2(QtWidgets.QTableView):
         테이블 데이터를 설정합니다.
         """
         model = QtGui.QStandardItemModel()
-
         model.setHorizontalHeaderLabels(['A', 'B', 'C'])
         for row in data:
             items = [QtGui.QStandardItem(str(item)) for item in row]
             model.appendRow(items)
+            # if items[0] == None:
+            #     # 클릭 안되되 되되싶다..
 
         self.setModel(model)
         self.resizeColumnsToContents()
         self.horizontal_header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
+
+    def mousePressEvent(self, event):
+        index = self.indexAt(event.pos())
+        if index.row() == 0:
+            event.ignore()
+        else:
+            super(Table2, self).mousePressEvent(event)
 
 
 class Table3(QtWidgets.QTableView):

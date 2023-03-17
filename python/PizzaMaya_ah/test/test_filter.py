@@ -12,10 +12,13 @@ class TestFilter(TestCase):
         # 테스트용 클래스변수 정의
         self.project = gazu.project.get_project_by_name('Project1')
         self.asset = gazu.asset.get_asset_by_name(self.project, 'lecture')
+        pp.pprint(self.asset)
         self.user = gazu.person.get_person_by_full_name('ahyeon jo')
         self.task_status = gazu.task.get_task_status_by_name('Todo')
         self.task_type = gazu.task.get_task_type_by_name('LayoutPizza')
         self.task = gazu.task.get_task_by_entity(self.asset, self.task_type)
+        vv = gazu.casting.get_asset_cast_in(self.task['entity_id'])
+        pp.pprint(vv)
         self.comment = 'Unit Test'
         # gazu.task.add_comment(self.task, self.task_status, self.comment)
         self.comment_dict = gazu.task.get_last_comment_for_task(self.task)
@@ -31,6 +34,7 @@ class TestFilter(TestCase):
         self.shot1 = gazu.shot.get_shot_by_name(self.seq1, 'sh1')
         self.shot2 = gazu.shot.get_shot_by_name(self.seq1, 'sh2')
         self.shot3 = gazu.shot.get_shot_by_name(self.seq1, 'sh3')
+        pp.pprint(self.shot1)
         # mb = gazu.files.new_output_type('MayaBinary', 'mb')
         # ma = gazu.files.new_output_type('MayaAskii', 'ma')
         # gazu.files.new_output_type('UndistortionJpg', 'jpg')

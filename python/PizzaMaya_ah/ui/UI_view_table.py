@@ -55,7 +55,8 @@ class HorizontalHeader(QtWidgets.QHeaderView):
 
     def sortIndicatorChanged(self, logicalIndex, order):
         """
-        
+        헤더인덱스의 변경사항에 따라 테이블의 정보를 변경하는 메서드
+        이 메서드는 헤더뷰의 서브클래스이다.
         """
         if logicalIndex == 2:
             self.seq_index = 0
@@ -68,7 +69,10 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         super(HorizontalHeader, self).sortIndicatorChanged(logicalIndex, order)
 
     def showEvent(self, event):
-
+        """
+        생성한 콤보박스를 보여주는 메서드
+        ft.collect_info_task 이 함수를 통해 콤보박스의 요소를 불러온다.
+        """
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(10)
@@ -98,6 +102,10 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         super(HorizontalHeader, self).showEvent(event)
 
     def combobox_changed1(self, option):
+        """
+            콤보박스1의 선택사항이 달려졌음을 알려주는 메서드
+            그에따라 프록시모델로 테이블뷰1의 내용을 변경한다.
+        """
         self.proxy_model = QtCore.QSortFilterProxyModel()
         self.proxy_model.setSourceModel(self.model)
         if option != 'Project':
@@ -118,6 +126,10 @@ class HorizontalHeader(QtWidgets.QHeaderView):
             self.combo2.setDisabled(True)
 
     def combobox_changed2(self, option2):
+        """
+        콤보박스2의 선택사항이 달려졌음을 알려주는 메서드
+        그에따라 프록시모델2로 테이블뷰1의 내용을 변경한다.
+        """
         if self.combo.currentIndex != 0:
             if option2 != 'Sequence':
                 self.seq_index = self.combo2.currentIndex()
@@ -133,9 +145,12 @@ class HorizontalHeader(QtWidgets.QHeaderView):
 
 class Table(QTableView):
     """
-    task 선택하는 TableView
+    프로젝트와 시퀀스 분류에 따라 task를 선택하는 TableView
     """
     def __init__(self):
+        """
+        헤더와 스타일을 설정한다.
+        """
         QTableView.__init__(self)
 
         self.setSortingEnabled(True)
@@ -170,9 +185,13 @@ class Table(QTableView):
 
 class Table2(QtWidgets.QTableView):
     """
-    asset 선택하는 TableView
+    테스크가 주어진 레이아웃어셋에 캐스팅된 asset 중 작업파일에 임포트 할 asset을 선택하는 TableView
     """
     def __init__(self, data=None):
+        """
+        헤더와 스타일을 설정한다.
+        데이터를 설정해준다.
+        """
         super(Table2, self).__init__()
         self.pizza = None
         font = QtGui.QFont()
@@ -212,7 +231,8 @@ class Table2(QtWidgets.QTableView):
 
     def set_data(self, data):
         """
-        테이블 데이터를 설정합니다.
+        테이블 데이터를 설정하는 메서드.
+        아규먼드 데이터를 UI컨트롤러에서 받아온다. 테이블뷰의 데이터를 모델로서 설정해준다.
         """
         model = QtGui.QStandardItemModel()
         model.setHorizontalHeaderLabels(['A', 'B', 'C'])
@@ -227,9 +247,13 @@ class Table2(QtWidgets.QTableView):
 
 class Table3(QtWidgets.QTableView):
     """
-    asset 선택하는 TableView
+    샷(언디스토션 이미지, 카메라)을 선택하는 TableView
     """
     def __init__(self, data=None):
+        """
+        헤더와 스타일을 설정한다.
+        데이터를 설정해준다.
+        """
         super(Table3, self).__init__()
 
         font = QtGui.QFont()
@@ -266,6 +290,7 @@ class Table3(QtWidgets.QTableView):
     def set_data(self, data):
         """
         테이블 데이터를 설정합니다.
+        아규먼드 데이터를 UI컨트롤러에서 받아온다. 테이블뷰의 데이터를 모델로서 설정해준다.
         """
         model = QtGui.QStandardItemModel()
         model.setHorizontalHeaderLabels(['A'])

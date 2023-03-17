@@ -27,7 +27,15 @@ from PySide2.QtCore import Qt
 
 
 class MainWindow(QMainWindow):
+    """
+    프로그램의 메인윈도우를 정의하는 클래스이다.
+    """
     def __init__(self, values=None, parent=None, size_policy=None):
+        """
+        변수를 정의하고 인스턴스를 생성하며 메인윈도우에 필요한 기능을 버튼과 연결해준다.
+        테이블 뷰 생성 후 모델을 추가한다.
+        프로그램 시작 시 auto login이 체크되어 있는지 확인하며, 체크되어 있으면 바로 main window 띄어준다.
+        """
         super(MainWindow, self).__init__()
 
         # 현재 작업 디렉토리 경로를 가져옴
@@ -139,6 +147,9 @@ class MainWindow(QMainWindow):
         QPixmapCache.setCacheLimit(500*1024)
 
     def selection_changed(self, selected, deselected):
+        """
+        사용자가 선택한 어셋의 인덱스 번호를 수집하는 메서드
+        """
         selection_model = self.table2.selectionModel()
         selected_rows = selection_model.selectedRows()
         selected_indexes = selection_model.selectedIndexes()
@@ -156,6 +167,9 @@ class MainWindow(QMainWindow):
     # save 또는 load 버튼 누르면 save 또는 load 윈도우를 호출
 
     def save_button(self):
+        """
+        선택한 테스크에 대한 작업내용을 퍼블리시하는 버튼을 생성하는 메서드
+        """
         # self.ui.hide()  ##### 메인 윈도우를 숨길 필요 있는지? 그냥 겹쳐서 띄우면 안되나 exec로
         if self.my_task == None:
             QMessageBox.warning(self, 'Error', '퍼블리시할 테스크를 먼저 선택해주세요.', QMessageBox.Ok)
@@ -172,6 +186,9 @@ class MainWindow(QMainWindow):
             self.save.my_task = self.my_task
 
     def load_button(self):
+        """
+        선택한 어셋과 카메라와 언디스토션 이미지를 현재작업 영역에 임포트하는 메서드
+        """
         if not self.my_task:
             return
         else:
@@ -211,6 +228,10 @@ class MainWindow(QMainWindow):
     # 로그아웃 버튼 클릭 시 Kitsu에서 로그아웃을 하고, 메인 윈도우 hide한 뒤 로그인 윈도우 띄움
 
     def login_button(self):
+        """
+        자동로그인이 선택되지 않았을 시에 로그인에 대한 뷰가 띄어졌을 경우에 해당 뷰에 동작을 관할하는 메서드
+        사용자가 호스트 박스,ID박스,PW박스에 입력한 정보를 기반으로 키츄에 로그인한다.
+        """
         host_box = self.login_window.ui.Host_Box
         id_box = self.login_window.ui.ID_Box
         pw_box = self.login_window.ui.PW_Box
@@ -229,6 +250,9 @@ class MainWindow(QMainWindow):
             self.table1_model.layoutChanged.emit()
 
     def logout_button(self):
+        """
+        키츄에서 로그아웃하고 메인윈도를 닫은 뒤 로그인 윈도우를 띄운다.
+        """
         self.login.log_out()
         self.ui.hide()
         self.login_window.ui.show()
@@ -237,6 +261,10 @@ class MainWindow(QMainWindow):
     # TableView의 항목을 클릭하면 항목의 정보를 프린트 해줌
 
     def table_clicked(self, event):
+        """
+        테스크 목록이 띄워져있는 테이블뷰를 클릭하였을 때 동작하는 메서드
+        선택한 테스크에 기반하여 파일 임포트 할 때와 테이블뷰2, 테이블뷰3에 필요한 정보를 받아온다.
+        """
         self.task_clicked_index = event.row()
         self.my_task, task_info, self.casting_info_list, \
             self.undi_info_list, self.camera_info_list = self.ft.select_task(self.horizontal_header.proj_index,
@@ -263,6 +291,10 @@ class MainWindow(QMainWindow):
         self.table3_model.layoutChanged.emit()
 
     def table_clicked2(self, event):
+        """
+        어셋 목록이 띄워져있는 테이블뷰를 클릭하였을 때 동작하는 메서드
+        선택한 어셋에 기반하여 정보를 받아오고 그 정보를 크게 띄운다.
+        """
         clicked_cast = self.casting_info_list[event.row()]
         png = bytes(self.asset_thumbnail_list[event.row()])
 
@@ -277,6 +309,10 @@ class MainWindow(QMainWindow):
         self.ui.InfoTextBox.appendPlainText('Newest or Not: Not')  # 모든 아웃풋 파일들이 전부 최신 리비전이면 YES로 표기
 
     def table_clicked3(self, event):
+        """
+        샷 목록이 띄워져있는 테이블뷰를 클릭하였을 때 동작하는 메서드
+        선택한 샷에 기반하여 정보를 받아오고 그 정보를 크게 띄운다.
+        """
         clicked_undi = self.undi_info_list[event.row()][0]
         clicked_cam = self.camera_info_list[event.row()][0]
         png = bytes(self.undi_thumbnail_list[event.row()])
@@ -315,12 +351,8 @@ class MainWindow(QMainWindow):
 
     def read_data(self):
         """
-        task 선택하는 TableView의 데이터
-
+        task 선택하는 TableView의 데이터를 받아오는 메서드
         filter의 선택에 따라 정보가 바뀐다.
-
-        Returns:
-
         """
         ft = Filter()
         self.task, task_info, _, _, _ = ft.select_task()
@@ -333,12 +365,8 @@ class MainWindow(QMainWindow):
 
     def read_data2(self):
         """
-        asset, camera, undi_img 선택하는 TableView의 데이터
-
+        asset 선택하는 TableView의 데이터를 받아오는 메서드
         task 선택 후 data가 생성된다.
-
-        Returns:
-
         """
         # 썸네일을 얻기 위해 받아와야 하는 정보
         data = []
@@ -354,6 +382,10 @@ class MainWindow(QMainWindow):
             return data
 
     def read_data3(self):
+        """
+        샷 선택하는 TableView의 데이터를 받아오는 메서드
+        task 선택 후 data가 생성된다.
+        """
         data = []
         if self.my_task is not None:
             # 샷 목록 추가

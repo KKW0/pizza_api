@@ -112,8 +112,6 @@ class CustomTableModel2(QAbstractTableModel):
 
         return False
 
-    def flags(self, index):
-        return Qt.ItemIsEditable | Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
 class CustomTableModel3(QAbstractTableModel):
     """
@@ -158,7 +156,6 @@ class CustomTableModel3(QAbstractTableModel):
                 pixmap.loadFromData(self.input_data[row][0])
                 pixmap_width = 100
                 scaled_width = min(pixmap.width(), pixmap_width)
-                # scaled_height = int(pixmap.height() * (scaled_width / pixmap.width()))
                 pixmap_image = pixmap.scaledToWidth(scaled_width)
                 return pixmap_image
 
@@ -174,6 +171,3 @@ class CustomTableModel3(QAbstractTableModel):
             return True
 
         return False
-
-    def flags(self, index):
-        return Qt.ItemIsEditable | Qt.ItemIsEnabled | Qt.ItemIsSelectable

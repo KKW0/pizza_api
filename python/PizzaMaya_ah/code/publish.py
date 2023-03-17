@@ -114,6 +114,9 @@ class PublishThings:
 
         Args:
             path(str): 파일명을 제외한 폴더 경로
+
+        Raises:
+            SystemError: 폴더가 이미 존재하여 새로 생성할 수 없는 경우
         """
 
         if os.path.exists(path) is False:
@@ -136,7 +139,12 @@ class PublishThings:
             task(dict): 선택한 task의 딕셔너리
             path(str): working file 또는 main preview file의 확장자를 제외한 path
             file_type(dict): 업로드할 working file의 딕셔너리. preview를 업로드할 경우 사용하지 않는다.
+            comment(str): 업로드할 working file에 추가할 comment
+
+        Raises:
+            ValueError: 적절한 경로를 입력하지 않은 경우
         """
+        full_path = None
         if file_type and 'working' in path:
             # working file 업로드
             soft = gazu.files.get_software(file_type['software_id'])
@@ -147,10 +155,14 @@ class PublishThings:
             comment = gazu.task.add_comment(task, self._task_status, comment)
             filenames = os.listdir(os.path.dirname(path))
             for filename in filenames:
+                # mov 파일이 저장할 경로에 이미 있는지 판별
                 if '.mov' in filename:
+                    # 이미 있으면 full_path 끝의 이름을 기존 이름과 같도록 변경함
                     full_path = os.path.dirname(path) + '/' + filename
+                else:
+                    full_path = path + '.mov'
             if gazu.files.get_all_preview_files_for_task(task):
-                # preview가 이미 존재하면 add
+                # preview가 이미 존재하면 add 후 upload
                 preview = gazu.task.add_preview(task, comment, full_path)
             else:
                 # preview가 존재하지 않으면 생성 후 upload
@@ -162,9 +174,9 @@ class PublishThings:
 
     def save_publish_real_data(self, task, comment=None):
         """
-        build된 패스(publish_file_data)에 맞추어 실제 폴더를 만든 뒤(make_folder_tree)
+        build된 패스(_publish_file_data)에 맞추어 실제 폴더를 만든 뒤(_make_folder_tree)
         working, output 파일을 저장하고(maya.save_scene_file, maya.export_output_file),
-        Kitsu에 working file과 main preview를 업로드하는(upload_files) 매서드
+        Kitsu에 working file과 main preview를 업로드하는(_upload_files) 매서드
 
         Args:
             task(dict): 선택한 task의 딕셔너리
@@ -190,17 +202,18 @@ class PublishThings:
 
     def save_publish_previews(self, shot_list, custom_camera_list, comment=None):
         """
-        각 샷에 해당하는 레이아웃의 preview file과 mb 파일을 저장하고 업로드하는 매서드
+        각 샷에 해당하는 레이아웃의 preview file과 mb 파일을 저장하고 퍼블리시하는 매서드
 
-        먼저 프리뷰 파일이 저장된 path를 build하고, shot에는 Layout의 Preview 올리기 용도의 task만 있고
-        output이나 working file이 존재하지 않기 때문에 폴더 path의 revision을 직접 업데이트한다.
+        먼저 프리뷰 파일이 저장된 path를 build한다.
+        shot에는 Layout의 Preview 올리기 용도의 task만 있고, output이나 working file이 존재하지 않기 때문에
+        폴더 path의 revision을 직접 업데이트한다.
         그 다음 해당 폴더에 각 샷에 대한 preview를 저장한다.(maya.export_shot_previews)
         마지막으로 저장된 preview file들을 각각의 샷에 맞게 Kitsu에 퍼블리시, 업로드해준다.
 
         Args:
             shot_list(list): 에셋이 캐스팅된 시퀀스 아래에 있는 모든 샷 딕셔너리들의 집합
-            custom_camera_list
-            comment
+            custom_camera_list(list): 현재 작업중인 마야 씬에 존재하는 카메라의 집합
+            comment(str): 퍼블리시할 때 사용할 comment
         """
         revision = 0
         task_type = gazu.task.get_task_type_by_name('Layout')

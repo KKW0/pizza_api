@@ -216,15 +216,11 @@ class MainWindow(QMainWindow):
         """
         # self.ui.hide()  ##### 메인 윈도우를 숨길 필요 있는지? 그냥 겹쳐서 띄우면 안되나 exec로
         if self.my_task == None:
-            QMessageBox.warning(self, 'Error', '퍼블리시할 테스크를 먼저 선택해주세요.', QMessageBox.Ok)
-            QMessageBox.setGeometry(
-                QtWidgets.QStyle.alignedRect(
-                    QtCore.Qt.LeftToRight,
-                    QtCore.Qt.AlignCenter,
-                    QMessageBox.size(),
-                    QtGui.QGuiApplication.primaryScreen().availableGeometry(),
-                ),
-            )
+            msg = QMessageBox()
+            msg.setText("⚠ 퍼블리시할 테스크를 먼저 선택해주세요.")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.setWindowTitle("Error")
+            msg.exec_()
         else:
             self.save.ui.show()
             self.save.my_task = self.my_task
@@ -236,6 +232,14 @@ class MainWindow(QMainWindow):
         if not self.my_task:
             return
         else:
+            load_ask = QMessageBox()
+            load_ask.setText("⚠ 퍼블리시할 테스크를 먼저 선택해주세요.")
+            load_ask.setStandardButtons(QMessageBox.Ok)
+            load_ask.setWindowTitle("Error")
+            load_ask.exec_()
+
+
+
             load_ask = QMessageBox()
             reply = load_ask.question(self, 'Confirmation', '{0}개의 에셋과 {1}개의 샷을 로드하시겠습니까?' \
                                       .format(len(self.selected_index_list), (len(self.my_shot_index_list))),

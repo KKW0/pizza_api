@@ -5,7 +5,7 @@ from PySide2.QtCore import Qt
 from PySide2.QtGui import QFont
 from PySide2.QtWidgets import QTableView, QHeaderView
 
-from PizzaMaya_ah.code.filter import Filter
+from PizzaMaya.code.filter import Filter
 
 
 class HorizontalHeader(QtWidgets.QHeaderView):

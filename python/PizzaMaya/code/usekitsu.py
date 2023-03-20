@@ -114,6 +114,6 @@ class KitsuThings:
             return file_dict
         else:
             # 아웃풋 파일이 없을 경우 오류 메세지를 출력한다.
-            print('* No Output! Asset Name: {0}'.format(asset['name']))
+            print('asset에 아웃풋 파일이 존재하지 않습니다. Asset Name: {0}'.format(asset['name']))
 
             return file_dict

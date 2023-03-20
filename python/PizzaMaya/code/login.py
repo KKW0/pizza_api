@@ -212,15 +212,15 @@ class LogIn(object):
         """
         user.json 파일에서 인증 설정을 load하고 필요한 경우 호스트에 연결합니다.
 
-        Raises:
-            ValueError : 호스트 URL 또는 사용자 ID 및 암호가 잘못된 경우
-            SystemError : 로그인할 호스트가 연결되어 있지 않은 경우
-            OSError : OS 오류로 인해 user.json 파일을 열 수 없는 경우
+        Returns:
+
         """
         user_dict = {}
         if os.path.exists(self.user_path):
             with open(self.user_path, 'r') as json_file:
                 user_dict = json.load(json_file)
+        else:
+            self.access_setting()
 
         return user_dict
 
@@ -228,8 +228,8 @@ class LogIn(object):
         """
         현재 인증 설정을 user.json 파일에 저장합니다.
 
-        Raises:
-            OSError : OS 오류로 인해 user.json 파일을 쓸 수 없는 경우
+        Returns:
+
         """
         user_dict = {
             'host': self.host,

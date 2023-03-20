@@ -105,7 +105,8 @@ class Filter:
         output_dict = dict()
         output_dict['output_type_name'] = output_type['name']
         if len(output_list) is 0:
-            raise ValueError("해당하는 output file이 존재하지 않습니다. Seq:{0}, Shot:{1}".format(shot['sequence_name'], shot['shot_name']))
+            raise ValueError(
+                "shot에 output file이 존재하지 않습니다. Seq:{0}, Shot:{1}".format(shot['sequence_name'], shot['shot_name']))
         for output in output_list:
             shot = gazu.shot.get_shot(output['entity_id'])
             output_dict['frame_range'] = shot['nb_frames']

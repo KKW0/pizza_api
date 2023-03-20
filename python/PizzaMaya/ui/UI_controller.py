@@ -5,20 +5,20 @@ import sys
 import gazu
 import pprint as pp
 
-from PizzaMaya_ah.code.login import LogIn
-from PizzaMaya_ah.code.filter import Filter
-from PizzaMaya_ah.code.usemaya import MayaThings
-from PizzaMaya_ah.code.thumbnail import thumbnail_control
+from PizzaMaya.code.login import LogIn
+from PizzaMaya.code.filter import Filter
+from PizzaMaya.code.usemaya import MayaThings
+from PizzaMaya.code.thumbnail import thumbnail_control
 
-from PizzaMaya_ah.ui.UI_view_publish import Save
-from PizzaMaya_ah.ui.UI_view_table import Table
-from PizzaMaya_ah.ui.UI_view_table import Table2
-from PizzaMaya_ah.ui.UI_view_table import Table3
-from PizzaMaya_ah.ui.UI_view_table import HorizontalHeader
-from PizzaMaya_ah.ui.UI_view_login import LoginWindow
-from PizzaMaya_ah.ui.UI_model import CustomTableModel
-from PizzaMaya_ah.ui.UI_model import CustomTableModel2
-from PizzaMaya_ah.ui.UI_model import CustomTableModel3
+from PizzaMaya.ui.UI_view_publish import Save
+from PizzaMaya.ui.UI_view_table import Table
+from PizzaMaya.ui.UI_view_table import Table2
+from PizzaMaya.ui.UI_view_table import Table3
+from PizzaMaya.ui.UI_view_table import HorizontalHeader
+from PizzaMaya.ui.UI_view_login import LoginWindow
+from PizzaMaya.ui.UI_model import CustomTableModel
+from PizzaMaya.ui.UI_model import CustomTableModel2
+from PizzaMaya.ui.UI_model import CustomTableModel3
 
 from PySide2 import QtWidgets, QtCore, QtUiTools, QtGui
 from PySide2.QtWidgets import QMainWindow, QMessageBox
@@ -100,6 +100,28 @@ class MainWindow(QMainWindow):
         self.table3_model = CustomTableModel3()
         self.table3.setModel(self.table3_model)
 
+        # ----------------------------------------------------------------------------------------------
+
+        # Login 버튼, Logout 버튼 연결
+        self.login_window.ui.Login_Button.clicked.connect(self.login_button)
+        self.ui.Logout_Button.clicked.connect(self.logout_button)
+
+        # TableView 3개 연결
+        self.table.clicked.connect(self.table_clicked)
+        self.table2.clicked.connect(self.table_clicked2)
+        self.table3.clicked.connect(self.table_clicked3)
+
+        # table2에 에셋 여러개 선택 가능하게 설정
+        self.table2.selectionModel().selectionChanged.connect(self.selection_changed)
+        QPixmapCache.setCacheLimit(500*1024)
+
+        # Save 클릭시 Save ui로 전환, Load 클릭시 로드됨
+        self.ui.Save_Button.clicked.connect(self.save_button)
+        self.ui.Load_Button.clicked.connect(self.load_button)
+        self.save = Save()
+
+        # ----------------------------------------------------------------------------------------------
+
         # 프로그램 시작 시 auto login이 체크되어 있는지 확인하며, 체크되어 있으면 바로 main window 띄움
         self.login_window = LoginWindow()
         self.login = LogIn()
@@ -122,29 +144,6 @@ class MainWindow(QMainWindow):
 
         self.ft = Filter()
         self.ma = MayaThings()
-
-        # ----------------------------------------------------------------------------------------------
-
-        # Login 버튼, Logout 버튼 연결
-        self.login_window.ui.Login_Button.clicked.connect(self.login_button)
-        self.ui.Logout_Button.clicked.connect(self.logout_button)
-        # Login 버튼, Logout 버튼 연결
-        self.login_window.ui.Login_Button.clicked.connect(self.login_button)
-        self.ui.Logout_Button.clicked.connect(self.logout_button)
-
-        # TableView 3개 연결
-        self.table.clicked.connect(self.table_clicked)
-        self.table2.clicked.connect(self.table_clicked2)
-        self.table3.clicked.connect(self.table_clicked3)
-
-        # Save 클릭시 Save ui로 전환, Load 클릭시 로드됨
-        self.ui.Save_Button.clicked.connect(self.save_button)
-        self.ui.Load_Button.clicked.connect(self.load_button)
-        self.save = Save()
-
-        # 에셋 여러개 선택
-        self.table2.selectionModel().selectionChanged.connect(self.selection_changed)
-        QPixmapCache.setCacheLimit(500*1024)
 
     def selection_changed(self, selected, deselected):
         """
@@ -298,8 +297,10 @@ class MainWindow(QMainWindow):
         clicked_cast = self.casting_info_list[event.row()]
         png = bytes(self.asset_thumbnail_list[event.row()])
 
+        self.preview_pixmap = QPixmap()
+        self.preview_pixmap.loadFromData(png)
         label = self.ui.Preview
-        label.setPixmap(pixmap.scaled(label.size(), Qt.KeepAspectRatio))
+        label.setPixmap(self.preview_pixmap.scaled(label.size(), Qt.KeepAspectRatio))
 
         self.ui.InfoTextBox.setPlainText('Asset Name: {}'.format(clicked_cast['asset_name'] + '\n'))
         self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(clicked_cast['description']))
@@ -320,7 +321,7 @@ class MainWindow(QMainWindow):
         self.preview_pixmap = QPixmap()
         self.preview_pixmap.loadFromData(png)
         label = self.ui.Preview
-        label.setPixmap(pixmap.scaled(label.size(), Qt.KeepAspectRatio))
+        label.setPixmap(self.preview_pixmap.scaled(label.size(), Qt.KeepAspectRatio))
 
         # self.preview_pixmap = QPixmap()
         # self.preview_pixmap.loadFromData(png)

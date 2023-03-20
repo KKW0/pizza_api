@@ -5,8 +5,8 @@ import sys
 import gazu
 import maya.cmds as mc
 
-from PizzaMaya_ah.code.filter import Filter
-from PizzaMaya_ah.code.publish import PublishThings
+from PizzaMaya.code.filter import Filter
+from PizzaMaya.code.publish import PublishThings
 
 from PySide2 import QtWidgets, QtCore, QtUiTools, QtGui
 

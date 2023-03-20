@@ -1,7 +1,7 @@
 #coding:utf-8
 name = 'Pizza'
 
-version = '1.0.1'
+version = '1.1.1'
 
 description = \
     """
@@ -10,7 +10,7 @@ description = \
 
 authors = ['Kyoungwook Kang', 'Jeongtae Park', 'Boreum Lee', 'Euimin Lee', 'Ahyeon Jo']
 
-requires = ['gazu']
+requires = ['gazu', 'maya2020']
 
 variants = [['platform-linux', 'python-2.7']]
 

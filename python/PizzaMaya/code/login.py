@@ -200,11 +200,11 @@ class LogIn(object):
             except OSError:
                 raise ValueError("에러 메시지 : 디렉터리를 만들지 못했습니다.")
 
-        try:
-            if not os.path.exists(self.user_path):
+        if not os.path.exists(self.user_path):
+            try:
                 self.reset_setting()
-        except OSError:
-            raise ValueError("에러 메시지 : user.json 파일을 생성하지 못했습니다.")
+            except OSError:
+                raise ValueError("에러 메시지 : user.json 파일을 생성하지 못했습니다.")
 
         return True
 
@@ -221,6 +221,8 @@ class LogIn(object):
                 user_dict = json.load(json_file)
         else:
             self.access_setting()
+            with open(self.user_path, 'r') as json_file:
+                user_dict = json.load(json_file)
 
         return user_dict
 

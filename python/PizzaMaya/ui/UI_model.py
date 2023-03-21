@@ -8,8 +8,10 @@ class CustomTableModel(QAbstractTableModel):
     """
     task 선택하는 TableView의 모델
     """
-    def __init__(self, table_data=[]):
+    def __init__(self, table_data=None):
         QAbstractTableModel.__init__(self)
+        if table_data is None:
+            table_data = []
         self.row_count = None
         self.input_data = None
         self.column_count = None
@@ -18,10 +20,7 @@ class CustomTableModel(QAbstractTableModel):
     def load_data(self, data):
         self.column_count = 3
         self.input_data = data
-        if data == None:
-            self.row_count = 3
-        else:
-            self.row_count = len(data)
+        self.row_count = len(data)
 
     def rowCount(self, parent=QModelIndex()):
         return self.row_count
@@ -57,8 +56,10 @@ class CustomTableModel2(QAbstractTableModel):
     """
     asset, camera, undi_img 선택하는 TableView의 모델
     """
-    def __init__(self, table_data=[]):
+    def __init__(self, table_data=None):
         QAbstractTableModel.__init__(self)
+        if table_data is None:
+            table_data = []
         self.row_count = None
         self.input_data = None
         self.column_count = None
@@ -117,8 +118,10 @@ class CustomTableModel3(QAbstractTableModel):
     """
     asset, camera, undi_img 선택하는 TableView의 모델
     """
-    def __init__(self, table_data=[]):
+    def __init__(self, table_data=None):
         QAbstractTableModel.__init__(self)
+        if table_data is None:
+            table_data = []
         self.row_count = None
         self.input_data = None
         self.column_count = None

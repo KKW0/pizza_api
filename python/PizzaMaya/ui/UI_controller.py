@@ -2,9 +2,9 @@
 
 import os
 import sys
+
 import gazu
 import pprint as pp
-import maya.cmds as mc
 
 from PizzaMaya.code.login import LogIn
 from PizzaMaya.code.filter import Filter
@@ -16,12 +16,8 @@ from PizzaMaya.ui.UI_view_publish import Save
 from PizzaMaya.ui.UI_view_login import LoginWindow
 from PizzaMaya.ui.UI_view_table import Table
 from PizzaMaya.ui.UI_view_table import Table2
-from PizzaMaya.ui.UI_view_table import Table3
 from PizzaMaya.ui.UI_view_table import HorizontalHeader
 from PizzaMaya.ui.UI_model import CustomTableModel
-from PizzaMaya.ui.UI_model import CustomTableModel2
-from PizzaMaya.ui.UI_model import CustomTableModel3
-
 
 from PySide2 import QtWidgets, QtCore, QtUiTools, QtGui
 from PySide2.QtWidgets import QMainWindow, QMessageBox
@@ -81,7 +77,6 @@ class MainWindow(QMainWindow):
                 QtGui.QGuiApplication.primaryScreen().availableGeometry(),
             ),
         )
-
         # 메인 윈도우의 레이아웃에 TableView 3개 추가
         self.table = Table()
         self.table.setSelectionMode(QtWidgets.QTableView.SingleSelection)
@@ -92,18 +87,24 @@ class MainWindow(QMainWindow):
         self.table2 = Table2()
         self.ui.verticalLayout.addWidget(self.table2, 0)
 
-        self.table3 = Table3()
+        self.table3 = Table2()
         self.table3.setSelectionMode(QtWidgets.QTableView.SingleSelection)
         self.ui.verticalLayout3.addWidget(self.table3, 0)
 
         # TableView에 모델 설정
         self.table1_model = CustomTableModel()
+        self.table1_model.column_count = 3
+        self.table1_model.header_data = ["Project", "Seq", "DueDate"]
         self.table.setModel(self.table1_model)
 
-        self.table2_model = CustomTableModel2()
+        self.table2_model = CustomTableModel()
+        self.table2_model.column_count = 3
+        self.table2_model.header_data = ["Thumbnail", "Name", "Type"]
         self.table2.setModel(self.table2_model)
 
-        self.table3_model = CustomTableModel3()
+        self.table3_model = CustomTableModel()
+        self.table3_model.column_count = 2
+        self.table3_model.header_data = ["Thumbnail", "Select Shot to Load Camera"]
         self.table3.setModel(self.table3_model)
 
         # ----------------------------------------------------------------------------------------------
@@ -187,7 +188,6 @@ class MainWindow(QMainWindow):
             self.ma = MayaThings()
             self.pub = PublishThings()
 
-
             # table1에 데이터 로드
             self.table1_model.load_data(self.read_data())
             self.table1_model.layoutChanged.emit()
@@ -219,25 +219,7 @@ class MainWindow(QMainWindow):
         이때 사용하는 my task 변수는 UI컨트롤러에서 정보를 받아온다.
         """
         comment = self.save.ui.Save_Path_View_2.toPlainText()
-        shot_dict_list = []
-        startup_cameras = []
-        all_cameras = mc.ls(type='camera', l=True)
-        for camera in all_cameras:
-            if mc.camera(mc.listRelatives(camera, parent=True)[0], startupCamera=True, q=True):
-                startup_cameras.append(camera)
-        custom_camera = list(set(all_cameras) - set(startup_cameras))
-
-        if custom_camera:
-            for cam_name in custom_camera:
-                cam_name_parts1 = cam_name.split("|")
-                cam_name_parts2 = cam_name_parts1[1].split("_")
-                proj_name = (cam_name_parts2[0]).title()
-                proj = gazu.project.get_project_by_name(proj_name)
-                seq_name = cam_name_parts2[1] + '_' + cam_name_parts2[2]  #### seq_1 형태라..
-                seq = gazu.shot.get_sequence_by_name(proj, seq_name)
-                shot = gazu.shot.get_shot_by_name(seq, cam_name_parts2[-1])
-                shot_dict_list.append(shot)
-
+        shot_dict_list, custom_camera, _ = self.ma.get_working_task()
         self.pub.save_publish_real_data(self.my_task, comment)
         self.pub.save_publish_previews(shot_dict_list, custom_camera, comment)
         self.ui.hide()  # 메인 윈도우 숨김
@@ -263,15 +245,21 @@ class MainWindow(QMainWindow):
         """
         선택한 테스크에 대한 작업내용을 퍼블리시하는 버튼 클릭 시 save ui를 띄우고, my_task의 정보를 넘긴다.
         """
-        if self.my_task == None:
+        shot_dict_list, custom_camera, all_assets = self.ma.get_working_task()
+
+        if self.my_task == None and len(custom_camera) == 0 and all_assets == 0:
             warning = QMessageBox()
-            warning.setText("⚠ 퍼블리시할 테스크를 먼저 선택해주세요.")
+            warning.setText("⚠ 비어있는 씬은 퍼블리시할 수 없습니다.")
             warning.setStandardButtons(QMessageBox.Ok)
             warning.setWindowTitle("Error")
             warning.exec_()
-        else:
+
+        elif self.my_task == None:
+            shot_dict_list[0]
+
+
+
             self.save.ui.show()
-            self.save.my_task = self.my_task
 
     def load_button(self):
         """
@@ -344,16 +332,16 @@ class MainWindow(QMainWindow):
         self.preview_pixmap.loadFromData(png)
         label = self.ui.Preview
         label.setPixmap(self.preview_pixmap.scaled(label.size(), Qt.KeepAspectRatio))
-
         self.ui.InfoTextBox.setPlainText('Project Name: {}'.format(task_info['project_name'] + '\n'))
         self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(task_info['description']))
         self.ui.InfoTextBox.appendPlainText('Due Date: {0}'.format(task_info['due_date']))
-        self.ui.InfoTextBox.appendPlainText('Comment: {0}'.format(str(task_info['last_comment']['text'])))
+        self.ui.InfoTextBox.appendPlainText(
+            'Comment: {0}'.format(str(task_info['last_comment']['text']).encode('utf-8', errors='ignore')))
 
-        self.table2_model.load_data2(self.read_data2())
+        self.table2_model.load_data(self.read_data2())
         self.table2_model.layoutChanged.emit()
 
-        self.table3_model.load_data3(self.read_data3())
+        self.table3_model.load_data(self.read_data3())
         self.table3_model.layoutChanged.emit()
 
     def table_clicked2(self, event):

@@ -1,6 +1,6 @@
 #coding:utf8
 import os
-import pprint
+import pprint as pp
 
 import gazu
 from usemaya import MayaThings
@@ -18,7 +18,7 @@ class PublishThings:
         self._task_status = gazu.task.get_task_status_by_name('Todo')
         self._preview_type = None
 
-    def _publish_file_data(self, task, comment='올라갑니다'):
+    def _publish_file_data(self, task, comment=''):
         """
         Kitsu에 task에 대한 working file, output file 모델을 생성하는 매서드
 

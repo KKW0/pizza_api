@@ -26,7 +26,10 @@ class Filter:
         """
         task_info = dict()
         task_info['project_name'] = task['project_name']
-        task_info['due_date'] = task['due_date']
+        if task['due_date'] != None:
+            task_info['due_date'] = task['due_date'].split('T')[0]
+        else:
+            task_info['due_date'] = task['due_date']
         task_info['description'] = task['description']
         task_info['last_comment'] = task['last_comment']
         # task asset이 사용되는 seq 구하기
@@ -72,13 +75,13 @@ class Filter:
 
         return task_info_list, task_list, proj_set, seq_set, sort_dict
 
-    def _list_append(self, shot, output_type, task_type):
+    def _get_img_cam_info_dict_list(self, shot, output_type, task_type):
         """
        리스트에 아웃풋 파일(언디스토션 이미지, camera)의 정보 중 필요한 정보를 선별하여 담는 매서드
 
         Args:
             shot(dict): 언디스토션 이미지, 카메라의 아웃풋 파일이 속한 shot
-            output_type(dict): 아웃풋 파일이 속한 아웃풋 타입(jpg, abc )
+            output_type(dict): 아웃풋 파일이 속한 아웃풋 타입(jpg, abc, fbx)
             task_type(dict): 아웃풋 파일이 속한 테스크 타입(Camera, Matchmove...)
 
         Returns:
@@ -157,7 +160,7 @@ class Filter:
 
         output file의 정보를 수집하기 위해 모델링, 매치무브, 카메라의 테스크 타입을 구한 뒤,
         작업 asset에 캐스팅된 다른 에셋들의 정보를 수집하여 저장한다.(_cast_dict_append)
-        그리고 작업 asset이 cast in 된 샷들에서 언디스토션 이미지와 camera output의 정보 중 필요한 내용을 추출한다.(_list_append)
+        그리고 작업 asset이 cast in 된 샷들에서 언디스토션 이미지와 camera output의 정보 중 필요한 내용을 추출한다.(_get_img_cam_info_dict_list)
 
         Args:
             task(dict): 선택한 task의 딕셔너리
@@ -188,10 +191,10 @@ class Filter:
         for shot in shot_list:
             jpgs = gazu.files.get_output_type_by_name('UndistortionJpg')
             abc = gazu.files.get_output_type_by_name('FBX')     ##### Alembic...
-            if self._list_append(shot, jpgs, task_match):
-                undi_info_list.append(self._list_append(shot, jpgs, task_match))
-            if self._list_append(shot, abc, task_cam):
-                camera_info_list.append(self._list_append(shot, abc, task_cam))
+            if self._get_img_cam_info_dict_list(shot, jpgs, task_match):
+                undi_info_list.append(self._get_img_cam_info_dict_list(shot, jpgs, task_match))
+            if self._get_img_cam_info_dict_list(shot, abc, task_cam):
+                camera_info_list.append(self._get_img_cam_info_dict_list(shot, abc, task_cam))
 
         return casting_info_list, undi_info_list, camera_info_list
 
@@ -231,8 +234,6 @@ class Filter:
             for seq_name in seq_set:
                 if gazu.shot.get_sequence_by_name(proj_dict, seq_name):
                     filtered_seq_set.append(seq_name)
-                else:
-                    continue
             seq_set = filtered_seq_set
 
         # 프로젝트를 필터링할 시 시퀀스 이름으로도 필터링 가능

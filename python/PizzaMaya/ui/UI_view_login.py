@@ -74,7 +74,7 @@ class LoginWindow(QtWidgets.QMainWindow):
         self.id_box = self.ui.findChild(QtWidgets.QLineEdit, "ID_Box")
         self.pw_box = self.ui.findChild(QtWidgets.QLineEdit, "PW_Box")
 
-    # ----------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------
 
 
 def main():

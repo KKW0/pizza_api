@@ -2,23 +2,22 @@
 
 import os
 import sys
+
 import gazu
 import pprint as pp
 
 from PizzaMaya.code.login import LogIn
 from PizzaMaya.code.filter import Filter
 from PizzaMaya.code.usemaya import MayaThings
+from PizzaMaya.code.publish import PublishThings
 from PizzaMaya.code.thumbnail import thumbnail_control
 
 from PizzaMaya.ui.UI_view_publish import Save
+from PizzaMaya.ui.UI_view_login import LoginWindow
 from PizzaMaya.ui.UI_view_table import Table
 from PizzaMaya.ui.UI_view_table import Table2
-from PizzaMaya.ui.UI_view_table import Table3
 from PizzaMaya.ui.UI_view_table import HorizontalHeader
-from PizzaMaya.ui.UI_view_login import LoginWindow
 from PizzaMaya.ui.UI_model import CustomTableModel
-from PizzaMaya.ui.UI_model import CustomTableModel2
-from PizzaMaya.ui.UI_model import CustomTableModel3
 
 from PySide2 import QtWidgets, QtCore, QtUiTools, QtGui
 from PySide2.QtWidgets import QMainWindow, QMessageBox
@@ -41,33 +40,35 @@ class MainWindow(QMainWindow):
         # 현재 작업 디렉토리 경로를 가져옴
         self.task = None
         self.my_task = None
-        self.task_num = None
         self.task_info = None
         self.preview_pixmap = None
         self.undi_info_list = None
         self.camera_info_list = None
         self.casting_info_list = None
         self.task_clicked_index = None
-        self.asset_thumbnail_list = None
         self.undi_thumbnail_list = None
+        self.asset_thumbnail_list = None
         self.shot_list = None
         self.is_logged_in = False
-
         self.my_shot_index_list = []
         self.selected_index_list = []  # 선택한 에셋들의 인덱스 번호
+
+        # ----------------------------------------------------------------------------------------------
+
+        # 메인 ui 설정
         cwd = os.path.dirname(os.path.abspath(__file__))
         # ui 파일 경로 생성
         ui_path = os.path.join(cwd, 'UI_design', 'Main.ui')
         # ui 파일이 존재하는지 확인
         if not os.path.exists(ui_path):
             raise Exception("UI file not found at: {0}".format(ui_path))
-
         ui_file = QtCore.QFile(ui_path)
         ui_file.open(QtCore.QFile.ReadOnly)
         loader = QtUiTools.QUiLoader()
         self.ui = loader.load(ui_file)
         ui_file.close()
 
+        # ui가 화면 중앙에 뜨도록 설정
         self.ui.setGeometry(
             QtWidgets.QStyle.alignedRect(
                 QtCore.Qt.LeftToRight,
@@ -76,8 +77,7 @@ class MainWindow(QMainWindow):
                 QtGui.QGuiApplication.primaryScreen().availableGeometry(),
             ),
         )
-
-        # 메인 윈도우의 레이아웃에 TableView 2개 추가
+        # 메인 윈도우의 레이아웃에 TableView 3개 추가
         self.table = Table()
         self.table.setSelectionMode(QtWidgets.QTableView.SingleSelection)
         self.ui.verticalLayout2.addWidget(self.table, 0)
@@ -87,18 +87,24 @@ class MainWindow(QMainWindow):
         self.table2 = Table2()
         self.ui.verticalLayout.addWidget(self.table2, 0)
 
-        self.table3 = Table3()
+        self.table3 = Table2()
         self.table3.setSelectionMode(QtWidgets.QTableView.SingleSelection)
         self.ui.verticalLayout3.addWidget(self.table3, 0)
 
-        # Getting the Model
+        # TableView에 모델 설정
         self.table1_model = CustomTableModel()
+        self.table1_model.column_count = 3
+        self.table1_model.header_data = ["Project", "Seq", "DueDate"]
         self.table.setModel(self.table1_model)
 
-        self.table2_model = CustomTableModel2()
+        self.table2_model = CustomTableModel()
+        self.table2_model.column_count = 3
+        self.table2_model.header_data = ["Thumbnail", "Name", "Type"]
         self.table2.setModel(self.table2_model)
 
-        self.table3_model = CustomTableModel3()
+        self.table3_model = CustomTableModel()
+        self.table3_model.column_count = 2
+        self.table3_model.header_data = ["Thumbnail", "Select Shot to Load Camera"]
         self.table3.setModel(self.table3_model)
 
         # ----------------------------------------------------------------------------------------------
@@ -120,9 +126,10 @@ class MainWindow(QMainWindow):
             self.save = Save()
             self.ft = Filter()
             self.ma = MayaThings()
+            self.pub = PublishThings()
             self.ui.show()
 
-            # Set table1 data
+            # table1에 데이터 로드
             self.table1_model.load_data(self.read_data())
             self.table1_model.layoutChanged.emit()
         else:
@@ -133,6 +140,10 @@ class MainWindow(QMainWindow):
         # Login 버튼, Logout 버튼 연결
         self.login_window.ui.Login_Button.clicked.connect(self.login_button)
         self.ui.Logout_Button.clicked.connect(self.logout_button)
+
+        # Save 버튼, Back 버튼 연결
+        self.save.ui.Final_Save_Button.clicked.connect(self.final_save_button)
+        self.save.ui.Back_Button.clicked.connect(self.back_button)
 
         # TableView 3개 연결
         self.table.clicked.connect(self.table_clicked)
@@ -155,36 +166,39 @@ class MainWindow(QMainWindow):
     def login_button(self):
         """
         자동로그인이 선택되지 않았을 시에 로그인에 대한 뷰가 띄어졌을 경우에 해당 뷰에 동작을 관할하는 메서드
-        사용자가 호스트 박스,ID박스,PW박스에 입력한 정보를 기반으로 키츄에 로그인한다.
+        사용자가 호스트 박스, ID박스, PW박스에 입력한 정보를 기반으로 키츄에 로그인한다.
         """
+        # 사용자가 입력한 텍스트를 받아서 변수에 저장하고, 오토로그인 체크 여부 갱신
         host_box = self.login_window.ui.Host_Box
         id_box = self.login_window.ui.ID_Box
         pw_box = self.login_window.ui.PW_Box
-
         self.login.host = host_box.text()
         self.login.user_id = id_box.text()
         self.login.user_pw = pw_box.text()
         self.login.auto_login = self.login_window.ui.Auto_Login_Check.isChecked()
 
+        # 로그인 진행
         tf1 = self.login.connect_host()
         tf2 = self.login.log_in()
         self.is_logged_in = True
 
-        if tf1 and tf2:
+        if tf1 and tf2 and self.is_logged_in:
             self.save = Save()
             self.ft = Filter()
             self.ma = MayaThings()
+            self.pub = PublishThings()
 
-            # Set table1 data
+            # table1에 데이터 로드
             self.table1_model.load_data(self.read_data())
             self.table1_model.layoutChanged.emit()
 
+            # 로그인 ui 숨기고 메인 ui 띄움
             self.login_window.ui.hide()
             self.ui.show()
 
     def logout_button(self):
         """
-        키츄에서 로그아웃하고 메인윈도를 닫은 뒤 로그인 윈도우를 띄운다.
+        키츄에서 로그아웃하고 메인 윈도우를 닫은 뒤 로그인 윈도우를 띄운다.
         """
         self.login.log_out()
         self.ui.hide()
@@ -192,8 +206,96 @@ class MainWindow(QMainWindow):
 
     # ----------------------------------------------------------------------------------------------
 
+    # 퍼블리시 윈도우에서 버튼을 클릭 시 동작하는 내용
+
+    def final_save_button(self):
+        """
+        최종 퍼블리시 승인 버튼이다.
+        이  버튼을 클릭하면 현재 작업하는 씬에 존재하는 카메라의 목록을 불러와 리스트에 추가하고 그 리스트에서 디폴트
+        카메라를 제외한 유저가 작업한 샷의 카메라만 남겨서 pub.save_publish_previews()에 넘겨준다.
+        text박스 안에 작성한 문장은 퍼블리시하는 파일들의 comment로 작성된다.
+        또한 카메라의 이름으로부터 시퀀스의 정보들을 얻어낸다.
+        pub.save_publish_real_data 이 함수를 통해 작업한 파일들을 실제로 폴더안에 저장한다.
+        이때 사용하는 my task 변수는 UI컨트롤러에서 정보를 받아온다.
+        """
+        comment = self.save.ui.Save_Path_View_2.toPlainText()
+        shot_dict_list, custom_camera, _ = self.ma.get_working_task()
+        self.pub.save_publish_real_data(self.my_task, comment)
+        self.pub.save_publish_previews(shot_dict_list, custom_camera, comment)
+        self.ui.hide()  # 메인 윈도우 숨김
+        self.save.ui.close()
+        # 퍼블리시 완료 팝업
+        completed = QMessageBox()
+        completed.setText("퍼블리시가 완료되었습니다!")
+        completed.setStandardButtons(QMessageBox.Ok)
+        completed.setWindowTitle("Completed")
+        completed.exec_()
+
+    def back_button(self):
+        """
+        퍼블리시를 취소하고 뒤로 돌아간다.
+        """
+        self.save.ui.close()
+
+    # ----------------------------------------------------------------------------------------------
+
     # save 또는 load 버튼 누르면 save 또는 load 윈도우를 호출
-    def selection_changed(self, selected, deselected):
+
+    def save_button(self):
+        """
+        선택한 테스크에 대한 작업내용을 퍼블리시하는 버튼 클릭 시 save ui를 띄우고, my_task의 정보를 넘긴다.
+        """
+        shot_dict_list, custom_camera, all_assets = self.ma.get_working_task()
+
+        if self.my_task == None and len(custom_camera) == 0 and all_assets == 0:
+            warning = QMessageBox()
+            warning.setText("⚠ 비어있는 씬은 퍼블리시할 수 없습니다.")
+            warning.setStandardButtons(QMessageBox.Ok)
+            warning.setWindowTitle("Error")
+            warning.exec_()
+
+        elif self.my_task == None:
+            shot_dict_list[0]
+
+
+
+            self.save.ui.show()
+
+    def load_button(self):
+        """
+        선택한 어셋과 카메라와 언디스토션 이미지를 현재작업 영역에 임포트하는 메서드
+        """
+        if not self.my_task:
+            return
+        else:
+            ask = QMessageBox()
+            ask.setText(
+                "{0}개의 에셋과 {1}개의 샷을 로드하시겠습니까?".format(len(self.selected_index_list), len(self.my_shot_index_list)))
+            ask.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+            ask.setDefaultButton(QMessageBox.NoButton)
+            ask.setWindowTitle("확인")
+            reply = ask.exec_()
+
+            if reply == QMessageBox.Yes:
+                my_layout_asset = gazu.asset.get_asset(self.my_task['entity_id'])
+                self.ma.import_casting_asset(my_layout_asset, self.selected_index_list)
+                for index in self.my_shot_index_list:
+                    shot_list = gazu.casting.get_asset_cast_in(self.my_task['entity_id'])
+                    self.ma.import_cam_seq(shot_list[index])
+                # 메인 윈도우 닫음
+                self.ui.close()
+                # 로드 완료 팝업
+                completed = QMessageBox()
+                completed.setText("로드되었습니다!")
+                completed.setStandardButtons(QMessageBox.Ok)
+                completed.setWindowTitle("Completed")
+                completed.exec_()
+
+    # ----------------------------------------------------------------------------------------------
+
+    # TableView의 항목을 클릭하면 항목의 정보를 프린트 해줌
+
+    def selection_changed(self):
         """
         사용자가 선택한 어셋의 인덱스 번호를 수집하는 메서드
         """
@@ -207,69 +309,10 @@ class MainWindow(QMainWindow):
             sel_asset_ids.add(sel_idx.row())
         self.selected_index_list = sel_asset_ids
         self.ui.Selection_Lable.setText('Selected Files %d / %d' % (len(selected_rows), row_count))
+
+        # 현재 클릭한 인덱스 번호와 몇개를 클릭했는지 출력
         print(self.ui.Selection_Lable.text())
         print(sel_asset_ids)
-
-    def save_button(self):
-        """
-        선택한 테스크에 대한 작업내용을 퍼블리시하는 버튼을 생성하는 메서드
-        """
-        # self.ui.hide()  ##### 메인 윈도우를 숨길 필요 있는지? 그냥 겹쳐서 띄우면 안되나 exec로
-        if self.my_task == None:
-            QMessageBox.warning(self, 'Error', '퍼블리시할 테스크를 먼저 선택해주세요.', QMessageBox.Ok)
-            QMessageBox.setGeometry(
-                QtWidgets.QStyle.alignedRect(
-                    QtCore.Qt.LeftToRight,
-                    QtCore.Qt.AlignCenter,
-                    QMessageBox.size(),
-                    QtGui.QGuiApplication.primaryScreen().availableGeometry(),
-                ),
-            )
-        else:
-            self.save.ui.show()
-            self.save.my_task = self.my_task
-
-    def load_button(self):
-        """
-        선택한 어셋과 카메라와 언디스토션 이미지를 현재작업 영역에 임포트하는 메서드
-        """
-        if not self.my_task:
-            return
-        else:
-            load_ask = QMessageBox()
-            reply = load_ask.question(self, 'Confirmation', '{0}개의 에셋과 {1}개의 샷을 로드하시겠습니까?' \
-                                      .format(len(self.selected_index_list), (len(self.my_shot_index_list))),
-                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-            load_ask.setGeometry(
-                QtWidgets.QStyle.alignedRect(
-                    QtCore.Qt.LeftToRight,
-                    QtCore.Qt.AlignCenter,
-                    load_ask.sizeHint(),
-                    QtGui.QGuiApplication.primaryScreen().availableGeometry(),
-                ),
-            )
-
-            if reply == QMessageBox.Yes:
-                my_layout_asset = gazu.asset.get_asset(self.my_task['entity_id'])
-                self.ma.import_casting_asset(my_layout_asset, self.selected_index_list)
-                for index in self.my_shot_index_list:
-                    shot_list = gazu.casting.get_asset_cast_in(self.my_task['entity_id'])
-                    self.ma.import_cam_seq(shot_list[index])
-                self.ui.close()
-                load_completed = QMessageBox()
-                load_completed.information(self, 'Completed', '로드되었습니다!', QMessageBox.Ok)
-                load_completed.setGeometry(
-                    QtWidgets.QStyle.alignedRect(
-                        QtCore.Qt.LeftToRight,
-                        QtCore.Qt.AlignCenter,
-                        load_completed.sizeHint(),
-                        QtGui.QGuiApplication.primaryScreen().availableGeometry(),
-                    ),
-                )
-
-    # ----------------------------------------------------------------------------------------------
-
-    # TableView의 항목을 클릭하면 항목의 정보를 프린트 해줌
 
     def table_clicked(self, event):
         """
@@ -289,16 +332,16 @@ class MainWindow(QMainWindow):
         self.preview_pixmap.loadFromData(png)
         label = self.ui.Preview
         label.setPixmap(self.preview_pixmap.scaled(label.size(), Qt.KeepAspectRatio))
-
         self.ui.InfoTextBox.setPlainText('Project Name: {}'.format(task_info['project_name'] + '\n'))
         self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(task_info['description']))
         self.ui.InfoTextBox.appendPlainText('Due Date: {0}'.format(task_info['due_date']))
-        self.ui.InfoTextBox.appendPlainText('Comment: {0}'.format(str(task_info['last_comment']['text'])))
+        self.ui.InfoTextBox.appendPlainText(
+            'Comment: {0}'.format(str(task_info['last_comment']['text']).encode('utf-8', errors='ignore')))
 
-        self.table2_model.load_data2(self.read_data2())
+        self.table2_model.load_data(self.read_data2())
         self.table2_model.layoutChanged.emit()
 
-        self.table3_model.load_data3(self.read_data3())
+        self.table3_model.load_data(self.read_data3())
         self.table3_model.layoutChanged.emit()
 
     def table_clicked2(self, event):
@@ -335,17 +378,12 @@ class MainWindow(QMainWindow):
         label = self.ui.Preview
         label.setPixmap(self.preview_pixmap.scaled(label.size(), Qt.KeepAspectRatio))
 
-        # self.preview_pixmap = QPixmap()
-        # self.preview_pixmap.loadFromData(png)
-        # label = self.ui.Preview
-        # label.setPixmap(self.preview_pixmap.scaled(label.size(), Qt.KeepAspectRatio))
-
         selection_model = self.table3.selectionModel()
         selected_indexes = selection_model.selectedIndexes()
-        sel_shot_idexes = set()
+        sel_shot_indexes = set()
         for sel_idx in selected_indexes:
-            sel_shot_idexes.add(sel_idx.row())
-        self.my_shot_index_list = sel_shot_idexes
+            sel_shot_indexes.add(sel_idx.row())
+        self.my_shot_index_list = sel_shot_indexes
 
         self.ui.InfoTextBox.setPlainText('[Shot Info]')
         self.ui.InfoTextBox.appendPlainText('Shot Name: {}'.format(clicked_undi['shot_name'] + '\n'))
@@ -367,8 +405,7 @@ class MainWindow(QMainWindow):
         task 선택하는 TableView의 데이터를 받아오는 메서드
         filter의 선택에 따라 정보가 바뀐다.
         """
-        ft = Filter()
-        self.task, task_info, _, _, _ = ft.select_task()
+        self.task, task_info, _, _, _ = self.ft.select_task()
         data = []
         for index in range(len(task_info)):
             data.append([task_info[index]['project_name'], task_info[index]['sequence_name'],
@@ -390,8 +427,10 @@ class MainWindow(QMainWindow):
                     data.append([None, cast['asset_name'], 'No Output File to Load'])
                 else:
                     data.append([self.asset_thumbnail_list[index], cast['asset_name'], cast['asset_type_name']])
+
             return data
         else:
+
             return data
 
     def read_data3(self):
@@ -404,12 +443,13 @@ class MainWindow(QMainWindow):
             # 샷 목록 추가
             for index, info_list in enumerate(self.undi_info_list):
                 data.append([self.undi_thumbnail_list[index], self.shot_list[index]['shot_name']])
+
             return data
         else:
+
             return data
 
     # ----------------------------------------------------------------------------------------------
-
 
 
 def main():

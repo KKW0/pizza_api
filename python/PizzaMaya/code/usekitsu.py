@@ -73,7 +73,7 @@ class KitsuThings:
 
         return full_path
 
-    def get_kitsu_path(self, casting):
+    def get_asset_path(self, casting):
         """
         작업 에셋에 캐스팅된 에셋들의 최신 output file들의 패스 리스트를 추출하는 매서드
 

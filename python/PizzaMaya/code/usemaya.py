@@ -64,6 +64,7 @@ class MayaThings:
             # fbx 애니메이션 데이터를 씬의 기존 애니메이션과 결합하도록 지정
             loadReferenceDepth="all",
             returnNewNodes=True
+            # 변수에 노드의 정보값을 넣으려고 쓰는 거라 없어도 될 듯
         )
 
         if asset and asset['nb_elements'] > 1:
@@ -131,11 +132,11 @@ class MayaThings:
         all_cast_list = gazu.casting.get_asset_casting(asset)
 
         for casting in all_cast_list:
-            output_path_nb_dict = self.kit.get_kitsu_path(casting)
+            output_path_nb_dict = self.kit.get_asset_path(casting)
             if output_path_nb_dict:
                 file_dict_list.append(output_path_nb_dict)
         if num_list is ['All']:
-            # 캐스팅된 것들의 전체 선택인 경우
+            # 캐스팅된 것들의 전체 선택인 경우        #### 구현 필요
             num_list = range(len(all_cast_list))
         for index in num_list:
             asset_output = file_dict_list[index]
@@ -321,3 +322,26 @@ class MayaThings:
             self.save_scene_file(path, 'mb')
             mc.setAttr("%s.visibility" % cam_name_parts[1], False)
             # 켰던 카메라 다시 꺼줌
+
+    def get_working_task(self):
+        shot_dict_list = []
+        startup_cameras = []
+        all_assets = mc.ls(references=True)
+        all_cameras = mc.ls(type='camera', l=True)
+        for camera in all_cameras:
+            if mc.camera(mc.listRelatives(camera, parent=True)[0], startupCamera=True, q=True):
+                startup_cameras.append(camera)
+        custom_camera = list(set(all_cameras) - set(startup_cameras))
+
+        if custom_camera:
+            for cam_name in custom_camera:
+                cam_name_parts1 = cam_name.split("|")
+                cam_name_parts2 = cam_name_parts1[1].split("_")
+                proj_name = (cam_name_parts2[0]).title()
+                proj = gazu.project.get_project_by_name(proj_name)
+                seq_name = cam_name_parts2[1] + '_' + cam_name_parts2[2]  #### seq_1 형태라..
+                seq = gazu.shot.get_sequence_by_name(proj, seq_name)
+                shot = gazu.shot.get_shot_by_name(seq, cam_name_parts2[-1])
+                shot_dict_list.append(shot)
+
+        return shot_dict_list, custom_camera, all_assets

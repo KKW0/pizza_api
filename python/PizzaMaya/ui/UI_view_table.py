@@ -1,8 +1,8 @@
 # coding=utf-8
 
-from PySide2 import QtWidgets, QtCore, QtGui
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QFont
+from PySide2 import QtWidgets, QtCore, QtGui
 from PySide2.QtWidgets import QTableView, QHeaderView
 
 from PizzaMaya.code.filter import Filter
@@ -29,12 +29,14 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         self.table = None
         self.model = None
         self.ft = Filter()
+
+        # 헤더 셀렉션 옵션 설정
         self.setSectionResizeMode(QHeaderView.Fixed)
         self.setStretchLastSection(True)
-
         self.setSectionsMovable(False)
-        self.setSectionsClickable(True)  # add this line
+        self.setSectionsClickable(True)
 
+        # 헤더의 sort 버튼 설정
         self.setSortIndicator(-1, Qt.AscendingOrder)
         self.sort_button = QtWidgets.QPushButton(self)
         self.sort_button.setText("Sort")
@@ -53,12 +55,12 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         else:  # proj_index와 seq_index가 모두 0인 경우        # 수정필요
             self.model.sort(self.logicalIndexAt(0), self.sortOrder())
 
-    def sortIndicatorChanged(self, logicalIndex, order):
+    def sortIndicatorChanged(self, logical_index, order):
         """
         헤더인덱스의 변경사항에 따라 테이블의 정보를 변경하는 메서드
         이 메서드는 헤더뷰의 서브클래스이다.
         """
-        if logicalIndex == 2:
+        if logical_index == 2:
             self.seq_index = 0
             self.proj_index = 0
             self.combo2.setCurrentIndex(0)
@@ -66,7 +68,7 @@ class HorizontalHeader(QtWidgets.QHeaderView):
                 self.proxy_model2.invalidate()
             elif self.proxy_model is not None:
                 self.proxy_model.invalidate()
-        super(HorizontalHeader, self).sortIndicatorChanged(logicalIndex, order)
+        super(HorizontalHeader, self).sortIndicatorChanged(logical_index, order)
 
     def showEvent(self, event):
         """
@@ -108,6 +110,7 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         """
         self.proxy_model = QtCore.QSortFilterProxyModel()
         self.proxy_model.setSourceModel(self.model)
+
         if option != 'Project':
             self.proj_index = self.combo.currentIndex()
             self.proxy_model.setFilterRegExp('^{}$'.format(option))
@@ -153,33 +156,30 @@ class Table(QTableView):
         """
         QTableView.__init__(self)
 
-        self.setSortingEnabled(True)
-
         font = QFont()
         font.setFamily("Arial")
         font.setPointSize(10)
         font.setBold(True)
         self.setFont(font)
 
-        self.horizontal_header = self.horizontalHeader()
+        self.setSortingEnabled(True)
         self.vertical_header = self.verticalHeader()
-        self.horizontal_header.setDefaultAlignment(Qt.AlignHCenter)
+        self.horizontal_header = self.horizontalHeader()
         self.vertical_header.setDefaultAlignment(Qt.AlignVCenter)
+        self.horizontal_header.setDefaultAlignment(Qt.AlignHCenter)
 
-        header = self.horizontalHeader()
-        header.setDefaultAlignment(QtCore.Qt.AlignCenter)
-        header.setFont(font)  # 헤더에 폰트 설정
-
-        self.horizontal_header.setMinimumSectionSize(50)
         self.vertical_header.setMinimumSectionSize(50)
+        self.horizontal_header.setMinimumSectionSize(50)
         self.vertical_header.setSectionResizeMode(QHeaderView.Fixed)
+        self.horizontal_header.setFont(font)  # 헤더에 폰트 설정
+        self.horizontal_header.setDefaultAlignment(QtCore.Qt.AlignCenter)
 
         self.setStyleSheet("background-color: #353535; selection-background-color: gray;")
         self.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
         self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
-        self.horizontal_header.setSortIndicatorShown(True)
         self.horizontal_header.setSectionsClickable(True)
+        self.horizontal_header.setSortIndicatorShown(True)
         self.horizontal_header.setStretchLastSection(True)
 
 
@@ -187,7 +187,7 @@ class Table2(QtWidgets.QTableView):
     """
     테스크가 주어진 레이아웃어셋에 캐스팅된 asset 중 작업파일에 임포트 할 asset을 선택하는 TableView
     """
-    def __init__(self, data=None):
+    def __init__(self):
         """
         헤더와 스타일을 설정한다.
         데이터를 설정해준다.
@@ -201,106 +201,24 @@ class Table2(QtWidgets.QTableView):
         self.setFont(font)
 
         # QTableView Headers
-        self.horizontal_header = self.horizontalHeader()
         self.vertical_header = self.verticalHeader()
+        self.horizontal_header = self.horizontalHeader()
 
         # 고정된 헤더 모드 설정
-        self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.vertical_header.setSectionResizeMode(QHeaderView.Fixed)
+        self.horizontal_header.setSectionResizeMode(QHeaderView.Fixed)
 
-        header = self.horizontalHeader()
-        header.setDefaultAlignment(QtCore.Qt.AlignCenter)
-        header.setFont(font)  # 헤더에 폰트 설정
+        self.horizontal_header.setFont(font)  # 헤더에 폰트 설정
+        self.horizontal_header.setDefaultAlignment(QtCore.Qt.AlignCenter)
 
-        self.horizontal_header.setMinimumSectionSize(100)
         self.vertical_header.setMinimumSectionSize(100)
-
+        self.horizontal_header.setMinimumSectionSize(100)
         self.horizontal_header.setStretchLastSection(True)
 
         self.setStyleSheet(
             "background-color: #353535; selection-background-color: gray;};")
-
         corner_button = self.findChild(QtWidgets.QAbstractButton)
         corner_button.setStyleSheet("background-color: #ABABAB; color: black;")
 
         self.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
         self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-
-        if data is not None:
-            self.set_data(data)
-
-    def set_data(self, data):
-        """
-        테이블 데이터를 설정하는 메서드.
-        아규먼드 데이터를 UI컨트롤러에서 받아온다. 테이블뷰의 데이터를 모델로서 설정해준다.
-        """
-        model = QtGui.QStandardItemModel()
-        model.setHorizontalHeaderLabels(['A', 'B', 'C'])
-        for row in data:
-            items = [QtGui.QStandardItem(str(item)) for item in row]
-            model.appendRow(items)
-
-        self.setModel(model)
-        self.resizeColumnsToContents()
-        self.horizontal_header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
-
-
-class Table3(QtWidgets.QTableView):
-    """
-    샷(언디스토션 이미지, 카메라)을 선택하는 TableView
-    """
-    def __init__(self, data=None):
-        """
-        헤더와 스타일을 설정한다.
-        데이터를 설정해준다.
-        """
-        super(Table3, self).__init__()
-
-        font = QtGui.QFont()
-        font.setFamily("Arial")
-        font.setPointSize(10)
-        font.setBold(True)
-        self.setFont(font)
-
-        # QTableView Headers
-        self.horizontal_header = self.horizontalHeader()
-        self.vertical_header = self.verticalHeader()
-
-
-        # 고정된 헤더 모드 설정
-        self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
-
-        header = self.horizontalHeader()
-        header.setDefaultAlignment(QtCore.Qt.AlignCenter)
-        header.setFont(font)  # 헤더에 폰트 설정
-
-        self.horizontal_header.setMinimumSectionSize(110)
-        self.vertical_header.setMinimumSectionSize(95)
-
-        self.horizontal_header.setStretchLastSection(True)
-
-        self.setStyleSheet("background-color: #353535; selection-background-color: gray;")
-        self.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
-        self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-
-        if data is not None:
-            self.set_data(data)
-
-    def set_data(self, data):
-        """
-        테이블 데이터를 설정합니다.
-        아규먼드 데이터를 UI컨트롤러에서 받아온다. 테이블뷰의 데이터를 모델로서 설정해준다.
-        """
-        model = QtGui.QStandardItemModel()
-        model.setHorizontalHeaderLabels(['A'])
-
-        for row in data:
-            items = [QtGui.QStandardItem(str(item)) for item in row]
-            model.appendRow(items)
-
-        self.setModel(model)
-        self.resizeColumnsToContents()
-        self.horizontal_header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
-
-

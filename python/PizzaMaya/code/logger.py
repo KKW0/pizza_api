@@ -87,7 +87,7 @@ class Logger:
     def logout_log(self):
         self.log.debug("Logout Succeed")
 
-    def create_working_file_log(self, user_name, working_file):
+    def load_file_log(self, file_name):
         """
         파일을 만든 사용자의 이름 및 파일 경로와 함께 DEBUG level에서 Maya 파일을 생성한 것을 기록합니다.
         파일이 없으면 경고 메시지를 기록합니다.
@@ -96,12 +96,9 @@ class Logger:
             user_name(str): 로그인한 사용자의 이름
             working_file(str): working file이 저장될 path str
         """
-        if os.path.exists(working_file):
-            self.log.debug("\"%s\" create maya file in \"%s\"" % (user_name, working_file))
-        else:
-            self.log.warning("\"%s\" failed to create Maya file" % user_name)
+        return self.log.debug("{} create maya file in " .format(file_name))
 
-    def load_output_file_log(self, user_name, output_file_path):
+    def save_output_file_log(self, file_name):
         """
         파일을 로드한 사용자의 이름과 파일 경로와 함께 DEBUG 수준의 출력 파일 로드를 기록합니다.
 
@@ -112,4 +109,4 @@ class Logger:
         Returns:
             log: Debug 레벨의 로그 메세지
         """
-        return self.log.debug("\"%s\" load output file from \"%s\"" % (user_name, output_file_path))
+        return self.log.debug("{} load working / output file".format(file_name))

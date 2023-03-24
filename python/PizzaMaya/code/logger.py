@@ -99,7 +99,7 @@ class Logger:
         if type(file_name) == set:
             return self.log.debug("{0}번째 에셋이 로드되었습니다.".format(str(file_name)))
         else:
-            return self.log.debug("로드된 에셋 이름 : {0}".format(file_name))
+            return self.log.debug("로드된 에셋 이름: {0}".format(file_name))
 
     def save_output_file_log(self, file_name):
         """

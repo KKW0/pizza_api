@@ -7,6 +7,7 @@ import gazu
 import pprint as pp
 
 from PizzaMaya.code.login import LogIn
+from PizzaMaya.code.logger import Logger
 from PizzaMaya.code.filter import Filter
 from PizzaMaya.code.usemaya import MayaThings
 from PizzaMaya.code.publish import PublishThings
@@ -114,6 +115,7 @@ class MainWindow(QMainWindow):
 
         # 프로그램 시작 시 auto login이 체크되어 있는지 확인하며, 체크되어 있으면 바로 main window 띄움
         self.login_window = LoginWindow()
+        self.log = Logger()
         self.login = LogIn()
 
         value = self.login.load_setting()
@@ -271,6 +273,9 @@ class MainWindow(QMainWindow):
         completed.setText("퍼블리시가 완료되었습니다!")
         completed.setStandardButtons(QMessageBox.Ok)
         completed.setWindowTitle("Completed")
+        self.log.save_output_file_log(self.my_task['entity_name'])
+        # 로그가 찍히네용 정보값만 넣어주면 될거같아요
+
         completed.exec_()
 
     def back_button(self):
@@ -338,6 +343,10 @@ class MainWindow(QMainWindow):
                 completed.setText("로드되었습니다!")
                 completed.setStandardButtons(QMessageBox.Ok)
                 completed.setWindowTitle("Completed")
+                print(my_layout_asset['id'])
+                print(self.selected_index_list)
+                # self.log.load_file_log(self.selected_index_list)
+
                 completed.exec_()
 
     # ----------------------------------------------------------------------------------------------

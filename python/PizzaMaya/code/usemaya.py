@@ -4,6 +4,7 @@ import gazu
 import pprint as pp
 import maya.cmds as mc
 from usekitsu import KitsuThings
+from logger import Logger
 
 
 class MayaThings:
@@ -15,6 +16,7 @@ class MayaThings:
         모듈의 인스턴스를 생성한다.
         """
         self.kit = KitsuThings()
+        self.log = Logger()
 
     def load_working(self, task, num=0):
         """
@@ -144,6 +146,8 @@ class MayaThings:
                 print('asset에 아웃풋 파일이 존재하지 않습니다. Asset Name: {0}'.format(asset['name']))
             else:
                 self._load_output(asset_output['path'], asset_output)
+            self._load_output(asset_output['path'], asset_output)
+            self.log.load_file_log(asset_output)
 
     def save_scene_file(self, path, representation):
         """

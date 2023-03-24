@@ -68,6 +68,7 @@ class MayaThings:
             returnNewNodes=True
             # 변수에 노드의 정보값을 넣으려고 쓰는 거라 없어도 될 듯
         )
+
         if asset and asset['nb_elements'] > 1:
             # 에셋이라면 nb_elements에 맞게 인스턴싱 진행
             for index in range(asset['nb_elements']-1):
@@ -145,7 +146,8 @@ class MayaThings:
                 print('asset에 아웃풋 파일이 존재하지 않습니다. Asset Name: {0}'.format(asset['name']))
             else:
                 self._load_output(asset_output['path'], asset_output)
-                self.log.load_file_log(asset_output['name'])
+            self._load_output(asset_output['path'], asset_output)
+            self.log.load_file_log(asset_output)
 
     def save_scene_file(self, path, representation):
         """
@@ -331,15 +333,7 @@ class MayaThings:
     def get_working_task(self):
         shot_dict_list = []
         startup_cameras = []
-        all_assets = []
-        all_references = mc.ls(references=True)
-        for ref in all_references:
-            ref_nodes = mc.referenceQuery(ref, nodes=True)
-            if ref_nodes:
-                for node in ref_nodes:
-                    if mc.objectType(node) == 'mesh':
-                        all_assets.append(node)
-
+        all_assets = mc.ls(references=True)
         all_cameras = mc.ls(type='camera', l=True)
         for camera in all_cameras:
             if mc.camera(mc.listRelatives(camera, parent=True)[0], startupCamera=True, q=True):

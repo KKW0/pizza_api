@@ -184,22 +184,20 @@ class MainWindow(QMainWindow):
             for asset in self.all_assets:
                 asset_name = asset.split('_')[2]
                 revision = asset.split('_')[4]
-                proj = gazu.project.get_project_by_name(asset.split('_')[0])
+                proj = gazu.project.get_project_by_name(asset.split[0])
                 output_type = gazu.files.get_output_type_by_name('FBX')
-                task_type = gazu.task.get_task_type_by_name('Modeling')
+                task_type = gazu.task.get_task_type_by_name('LayoutPizza')
                 kitsu_asset = gazu.asset.get_asset_by_name(proj, asset_name.title())
-                if kitsu_asset:
-                    kitsu_revision = gazu.files.get_last_entity_output_revision(kitsu_asset, output_type, task_type)
-                    if revision < kitsu_revision:
-                        old_asset_list.append(asset)
-                        ask = QMessageBox()
-                        ask.setText(
-                            '현재 씬에 존재하는 {0}에셋이 최신 파일이 아닙니다. 최신 파일을 로드하시겠습니까?'.format(str(old_asset_list)))
-                        ask.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-                        ask.setWindowTitle("Old File Exists")
-                        reply = ask.exec_()
-                        if reply == QMessageBox.Yes:
-                            print("현재 레퍼런스된 파일을 새 파일로 교체합니다.")
+                kitsu_revision = gazu.files.get_last_entity_output_revision(kitsu_asset, output_type, task_type)
+                if revision < kitsu_revision:
+                    old_asset_list.append(asset)
+            ask = QMessageBox()
+            ask.setText('현재 씬에 존재하는 {0}에셋이 최신 파일이 아닙니다. 최신 파일을 로드하시겠습니까?'.format(old_asset_list))
+            ask.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+            ask.setWindowTitle("Old File Exists")
+            reply = ask.exec_()
+            if reply == QMessageBox.Yes:
+                print("현재 레퍼런스된 파일을 새 파일로 교체합니다.")
 
     # ----------------------------------------------------------------------------------------------
 
@@ -344,7 +342,9 @@ class MainWindow(QMainWindow):
                 completed.setText("로드되었습니다!")
                 completed.setStandardButtons(QMessageBox.Ok)
                 completed.setWindowTitle("Completed")
-                self.log.load_file_log(self.selected_index_list)
+                print(my_layout_asset['id'])
+                print(self.selected_index_list)
+                # self.log.load_file_log(self.selected_index_list)
 
                 completed.exec_()
 

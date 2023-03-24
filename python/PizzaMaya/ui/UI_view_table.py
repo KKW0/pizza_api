@@ -32,6 +32,23 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         self.setSectionsMovable(False)
         self.setSectionsClickable(True)
 
+        # # 헤더의 sort 버튼 설정
+        # self.setSortIndicator(-1, Qt.AscendingOrder)
+        # self.model.sort(self.logicalIndex(0), Qt.AscendingOrder)
+
+    # def sortIndicatorChanged(self, logical_index, order):
+    #     """
+    #     헤더 인덱스의 변경사항에 따라 테이블의 정보를 변경하는 메서드
+    #     """
+    #     if self.proxy_model:
+    #         print('B')
+    #         self.proxy_model.invalidate()
+    #     elif self.model:
+    #         print('A')
+    #         self.model.invalidate()
+    #
+    #     super(HorizontalHeader, self).sortIndicatorChanged(logical_index, order)
+
     def showEvent(self, event):
         """
         생성한 콤보박스를 보여주는 메서드

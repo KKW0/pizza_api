@@ -363,6 +363,21 @@ class MainWindow(QMainWindow):
         print(self.ui.Selection_Lable.text())
         print(sel_asset_ids)
 
+    def no_data_no_click(self, model):
+        """
+        table2에 썸네일 None이면 선택 안되게 설정
+
+        Args:
+            model: QTableView에 SetModel 한 QTableModel
+        """
+        asset_rows = model.rowCount()
+        for index in asset_rows:
+            png_index = model.index(index, 0)
+            item = model.itemFromIndex(png_index)
+            data = item.text()
+            if data == None:
+                print("{0}번 row는 로드할 데이터가 없어 선택할 수 없습니다.".format(index))
+
     def table_clicked(self, event):
         """
         테스크 목록이 띄워져있는 테이블뷰를 클릭하였을 때 동작하는 메서드
@@ -386,11 +401,14 @@ class MainWindow(QMainWindow):
         self.ui.InfoTextBox.appendPlainText('Due Date: {0}'.format(task_info['due_date']))
         self.ui.InfoTextBox.appendPlainText(
             'Comment: {}'.format(task_info['last_comment']['text']))
+
         self.table2_model.load_data(self.read_data2())
         self.table2_model.layoutChanged.emit()
+        self.no_data_no_click(self.table2_model)
 
         self.table3_model.load_data(self.read_data3())
         self.table3_model.layoutChanged.emit()
+        self.no_data_no_click(self.table3_model)
 
     def table_clicked2(self, event):
         """

@@ -15,11 +15,11 @@ class SET():
 #         # # 테스트용 클래스변수 정의
         self.project = gazu.project.get_project_by_name('Project1')
         self.asset = gazu.asset.get_asset_by_name(self.project, 'lecture')
-        pp.pprint(self.asset)
         # self.user = gazu.person.get_person_by_full_name('ahyeon jo')
 #         # self.task_status = gazu.task.get_task_status_by_name('Todo')
         self.task_type = gazu.task.get_task_type_by_name('LayoutPizza')
         self.task = gazu.task.get_task_by_entity(self.asset, self.task_type)
+        pp.pprint(self.task)
         # self.comment = 'Unit Test'
         # # gazu.task.add_comment(self.task, self.task_status, self.comment)
         # self.comment_dict = gazu.task.get_last_comment_for_task(self.task)

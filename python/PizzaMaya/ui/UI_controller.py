@@ -46,7 +46,6 @@ class MainWindow(QMainWindow):
         self.undi_info_list = None
         self.camera_info_list = None
         self.casting_info_list = None
-        self.task_clicked_index = None
         self.undi_thumbnail_list = None
         self.asset_thumbnail_list = None
         self.shot_list = None
@@ -85,8 +84,6 @@ class MainWindow(QMainWindow):
         self.table = Table()
         self.table.setSelectionMode(QtWidgets.QTableView.SingleSelection)
         self.ui.verticalLayout2.addWidget(self.table, 0)
-        self.horizontal_header = HorizontalHeader()
-        self.table.setHorizontalHeader(self.horizontal_header)
 
         self.table2 = Table2(corner=True)
         self.ui.verticalLayout.addWidget(self.table2, 0)
@@ -100,6 +97,8 @@ class MainWindow(QMainWindow):
         self.table1_model.column_count = 3
         self.table1_model.header_data = ["Project", "Seq", "DueDate"]
         self.table.setModel(self.table1_model)
+        self.horizontal_header = HorizontalHeader(self.table)
+        self.table.setHorizontalHeader(self.horizontal_header)
 
         self.table2_model = CustomTableModel()
         self.table2_model.column_count = 3
@@ -386,18 +385,34 @@ class MainWindow(QMainWindow):
             if data == None:
                 print("{0}번 row는 로드할 데이터가 없어 선택할 수 없습니다.".format(index))
 
+    def already_loaded_no_click(self, item, model):
+        shot_dict_list, custom_camera, all_assets = self.ma.get_working_task()
+
+        if item == "asset":
+            for index in range(len(self.casting_info_list)):
+                for asset in all_assets:
+                    if self.casting_info_list[index]['asset_name'] in asset:
+                        print('{0} 에셋은 이미 로드되어 클릭이 불가능합니다.'.format(self.casting_info_list[index]['asset_name']))
+
+        elif item == "shot":
+            for index in range(len(self.camera_info_list)):
+                for cam in custom_camera:
+                    if self.camera_info_list[index][0]['shot_name'] and \
+                            self.camera_info_list[index][0]['shot_name'] in cam:
+                        print('{0} 샷은 이미 로드되어 클릭이 불가능합니다.'.format(self.camera_info_list[index][0]['shot_name']))
+
     def table_clicked(self, event):
         """
         테스크 목록이 띄워져있는 테이블뷰를 클릭하였을 때 동작하는 메서드
         선택한 테스크에 기반하여 파일 임포트 할 때와 테이블뷰2, 테이블뷰3에 필요한 정보를 받아온다.
         """
-        self.task_clicked_index = event.row()
+        task_clicked_index = event.row()
+        clicked_asset = self.table.model().data(self.table.model().index(task_clicked_index, 1))
         self.my_task, task_info, self.casting_info_list, \
             self.undi_info_list, self.camera_info_list = self.ft.select_task(self.horizontal_header.proj_index,
-                                                                             self.horizontal_header.seq_index,
-                                                                             self.task_clicked_index)
+                                                                             task_clicked_index, clicked_asset)
         tup, self.asset_thumbnail_list, self.undi_thumbnail_list, self.shot_list = \
-            thumbnail_control(self.my_task, self.task_clicked_index, self.casting_info_list, self.undi_info_list)
+            thumbnail_control(self.my_task, task_clicked_index, self.casting_info_list, self.undi_info_list)
         png = bytes(tup)
 
         self.preview_pixmap = QPixmap()
@@ -415,23 +430,18 @@ class MainWindow(QMainWindow):
         self.table2_model.load_data(self.read_data2())
         self.table2_model.layoutChanged.emit()
         self.no_data_no_click(self.table2_model)
+        self.already_loaded_no_click('asset', self.table2_model)
 
         self.table3_model.load_data(self.read_data3())
         self.table3_model.layoutChanged.emit()
         self.no_data_no_click(self.table3_model)
+        self.already_loaded_no_click('shot', self.table3_model)
 
     def table_clicked2(self, event):
         """
         어셋 목록이 띄워져있는 테이블뷰를 클릭하였을 때 동작하는 메서드
         선택한 어셋에 기반하여 정보를 받아오고 그 정보를 크게 띄운다.
         """
-        shot_dict_list, custom_camera, all_assets = self.ma.get_working_task()
-
-        for index in range(len(self.casting_info_list)):
-            for asset in all_assets:
-                if self.casting_info_list[index]['asset_name'] in asset:
-                    print('{0} 에셋은 이미 로드되어 클릭이 불가능합니다.'.format(self.casting_info_list[index]['asset_name']))
-
         clicked_cast = self.casting_info_list[event.row()]
         png = bytes(self.asset_thumbnail_list[event.row()])
 
@@ -452,13 +462,6 @@ class MainWindow(QMainWindow):
         샷 목록이 띄워져있는 테이블뷰를 클릭하였을 때 동작하는 메서드
         선택한 샷에 기반하여 정보를 받아오고 그 정보를 크게 띄운다.
         """
-        _, custom_camera, all_assets = self.ma.get_working_task()
-        for index in range(len(self.camera_info_list)):
-            for cam in custom_camera:
-                if self.camera_info_list[index][0]['shot_name'] and \
-                        self.camera_info_list[index][0]['shot_name'] in cam:
-                    print('{0} 샷은 이미 로드되어 클릭이 불가능합니다.'.format(self.camera_info_list[index][0]['shot_name']))
-
         clicked_undi = self.undi_info_list[event.row()][0]
         clicked_cam = self.camera_info_list[event.row()][0]
         png = bytes(self.undi_thumbnail_list[event.row()])

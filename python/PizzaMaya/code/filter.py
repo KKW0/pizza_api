@@ -40,7 +40,7 @@ class Filter:
         task_info['sequence_name'] = seq['name']
         task_info['asset_name'] = asset['name']
 
-        return task_info, seq['name']
+        return task_info
 
     def collect_info_task(self):
         """
@@ -52,29 +52,20 @@ class Filter:
                                   keys - project_name, due_date, description, last_comment, sequence_name
             list(task_list): 사용자에게 assign되었고, task status가 _Todo_ 또는 WIP인  모든 task 딕셔너리의 집합
             list(proj_set): 각 task가 속한 프로젝트의 이름들을 중복없이 모든 리스트
-            list(seq_set): 각각 task가 속한 프로젝트의 이름들을 중복없이 모은 리스트
         """
-        seq_list = []
         proj_list = []
         task_list = []
         task_info_list = []
-        sort_dict = dict()
         tmp_task_list = gazu.user.all_tasks_to_do()
         for index, task in enumerate(tmp_task_list):
             if task['task_type_name'] == 'LayoutPizza':
                 proj_list.append(task['project_name'])
-                task_info, seq_name = self._get_information_dict(task)
-                if type(sort_dict.get(task['project_name'])) is list:
-                    sort_dict[task['project_name']].append(seq_name)
-                else:
-                    sort_dict[task['project_name']] = [seq_name]
+                task_info = self._get_information_dict(task)
                 task_info_list.append(task_info)
                 task_list.append(task)
-                seq_list.append(seq_name)
         proj_set = list(set(proj_list))
-        seq_set = list(set(seq_list))
 
-        return task_info_list, task_list, proj_set, seq_set, sort_dict
+        return task_info_list, task_list, proj_set
 
     def _get_img_cam_info_dict_list(self, shot, output_type, task_type):
         """
@@ -208,7 +199,7 @@ class Filter:
 
         return casting_info_list, undi_info_list, camera_info_list
 
-    def _filter_info(self, proj_num=0, seq_num=0):
+    def _filter_info(self, proj_num=0):
         """
         유저가 필터링을 했는지 판별하여 해당하는 task들만 노출하는 매서드
         유저가 클릭한 테스크의 dict를 저장한다
@@ -221,51 +212,31 @@ class Filter:
             list: 필터링된 task dict의 집합
             list: 필터링된 task 정보 중 필요한 내용만 담긴 dict의 집합
         """
-        task_info_list, task_list, proj_set, seq_set, _ = self.collect_info_task()
+        task_info_list, task_list, proj_set = self.collect_info_task()
         filtered_task_list = []
         filtered_task_info_list = []
-        double_filtered_task_list = []
-        double_filtered_task_info_list = []
-        filtered_seq_set = []
 
         proj_set.sort()
-        seq_set.sort()
 
         # 프로젝트 이름 필터링
         if proj_num == 0 or proj_num == None:
             return task_list, task_info_list
         else:
             proj = proj_set[proj_num-1]
-            proj_dict = gazu.project.get_project_by_name(proj)
             for index, task in enumerate(task_list):
                 if task['project_name'] == proj:
                     filtered_task_list.append(task)
                     filtered_task_info_list.append(task_info_list[index])
-            for seq_name in seq_set:
-                if gazu.shot.get_sequence_by_name(proj_dict, seq_name):
-                    filtered_seq_set.append(seq_name)
-            seq_set = filtered_seq_set
-
-        # 프로젝트를 필터링할 시 시퀀스 이름으로도 필터링 가능
-        if seq_num == 0:
             return filtered_task_list, filtered_task_info_list
-        seq = seq_set[seq_num-1]
-        for index, task in enumerate(filtered_task_list):
-            if filtered_task_info_list[index]['sequence_name'] is not seq:
-                continue
-            else:
-                double_filtered_task_list.append(task)
-                double_filtered_task_info_list.append(filtered_task_info_list[index])
-                return double_filtered_task_list, double_filtered_task_info_list
 
-    def select_task(self, proj_num=0, seq_num=0, task_num=None):
+    def select_task(self, proj_num=0, task_num=None, clicked_asset=None):
         """
         필터링을 마친 뒤 선택한 테스크에 대한 정보를 노출하는 매서드
 
         Args:
             proj_num: 선택한 프로젝트의 인덱스 번호. 0은 All을 뜻한다
-            seq_num: 선택한 시퀀스의 인덱스 번호. 0은 All을 뜻한다
             task_num: 선택한 테스크의 인덱스 번호. 테스크 선택 전에는 None
+            clicked_asset: 선택한 테스크가 속한 에셋의 이름
 
         Returns:
             dict or list(task): 선택한 task의 딕셔너리 또는 모든 task 딕셔너리의 집합(선택 전)
@@ -277,12 +248,16 @@ class Filter:
         casting_info_list = None
         undi_info_list = None
         camera_info_list = None
-        final_task_list, final_task_info_list = self._filter_info(proj_num, seq_num)
+        final_task_list, final_task_info_list = self._filter_info(proj_num)
         if task_num is None:
             task = final_task_list
             task_info = final_task_info_list
         else:
-            task = final_task_list[task_num]
-            task_info = final_task_info_list[task_num]
-            casting_info_list, undi_info_list, camera_info_list = self._collect_info_casting(task)
+            asset_name = clicked_asset.split('\n')[1]
+            for index, task_item in enumerate(final_task_list):
+                asset = gazu.asset.get_asset(task_item['entity_id'])
+                if asset_name == asset['name']:
+                    task = task_item
+                    task_info = final_task_info_list[index]
+                    casting_info_list, undi_info_list, camera_info_list = self._collect_info_casting(task)
         return task, task_info, casting_info_list, undi_info_list, camera_info_list

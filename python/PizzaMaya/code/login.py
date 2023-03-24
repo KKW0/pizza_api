@@ -46,6 +46,7 @@ class LogIn(object):
         self.logging = Logger()
         self.dir_path = os.path.dirname(os.path.abspath(__file__))+'/.config'
         self.user_path = os.path.join(self.dir_path, 'user.json')
+        self.logging.set_logger()
 
     @property
     def valid_host(self):
@@ -134,7 +135,6 @@ class LogIn(object):
         Raises:
             ValueError: 호스트 URL이 잘못된 경우.
         """
-        self.logging.set_logger()
         gazu.set_host(self.host)
 
         if not gazu.client.host_is_valid():

@@ -26,7 +26,7 @@ class Filter:
         """
         task_info = dict()
         task_info['project_name'] = task['project_name']
-        if task['due_date'] != None:
+        if task['due_date']:
             task_info['due_date'] = task['due_date'].split('T')[0]
         else:
             task_info['due_date'] = task['due_date']
@@ -38,6 +38,7 @@ class Filter:
         shot = gazu.shot.get_shot(shots[0]['shot_id'])
         seq = gazu.shot.get_sequence_from_shot(shot)
         task_info['sequence_name'] = seq['name']
+        task_info['asset_name'] = asset['name']
 
         return task_info, seq['name']
 
@@ -105,11 +106,20 @@ class Filter:
         else:
             output_list = output_list_tmp
 
-        output_dict = dict()
+        output_dict = {
+            'output_type_name': None,
+            'frame_range': None,
+            'output_name': None,
+            'comment': None,
+            'description': None,
+            'shot_name': None
+        }
         output_dict['output_type_name'] = output_type['name']
         if len(output_list) is 0:
-            # raise ValueError(
-                print("shot에 output file이 존재하지 않습니다. Seq:{0}, Shot:{1}".format(shot['sequence_name'], shot['shot_name']))
+            print("shot에 {0} output file이 존재하지 않습니다. Seq: {1}, Shot: {2}".format(output_type['name'],
+                                                                                 shot['sequence_name'],
+                                                                                 shot['shot_name']))
+            info_list.append(output_dict)
         for output in output_list:
             shot = gazu.shot.get_shot(output['entity_id'])
             output_dict['frame_range'] = shot['nb_frames']
@@ -190,7 +200,7 @@ class Filter:
             casting_info_list.append(casting_dict)
         for shot in shot_list:
             jpgs = gazu.files.get_output_type_by_name('UndistortionJpg')
-            abc = gazu.files.get_output_type_by_name('FBX')     ##### Alembic...
+            abc = gazu.files.get_output_type_by_name('FBX')     ##### Alembic으로 바꿔야 함
             if self._get_img_cam_info_dict_list(shot, jpgs, task_match):
                 undi_info_list.append(self._get_img_cam_info_dict_list(shot, jpgs, task_match))
             if self._get_img_cam_info_dict_list(shot, abc, task_cam):

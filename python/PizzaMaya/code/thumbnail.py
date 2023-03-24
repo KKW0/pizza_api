@@ -49,8 +49,11 @@ def thumbnail_control(task_dict, task_num=None, casting_info_list=None, undi_inf
         asset_thumbnail_list = []
         undi_thumbnail_list = []
         layout_asset = gazu.entity.get_entity(task_dict['entity_id'])
-        preview = gazu.files.get_preview_file(layout_asset['preview_file_id'])
-        png = _get_thumbnail(preview)
+        if layout_asset['preview_file_id']:
+            preview = gazu.files.get_preview_file(layout_asset['preview_file_id'])
+            png = _get_thumbnail(preview)
+        else:
+            return None, asset_thumbnail_list, undi_thumbnail_list, None
         if len(casting_info_list) == 0 and len(undi_info_list) == 0:
             return png, asset_thumbnail_list, undi_thumbnail_list, None
         else:

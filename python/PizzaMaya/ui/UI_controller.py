@@ -53,6 +53,9 @@ class MainWindow(QMainWindow):
         self.is_logged_in = False
         self.my_shot_index_list = []
         self.selected_index_list = []  # 선택한 에셋들의 인덱스 번호
+        self.shot_dict_list = None
+        self.custom_camera = None
+        self.all_assets = None
 
         # ----------------------------------------------------------------------------------------------
 
@@ -85,7 +88,7 @@ class MainWindow(QMainWindow):
         self.horizontal_header = HorizontalHeader()
         self.table.setHorizontalHeader(self.horizontal_header)
 
-        self.table2 = Table2()
+        self.table2 = Table2(corner=True)
         self.ui.verticalLayout.addWidget(self.table2, 0)
 
         self.table3 = Table2()
@@ -129,11 +132,14 @@ class MainWindow(QMainWindow):
             self.ft = Filter()
             self.ma = MayaThings()
             self.pub = PublishThings()
-            self.ui.show()
+            self.shot_dict_list, self.custom_camera, self.all_assets = self.ma.get_working_task()
 
             # table1에 데이터 로드
             self.table1_model.load_data(self.read_data())
             self.table1_model.layoutChanged.emit()
+
+            self.scene_open_check()
+            self.ui.show()
         else:
             self.login_window.ui.show()
 
@@ -159,6 +165,40 @@ class MainWindow(QMainWindow):
         # Save 클릭시 Save ui로 전환, Load 클릭시 로드됨
         self.ui.Save_Button.clicked.connect(self.save_button)
         self.ui.Load_Button.clicked.connect(self.load_button)
+
+    # ----------------------------------------------------------------------------------------------
+
+    def scene_open_check(self):
+        """
+        현재 씬에 import된 파일이 있을 경우 작업중인 task와 로드된 asset, camera, undistortion img를 판별하는 함수
+        """
+        self.shot_dict_list, self.custom_camera, self.all_assets = self.ma.get_working_task()
+        if len(self.custom_camera) != 0:
+            seq = gazu.shot.get_sequence_from_shot(self.shot_dict_list[0])['name']
+            for index, item in enumerate(self.task_info):
+                if seq == item['sequence_name']:
+                    self.my_task = self.task[index]
+                    print('{0} task가 씬에 존재하여 자동 선택되었습니다.'.format(seq))
+
+        if len(self.all_assets) != 0:
+            old_asset_list = []
+            for asset in self.all_assets:
+                asset_name = asset.split('_')[2]
+                revision = asset.split('_')[4]
+                proj = gazu.project.get_project_by_name(asset.split[0])
+                output_type = gazu.files.get_output_type_by_name('FBX')
+                task_type = gazu.task.get_task_type_by_name('LayoutPizza')
+                kitsu_asset = gazu.asset.get_asset_by_name(proj, asset_name.title())
+                kitsu_revision = gazu.files.get_last_entity_output_revision(kitsu_asset, output_type, task_type)
+                if revision < kitsu_revision:
+                    old_asset_list.append(asset)
+            ask = QMessageBox()
+            ask.setText('현재 씬에 존재하는 {0}에셋이 최신 파일이 아닙니다. 최신 파일을 로드하시겠습니까?'.format(old_asset_list))
+            ask.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+            ask.setWindowTitle("Old File Exists")
+            reply = ask.exec_()
+            if reply == QMessageBox.Yes:
+                print("현재 레퍼런스된 파일을 새 파일로 교체합니다.")
 
     # ----------------------------------------------------------------------------------------------
 
@@ -193,6 +233,8 @@ class MainWindow(QMainWindow):
             # table1에 데이터 로드
             self.table1_model.load_data(self.read_data())
             self.table1_model.layoutChanged.emit()
+
+            self.scene_open_check()
 
             # 로그인 ui 숨기고 메인 ui 띄움
             self.login_window.ui.hide()
@@ -250,21 +292,28 @@ class MainWindow(QMainWindow):
         """
         선택한 테스크에 대한 작업내용을 퍼블리시하는 버튼 클릭 시 save ui를 띄우고, my_task의 정보를 넘긴다.
         """
-        shot_dict_list, custom_camera, all_assets = self.ma.get_working_task()
-
-        if self.my_task == None and len(custom_camera) == 0 and all_assets == 0:
+        if self.my_task == None and len(self.custom_camera) == 0 and len(self.all_assets) == 0:
             warning = QMessageBox()
             warning.setText("⚠ 비어있는 씬은 퍼블리시할 수 없습니다.")
             warning.setStandardButtons(QMessageBox.Ok)
             warning.setWindowTitle("Error")
             warning.exec_()
-
-        elif self.my_task == None:
-             shot_dict_list[0]
-
-
+        elif self.my_task == None and len(self.custom_camera) == 0:
+            warning = QMessageBox()
+            warning.setText("⚠ 카메라가 존재하지 않는 씬은 퍼블리시할 수 없습니다.")
+            warning.setStandardButtons(QMessageBox.Ok)
+            warning.setWindowTitle("Error")
+            warning.exec_()
         else:
-            self.save.ui.show()
+            seq = gazu.shot.get_sequence_from_shot(self.shot_dict_list[0])['name']
+            asset = gazu.asset.get_asset(self.my_task['entity_id'])
+            warning = QMessageBox()
+            warning.setText("작업물({0}, 이름: {1})을 퍼블리시하는 것이 맞습니까?".format(seq, asset['name']))
+            warning.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+            warning.setWindowTitle("Publish Check")
+            reply = warning.exec_()
+            if reply == QMessageBox.Yes:
+                self.save.ui.show()
 
     def load_button(self):
         """
@@ -278,7 +327,7 @@ class MainWindow(QMainWindow):
                 "{0}개의 에셋과 {1}개의 샷을 로드하시겠습니까?".format(len(self.selected_index_list), len(self.my_shot_index_list)))
             ask.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
             ask.setDefaultButton(QMessageBox.NoButton)
-            ask.setWindowTitle("확인")
+            ask.setWindowTitle("Load Check")
             reply = ask.exec_()
 
             if reply == QMessageBox.Yes:
@@ -345,8 +394,7 @@ class MainWindow(QMainWindow):
         self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(task_info['description']))
         self.ui.InfoTextBox.appendPlainText('Due Date: {0}'.format(task_info['due_date']))
         self.ui.InfoTextBox.appendPlainText(
-            'Comment: {0}'.format(str(task_info['last_comment']['text']).encode('utf-8', errors='ignore')))
-
+            'Comment: {}'.format(task_info['last_comment']['text']))
         self.table2_model.load_data(self.read_data2())
         self.table2_model.layoutChanged.emit()
 
@@ -358,6 +406,13 @@ class MainWindow(QMainWindow):
         어셋 목록이 띄워져있는 테이블뷰를 클릭하였을 때 동작하는 메서드
         선택한 어셋에 기반하여 정보를 받아오고 그 정보를 크게 띄운다.
         """
+        shot_dict_list, custom_camera, all_assets = self.ma.get_working_task()
+
+        for index in range(len(self.casting_info_list)):
+            for asset in all_assets:
+                if self.casting_info_list[index]['asset_name'] in asset:
+                    print('{0} 에셋은 이미 로드되어 클릭이 불가능합니다.'.format(self.casting_info_list[index]['asset_name']))
+
         clicked_cast = self.casting_info_list[event.row()]
         png = bytes(self.asset_thumbnail_list[event.row()])
 
@@ -378,6 +433,13 @@ class MainWindow(QMainWindow):
         샷 목록이 띄워져있는 테이블뷰를 클릭하였을 때 동작하는 메서드
         선택한 샷에 기반하여 정보를 받아오고 그 정보를 크게 띄운다.
         """
+        _, custom_camera, all_assets = self.ma.get_working_task()
+        for index in range(len(self.camera_info_list)):
+            for cam in custom_camera:
+                if self.camera_info_list[index][0]['shot_name'] and \
+                        self.camera_info_list[index][0]['shot_name'] in cam:
+                    print('{0} 샷은 이미 로드되어 클릭이 불가능합니다.'.format(self.camera_info_list[index][0]['shot_name']))
+
         clicked_undi = self.undi_info_list[event.row()][0]
         clicked_cam = self.camera_info_list[event.row()][0]
         png = bytes(self.undi_thumbnail_list[event.row()])
@@ -414,11 +476,12 @@ class MainWindow(QMainWindow):
         task 선택하는 TableView의 데이터를 받아오는 메서드
         filter의 선택에 따라 정보가 바뀐다.
         """
-        self.task, task_info, _, _, _ = self.ft.select_task()
+        self.task, self.task_info, _, _, _ = self.ft.select_task()
         data = []
-        for index in range(len(task_info)):
-            data.append([task_info[index]['project_name'], task_info[index]['sequence_name'],
-                         task_info[index]['due_date']])
+        for index in range(len(self.task_info)):
+            data.append([self.task_info[index]['project_name'],
+                         self.task_info[index]['sequence_name'] + '\n' + self.task_info[index]['asset_name'],
+                         self.task_info[index]['due_date']])
 
         return data
 

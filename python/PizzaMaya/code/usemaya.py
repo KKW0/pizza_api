@@ -140,7 +140,10 @@ class MayaThings:
             num_list = range(len(all_cast_list))
         for index in num_list:
             asset_output = file_dict_list[index]
-            self._load_output(asset_output['path'], asset_output)
+            if asset_output['path'] == '':
+                print('asset에 아웃풋 파일이 존재하지 않습니다. Asset Name: {0}'.format(asset['name']))
+            else:
+                self._load_output(asset_output['path'], asset_output)
 
     def save_scene_file(self, path, representation):
         """
@@ -339,7 +342,7 @@ class MayaThings:
                 cam_name_parts2 = cam_name_parts1[1].split("_")
                 proj_name = (cam_name_parts2[0]).title()
                 proj = gazu.project.get_project_by_name(proj_name)
-                seq_name = cam_name_parts2[1] + '_' + cam_name_parts2[2]  #### seq_1 형태라..
+                seq_name = cam_name_parts2[1]
                 seq = gazu.shot.get_sequence_by_name(proj, seq_name)
                 shot = gazu.shot.get_shot_by_name(seq, cam_name_parts2[-1])
                 shot_dict_list.append(shot)

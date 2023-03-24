@@ -64,12 +64,12 @@ class KitsuThings:
         Returns:
             str: 카메라(fbx 등) 아웃풋 파일이 저장된 path
         """
-        output_type = gazu.files.get_output_type_by_name('FBX')
+        output_type = gazu.files.get_output_type_by_name('FBX')     #### Alembic으로 바꿔야 함
         task_type = gazu.task.get_task_type_by_name('Camera')
         camera_files = gazu.files.get_last_output_files_for_entity(shot, output_type, task_type)
         camera_path = gazu.files.build_entity_output_file_path(shot, output_type, task_type)
         # full_path = camera_path + '.' + camera_files[0]['representation']     ### output file에 안넣어줘서...
-        full_path = camera_path + '.fbx'
+        full_path = camera_path + '.fbx'    ### abc로 바꿔야 함
 
         return full_path
 
@@ -111,9 +111,4 @@ class KitsuThings:
             file_dict['path'] = path
             file_dict['nb_elements'] = out_file['nb_elements']
 
-            return file_dict
-        else:
-            # 아웃풋 파일이 없을 경우 오류 메세지를 출력한다.
-            print('asset에 아웃풋 파일이 존재하지 않습니다. Asset Name: {0}'.format(asset['name']))
-
-            return file_dict
+        return file_dict

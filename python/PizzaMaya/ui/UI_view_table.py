@@ -82,7 +82,6 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         self.setFont(font)
 
         _, _, proj_set, _, self.sort_dict = self.ft.collect_info_task()
-
         self.combo = QtWidgets.QComboBox(self)
         if proj_set:
             proj_set.sort()
@@ -187,18 +186,19 @@ class Table2(QtWidgets.QTableView):
     """
     테스크가 주어진 레이아웃어셋에 캐스팅된 asset 중 작업파일에 임포트 할 asset을 선택하는 TableView
     """
-    def __init__(self):
+    def __init__(self, corner=False):
         """
         헤더와 스타일을 설정한다.
         데이터를 설정해준다.
         """
         super(Table2, self).__init__()
-        self.pizza = None
+
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(10)
         font.setBold(True)
         self.setFont(font)
+        self.corner = corner
 
         # QTableView Headers
         self.vertical_header = self.verticalHeader()
@@ -215,10 +215,11 @@ class Table2(QtWidgets.QTableView):
         self.horizontal_header.setMinimumSectionSize(100)
         self.horizontal_header.setStretchLastSection(True)
 
-        self.setStyleSheet(
-            "background-color: #353535; selection-background-color: gray;};")
-        corner_button = self.findChild(QtWidgets.QAbstractButton)
-        corner_button.setStyleSheet("background-color: #ABABAB; color: black;")
-
         self.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
         self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+
+        if self.corner:
+            self.setStyleSheet(
+                "background-color: #353535; selection-background-color: gray;};")
+            corner_button = self.findChild(QtWidgets.QAbstractButton)
+            corner_button.setStyleSheet("background-color: #ABABAB; color: black;")

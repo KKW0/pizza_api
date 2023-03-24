@@ -136,13 +136,7 @@ class MainWindow(QMainWindow):
             self.table1_model.load_data(self.read_data())
             self.table1_model.layoutChanged.emit()
 
-            if len(self.custom_camera) != 0 and len(self.all_assets) != 0:
-                seq = gazu.shot.get_sequence_from_shot(self.shot_dict_list[0])['name']
-                for index, item in enumerate(self.task_info):
-                    if seq == item['sequence_name']:
-                        self.my_task = self.task[index]
-                        print('{0} task가 씬에 존재하여 자동 선택되었습니다.'.format(seq))
-
+            self.scene_open_check()
             self.ui.show()
         else:
             self.login_window.ui.show()
@@ -169,6 +163,40 @@ class MainWindow(QMainWindow):
         # Save 클릭시 Save ui로 전환, Load 클릭시 로드됨
         self.ui.Save_Button.clicked.connect(self.save_button)
         self.ui.Load_Button.clicked.connect(self.load_button)
+
+    # ----------------------------------------------------------------------------------------------
+
+    def scene_open_check(self):
+        """
+        현재 씬에 import된 파일이 있을 경우 작업중인 task와 로드된 asset, camera, undistortion img를 판별하는 함수
+        """
+        self.shot_dict_list, self.custom_camera, self.all_assets = self.ma.get_working_task()
+        if len(self.custom_camera) != 0:
+            seq = gazu.shot.get_sequence_from_shot(self.shot_dict_list[0])['name']
+            for index, item in enumerate(self.task_info):
+                if seq == item['sequence_name']:
+                    self.my_task = self.task[index]
+                    print('{0} task가 씬에 존재하여 자동 선택되었습니다.'.format(seq))
+
+        if len(self.all_assets) != 0:
+            old_asset_list = []
+            for asset in self.all_assets:
+                asset_name = asset.split('_')[2]
+                revision = asset.split('_')[4]
+                proj = gazu.project.get_project_by_name(asset.split[0])
+                output_type = gazu.files.get_output_type_by_name('FBX')
+                task_type = gazu.task.get_task_type_by_name('LayoutPizza')
+                kitsu_asset = gazu.asset.get_asset_by_name(proj, asset_name.title())
+                kitsu_revision = gazu.files.get_last_entity_output_revision(kitsu_asset, output_type, task_type)
+                if revision < kitsu_revision:
+                    old_asset_list.append(asset)
+            ask = QMessageBox()
+            ask.setText('현재 씬에 존재하는 {0}에셋이 최신 파일이 아닙니다. 최신 파일을 로드하시겠습니까?'.format(old_asset_list))
+            ask.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+            ask.setWindowTitle("Old File Exists")
+            reply = ask.exec_()
+            if reply == QMessageBox.Yes:
+                print("현재 레퍼런스된 파일을 새 파일로 교체합니다.")
 
     # ----------------------------------------------------------------------------------------------
 
@@ -204,13 +232,7 @@ class MainWindow(QMainWindow):
             self.table1_model.load_data(self.read_data())
             self.table1_model.layoutChanged.emit()
 
-            self.shot_dict_list, self.custom_camera, self.all_assets = self.ma.get_working_task()
-            if len(self.custom_camera) != 0 and len(self.all_assets) != 0:
-                seq = gazu.shot.get_sequence_from_shot(self.shot_dict_list[0])['name']
-                for index, item in enumerate(self.task_info):
-                    if seq == item['sequence_name']:
-                        self.my_task = self.task[index]
-                        print('{0} task가 씬에 존재하여 자동 선택되었습니다.'.format(seq))
+            self.scene_open_check()
 
             # 로그인 ui 숨기고 메인 ui 띄움
             self.login_window.ui.hide()

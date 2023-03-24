@@ -380,10 +380,9 @@ class MainWindow(QMainWindow):
             model: QTableView에 SetModel 한 QTableModel
         """
         asset_rows = model.rowCount()
-        for index in asset_rows:
+        for index in range(asset_rows):
             png_index = model.index(index, 0)
-            item = model.itemFromIndex(png_index)
-            data = item.text()
+            data = model.data(png_index)
             if data == None:
                 print("{0}번 row는 로드할 데이터가 없어 선택할 수 없습니다.".format(index))
 
@@ -408,9 +407,11 @@ class MainWindow(QMainWindow):
         self.ui.InfoTextBox.setPlainText('Project Name: {}'.format(task_info['project_name'] + '\n'))
         self.ui.InfoTextBox.appendPlainText('Description: {0}'.format(task_info['description']))
         self.ui.InfoTextBox.appendPlainText('Due Date: {0}'.format(task_info['due_date']))
-        self.ui.InfoTextBox.appendPlainText(
-            'Comment: {}'.format(task_info['last_comment']['text']))
-
+        if task_info['last_comment']:
+            self.ui.InfoTextBox.appendPlainText(
+                'Comment: {}'.format(task_info['last_comment']['text'].encode('utf-8')))
+        else:
+            self.ui.InfoTextBox.appendPlainText('Comment: None')
         self.table2_model.load_data(self.read_data2())
         self.table2_model.layoutChanged.emit()
         self.no_data_no_click(self.table2_model)
@@ -529,10 +530,13 @@ class MainWindow(QMainWindow):
         task 선택 후 data가 생성된다.
         """
         data = []
-        if self.my_task is not None:
+        if self.my_task:
             # 샷 목록 추가
-            for index, info_list in enumerate(self.undi_info_list):
-                data.append([self.undi_thumbnail_list[index], self.shot_list[index]['shot_name']])
+            for index, _ in enumerate(self.undi_info_list):
+                if self.shot_list:
+                    data.append([self.undi_thumbnail_list[index], self.shot_list[index]['shot_name']])
+                else:
+                    data.append([None, 'No Output File to Load'])
 
             return data
         else:

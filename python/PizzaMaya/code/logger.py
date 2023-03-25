@@ -96,7 +96,10 @@ class Logger:
             user_name(str): 로그인한 사용자의 이름
             working_file(str): working file이 저장될 path str
         """
-        return self.log.debug("{} create maya file in " .format(file_name))
+        if type(file_name) == set:
+            return self.log.debug("{0}번째 에셋이 로드되었습니다.".format(str(file_name)))
+        else:
+            return self.log.debug("로드된 에셋 이름: {0}".format(file_name))
 
     def save_output_file_log(self, file_name):
         """

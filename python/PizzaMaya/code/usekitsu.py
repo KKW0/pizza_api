@@ -90,6 +90,7 @@ class KitsuThings:
             dict: 아웃풋 파일들의 패스(확장자 포함), 개수가 담긴 dict
         """
         file_dict = {
+            'name': "",
             'path': "",
             'nb_elements': 0,
         }
@@ -108,6 +109,7 @@ class KitsuThings:
                 path = out_path + '_' + '[1-' + str(out_file['nb_elements']) + '].fbx' ### output file에 안넣어줘서..2
             else:
                 path = out_path + '.fbx'
+            file_dict['name'] = asset['name']
             file_dict['path'] = path
             file_dict['nb_elements'] = out_file['nb_elements']
 

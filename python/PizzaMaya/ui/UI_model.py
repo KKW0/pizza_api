@@ -12,6 +12,7 @@ class CustomTableModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self)
         if table_data is None:
             table_data = []
+        self.asset_name = None
         self.row_count = None
         self.input_data = None
         self.column_count = None
@@ -80,3 +81,10 @@ class CustomTableModel(QAbstractTableModel):
             return True
 
         return False
+
+    def flags(self, index):
+        if self.input_data[index.row()][0] is None:
+            return Qt.ItemFlags(Qt.ItemIsEnabled)
+        if self.asset_name and self.input_data[index.row()][1] == self.asset_name:
+            return Qt.ItemFlags(Qt.ItemIsEnabled)
+        return Qt.ItemFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)

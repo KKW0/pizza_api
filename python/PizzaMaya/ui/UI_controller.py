@@ -49,12 +49,14 @@ class MainWindow(QMainWindow):
         self.undi_thumbnail_list = None
         self.asset_thumbnail_list = None
         self.shot_list = None
+        self.user_name = None
         self.is_logged_in = False
         self.my_shot_index_list = []
         self.selected_index_list = []  # 선택한 에셋들의 인덱스 번호
         self.shot_dict_list = None
         self.custom_camera = None
         self.all_assets = None
+        self.old_or_not = dict()
 
         # ----------------------------------------------------------------------------------------------
 
@@ -124,7 +126,7 @@ class MainWindow(QMainWindow):
             self.login.user_pw = value['user_pw']
             self.login.auto_login = value['auto_login']
             self.login.connect_host()
-            self.login.log_in()
+            _, self.user_name = self.login.log_in()
             self.is_logged_in = True
 
             self.save = Save()
@@ -178,10 +180,13 @@ class MainWindow(QMainWindow):
                 if seq == item['sequence_name']:
                     self.my_task = self.task[index]
                     print('{0} task가 씬에 존재하여 자동 선택되었습니다.'.format(seq))
+                    self.table.selectRow(index)
+                    self.table_clicked(None, index)
 
         if len(self.all_assets) != 0:
             old_asset_list = []
             for asset in self.all_assets:
+                asset_rn = '_'.join(asset.split('_')[:-1]) + 'RN'
                 asset_name = asset.split('_')[2]
                 revision = asset.split('_')[4]
                 proj = gazu.project.get_project_by_name(asset.split('_')[0])
@@ -200,6 +205,7 @@ class MainWindow(QMainWindow):
                         reply = ask.exec_()
                         if reply == QMessageBox.Yes:
                             print("현재 레퍼런스된 파일을 새 파일로 교체합니다.")
+                            self.ma.update_reference(kitsu_asset, asset_rn, kitsu_revision, output_type, task_type)
 
     # ----------------------------------------------------------------------------------------------
 
@@ -222,7 +228,7 @@ class MainWindow(QMainWindow):
 
         # 로그인 진행
         tf1 = self.login.connect_host()
-        tf2 = self.login.log_in()
+        tf2, self.user_name = self.login.log_in()
         self.is_logged_in = True
 
         if tf1 and tf2 and self.is_logged_in:
@@ -275,7 +281,6 @@ class MainWindow(QMainWindow):
         completed.setStandardButtons(QMessageBox.Ok)
         completed.setWindowTitle("Completed")
         self.log.save_output_file_log(self.my_task['entity_name'])
-        # 로그가 찍히네용 정보값만 넣어주면 될거같아요
 
         completed.exec_()
 
@@ -383,7 +388,7 @@ class MainWindow(QMainWindow):
             png_index = model.index(index, 0)
             data = model.data(png_index)
             if data == None:
-                print("{0}번 row는 로드할 데이터가 없어 선택할 수 없습니다.".format(index))
+                print("{0}번 항목은 로드할 데이터가 없어 선택할 수 없습니다.".format(index))
 
     def already_loaded_no_click(self, item, model):
         shot_dict_list, custom_camera, all_assets = self.ma.get_working_task()
@@ -392,21 +397,27 @@ class MainWindow(QMainWindow):
             for index in range(len(self.casting_info_list)):
                 for asset in all_assets:
                     if self.casting_info_list[index]['asset_name'] in asset:
-                        print('{0} 에셋은 이미 로드되어 클릭이 불가능합니다.'.format(self.casting_info_list[index]['asset_name']))
+                        print('{0} 에셋은 이미 로드되어 선택할 수 없습니다.'.format(self.casting_info_list[index]['asset_name']))
+                        model.asset_name = self.casting_info_list[index]['asset_name']
 
         elif item == "shot":
             for index in range(len(self.camera_info_list)):
                 for cam in custom_camera:
                     if self.camera_info_list[index][0]['shot_name'] and \
                             self.camera_info_list[index][0]['shot_name'] in cam:
-                        print('{0} 샷은 이미 로드되어 클릭이 불가능합니다.'.format(self.camera_info_list[index][0]['shot_name']))
+                        print('{0} 샷은 이미 로드되어 선택할 수 없습니다.'.format(self.camera_info_list[index][0]['shot_name']))
+                        model.asset_name = self.camera_info_list[index][0]['shot_name']
 
-    def table_clicked(self, event):
+    def table_clicked(self, event, index=None):
         """
         테스크 목록이 띄워져있는 테이블뷰를 클릭하였을 때 동작하는 메서드
         선택한 테스크에 기반하여 파일 임포트 할 때와 테이블뷰2, 테이블뷰3에 필요한 정보를 받아온다.
         """
-        task_clicked_index = event.row()
+        if index:
+            task_clicked_index = index
+        else:
+            task_clicked_index = event.row()
+
         clicked_asset = self.table.model().data(self.table.model().index(task_clicked_index, 1))
         self.my_task, task_info, self.casting_info_list, \
             self.undi_info_list, self.camera_info_list = self.ft.select_task(self.horizontal_header.proj_index,
@@ -455,7 +466,7 @@ class MainWindow(QMainWindow):
         self.ui.InfoTextBox.appendPlainText('Asset Type: {0}'.format(clicked_cast['asset_type_name']))
         self.ui.InfoTextBox.appendPlainText('Occurence: {0}'.format(str(clicked_cast['nb_occurences'])))
         self.ui.InfoTextBox.appendPlainText('Output File: {0}'.format(str(len(clicked_cast['output']))))
-        self.ui.InfoTextBox.appendPlainText('Newest or Not: Not')  # 모든 아웃풋 파일들이 전부 최신 리비전이면 YES로 표기
+        self.ui.InfoTextBox.appendPlainText('Latest or Not: {0}'.format(self.old_or_not[clicked_cast['asset_name']]))
 
     def table_clicked3(self, event):
         """
@@ -517,10 +528,12 @@ class MainWindow(QMainWindow):
         if self.my_task is not None:
             # 캐스팅된 에셋목록 추가
             for index, cast in enumerate(self.casting_info_list):
-                if len(cast['output']) == 0:
-                    data.append([None, cast['asset_name'], 'No Output File to Load'])
-                else:
+                if len(cast['output']) != 0:
+                    self.old_or_not[self.casting_info_list[index]['asset_name']] = 'Latest File Exists'
                     data.append([self.asset_thumbnail_list[index], cast['asset_name'], cast['asset_type_name']])
+                else:
+                    self.old_or_not[self.casting_info_list[index]['asset_name']] = None
+                    data.append([None, cast['asset_name'], 'No Output File to Load'])
 
             return data
         else:
@@ -536,7 +549,7 @@ class MainWindow(QMainWindow):
         if self.my_task:
             # 샷 목록 추가
             for index, _ in enumerate(self.undi_info_list):
-                if self.shot_list:
+                if len(self.undi_thumbnail_list) and len(self.shot_list):
                     data.append([self.undi_thumbnail_list[index], self.shot_list[index]['shot_name']])
                 else:
                     data.append([None, 'No Output File to Load'])

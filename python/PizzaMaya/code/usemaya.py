@@ -136,9 +136,6 @@ class MayaThings:
             output_path_nb_dict = self.kit.get_asset_path(casting)
             if output_path_nb_dict:
                 file_dict_list.append(output_path_nb_dict)
-        if num_list is ['All']:
-            # 캐스팅된 것들의 전체 선택인 경우        #### 구현 필요
-            num_list = range(len(all_cast_list))
         for index in num_list:
             asset_output = file_dict_list[index]
             if asset_output['path'] == '':
@@ -358,3 +355,10 @@ class MayaThings:
                 shot_dict_list.append(shot)
 
         return shot_dict_list, custom_camera, all_assets
+
+    def update_reference(self, asset, asset_name_rn, revision, output_type, task_type):
+        new_revision_path = gazu.files.build_entity_output_file_path(asset, output_type, task_type,
+                                                                      representation='fbx',
+                                                                      revision=revision)
+        new_file_path = new_revision_path + '.fbx'
+        mc.file(new_file_path, loadReference=asset_name_rn)

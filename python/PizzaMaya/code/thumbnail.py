@@ -78,8 +78,9 @@ def thumbnail_control(task_dict, task_num=None, casting_info_list=None, undi_inf
             for shot in shot_list:
                 task = gazu.task.get_task_by_entity(shot['shot_id'], task_type)
                 previews = gazu.files.get_all_preview_files_for_task(task)
-                undi_png = _get_thumbnail(previews[0])
-                undi_thumbnail_list.append(undi_png)
+                if previews:
+                    undi_png = _get_thumbnail(previews[0])
+                    undi_thumbnail_list.append(undi_png)
             return png, asset_thumbnail_list, undi_thumbnail_list, shot_list
 
         # 카메라는 썸네일 없음

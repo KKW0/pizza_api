@@ -163,12 +163,12 @@ class LogIn(object):
             self.logging.failed_log()
             raise ValueError('에러 메시지 : 사용자 ID 또는 암호가 잘못 입력되었습니다.')
 
-        self._user = log_in['user']
+        self.user = log_in['user']
         self.valid_user = True
         self.save_setting()
         self.logging.enter_log(self.user["full_name"])
 
-        return True
+        return True, self.user["full_name"]
 
     def log_out(self):
         """

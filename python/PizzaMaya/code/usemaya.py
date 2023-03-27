@@ -68,6 +68,8 @@ class MayaThings:
             returnNewNodes=True
             # 변수에 노드의 정보값을 넣으려고 쓰는 거라 없어도 될 듯
         )
+        i = 0
+        v = 0
         if asset and asset['nb_elements'] > 1:
             # 에셋이라면 nb_elements에 맞게 인스턴싱 진행
             for index in range(asset['nb_elements']-1):
@@ -75,7 +77,15 @@ class MayaThings:
                 file_name_parts = full_filename.split('_')
                 import_name = '_'.join(file_name_parts[:-1]) \
                               + '__1_' + str(asset['nb_elements']) + '__' + file_name_parts[2]
-                mc.instance(import_name)
+                instance_geo = mc.instance(import_name)
+                bounding_box = mc.exactWorldBoundingBox(instance_geo, ce=1)
+                if index < 10:
+                    mc.setAttr("%s.translateX" % instance_geo[0], i)
+                    i+=bounding_box[3]*2
+                else:
+                    mc.setAttr("%s.translateZ" % instance_geo[0], bounding_box[5] * 2)
+                    mc.setAttr("%s.translateX" % instance_geo[0], v)
+                    v += bounding_box[3] * 2
 
     def _connect_image(self, undi_path, camera_path):
         """

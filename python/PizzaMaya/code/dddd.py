@@ -77,13 +77,49 @@ def make(proj, t=None, tt=None, sof=None, ot=None, rp=None):
     gazu.files.new_entity_output_file(shot1, ot, tt,
                                       comment, w1, representation=rp)
 
-task = gazu.task.get_task_by_entity(shot1, task_type_mm)
-make(project, task, task_type_mm, ot=output_type_ujpg, rp='jpg')
+# task = gazu.task.get_task_by_entity(shot1, task_type_mm)
+# make(project, task, task_type_mm, ot=output_type_ujpg, rp='jpg')
+#
+# task = gazu.task.get_task_by_entity(shot1, task_type_cam)
+# make(project, task, task_type_cam, ot=output_type_abc, rp='abc')
+#
+# task = gazu.task.get_task_by_entity(shot1, task_type_cam)
+# make(project, task, task_type_cam, ot=output_type_abc, rp='abc')
 
-task = gazu.task.get_task_by_entity(shot1, task_type_cam)
-make(project, task, task_type_cam, ot=output_type_abc, rp='abc')
 
-task = gazu.task.get_task_by_entity(shot1, task_type_cam)
-make(project, task, task_type_cam, ot=output_type_abc, rp='abc')
 
-        
+
+mountpoint = '/mnt/Project'
+root = 'JS'
+tree = {
+    "working": {
+        "mountpoint": mountpoint,
+        "root": root,
+        "folder_path": {
+            "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/working/v<Revision>",
+            "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/working/v<Revision>",
+            "style": "lowercase"
+        },
+        "file_name": {
+            "shot": "<Project>_<Sequence>_<Shot>_<TaskType>_<Revision>",
+            "asset": "<Project>_<AssetType>_<Asset>_<TaskType>_<Revision>",
+            "style": "lowercase"
+        }
+    },
+    "output": {
+        "mountpoint": mountpoint,
+        "root": root,
+        "folder_path": {
+            "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/output/<OutputType>/v<Revision>",
+            "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/output/<OutputType>/v<Revision>",
+            "style": "lowercase"
+        },
+        "file_name": {
+            "shot": "<Project>_<Sequence>_<Shot>_<OutputType>_v<Revision>",
+            "asset": "<Project>_<AssetType>_<Asset>_<OutputType>_v<Revision>",
+            "style": "lowercase"
+        }
+    }
+}
+
+gazu.files.update_project_file_tree(project, tree)

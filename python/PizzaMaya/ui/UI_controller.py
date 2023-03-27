@@ -127,6 +127,8 @@ class MainWindow(QMainWindow):
             self.login.auto_login = value['auto_login']
             self.login.connect_host()
             _, self.user_name = self.login.log_in()
+            text = 'User: ' + self.user_name
+            self.ui.User_Name.setText(text.encode('utf-8'))
             self.is_logged_in = True
 
             self.save = Save()
@@ -229,6 +231,8 @@ class MainWindow(QMainWindow):
         # 로그인 진행
         tf1 = self.login.connect_host()
         tf2, self.user_name = self.login.log_in()
+        text = 'User: ' + self.user_name
+        self.ui.User_Name.setText(text.encode('utf-8'))
         self.is_logged_in = True
 
         if tf1 and tf2 and self.is_logged_in:
@@ -530,7 +534,10 @@ class MainWindow(QMainWindow):
             for index, cast in enumerate(self.casting_info_list):
                 if len(cast['output']) != 0:
                     self.old_or_not[self.casting_info_list[index]['asset_name']] = 'Latest File Exists'
-                    data.append([self.asset_thumbnail_list[index], cast['asset_name'], cast['asset_type_name']])
+                    if len(self.asset_thumbnail_list):
+                        data.append([self.asset_thumbnail_list[index], cast['asset_name'], cast['asset_type_name']])
+                    else:
+                        data.append([None, cast['asset_name'], cast['asset_type_name']])
                 else:
                     self.old_or_not[self.casting_info_list[index]['asset_name']] = None
                     data.append([None, cast['asset_name'], 'No Output File to Load'])
@@ -549,8 +556,12 @@ class MainWindow(QMainWindow):
         if self.my_task:
             # 샷 목록 추가
             for index, _ in enumerate(self.undi_info_list):
-                if len(self.undi_thumbnail_list) and len(self.shot_list):
-                    data.append([self.undi_thumbnail_list[index], self.shot_list[index]['shot_name']])
+                if self.shot_list:
+                    if len(self.undi_thumbnail_list):
+                        data.append([self.undi_thumbnail_list[index], self.shot_list[index]['shot_name']])
+                    else:
+                        data.append([None, self.shot_list[index]['shot_name']])
+
                 else:
                     data.append([None, 'No Output File to Load'])
 

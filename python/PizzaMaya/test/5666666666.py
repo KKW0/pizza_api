@@ -37,40 +37,7 @@ class SET():
         self.output_type_abc = gazu.files.get_output_type_by_name('Alembic')
         self.output_type_fbx = gazu.files.get_output_type_by_name('FBX')
 
-        # mountpoint = '/mnt/project'
-        # root = 'JS'
-        # tree = {
-        #     "working": {
-        #         "mountpoint": mountpoint,
-        #         "root": root,
-        #         "folder_path": {
-        #             "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/working/v<Revision>",
-        #             "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/working/v<Revision>",
-        #             "style": "lowercase"
-        #         },
-        #         "file_name": {
-        #             "shot": "<Project>_<Sequence>_<Shot>_<TaskType>_<Revision>",
-        #             "asset": "<Project>_<AssetType>_<Asset>_<TaskType>_<Revision>",
-        #             "style": "lowercase"
-        #         }
-        #     },
-        #     "output": {
-        #         "mountpoint": mountpoint,
-        #         "root": root,
-        #         "folder_path": {
-        #             "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/output/<OutputType>/v<Revision>",
-        #             "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/output/<OutputType>/v<Revision>",
-        #             "style": "lowercase"
-        #         },
-        #         "file_name": {
-        #             "shot": "<Project>_<Sequence>_<Shot>_<OutputType>_v<Revision>",
-        #             "asset": "<Project>_<AssetType>_<Asset>_<OutputType>_v<Revision>",
-        #             "style": "lowercase"
-        #         }
-        #     }
-        # }
-        #
-        # gazu.files.update_project_file_tree(self.project, tree)
+
 
 
         self.task = gazu.task.get_task_by_entity(self.shot2, self.task_type_mm)

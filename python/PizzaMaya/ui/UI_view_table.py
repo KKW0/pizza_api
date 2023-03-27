@@ -48,6 +48,7 @@ class HorizontalHeader(QtWidgets.QHeaderView):
         if proj_set:
             proj_set.sort()
         self.combo.addItems(['Project'] + proj_set)
+        self.combo.setStyleSheet("font-family: Arial; font-size: 10pt; font-weight: bold;")
         self.combo.currentTextChanged.connect(self.combobox_changed)
         self.combo.setGeometry(self.sectionViewportPosition(0), 0, self.sectionSize(0) - 0, self.height())
         self.combo.show()

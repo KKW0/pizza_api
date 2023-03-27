@@ -67,7 +67,7 @@ class Filter:
 
         return task_info_list, task_list, proj_set
 
-    def _get_img_cam_info_dict_list(self, shot, output_type, task_type):
+    def _get_img_cam_info_dict_list(self, shot, output_type, task_type, p=None):
         """
        리스트에 아웃풋 파일(언디스토션 이미지, camera)의 정보 중 필요한 정보를 선별하여 담는 매서드
 
@@ -106,7 +106,7 @@ class Filter:
             'shot_name': None
         }
         output_dict['output_type_name'] = output_type['name']
-        if len(output_list) is 0:
+        if len(output_list) is 0 and p:
             print("shot에 {0} output file이 존재하지 않습니다. Seq: {1}, Shot: {2}".format(output_type['name'],
                                                                                  shot['sequence_name'],
                                                                                  shot['shot_name']))
@@ -193,9 +193,9 @@ class Filter:
             jpgs = gazu.files.get_output_type_by_name('UndistortionJpg')
             abc = gazu.files.get_output_type_by_name('FBX')     ##### Alembic으로 바꿔야 함
             if self._get_img_cam_info_dict_list(shot, jpgs, task_match):
-                undi_info_list.append(self._get_img_cam_info_dict_list(shot, jpgs, task_match))
+                undi_info_list.append(self._get_img_cam_info_dict_list(shot, jpgs, task_match, 1))
             if self._get_img_cam_info_dict_list(shot, abc, task_cam):
-                camera_info_list.append(self._get_img_cam_info_dict_list(shot, abc, task_cam))
+                camera_info_list.append(self._get_img_cam_info_dict_list(shot, abc, task_cam, 1))
 
         return casting_info_list, undi_info_list, camera_info_list
 

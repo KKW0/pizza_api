@@ -295,7 +295,7 @@ class MayaThings:
             mc.setAttr("%s.visibility" % cam_name_parts[1], False)
 
         cam_name_parts = custom_camera.split('|')
-        # mc.setAttr("%s.visibility" % cam_name_parts[1], True)
+        mc.setAttr("%s.visibility" % cam_name_parts[1], True)
         mc.lookThru(custom_camera)
         mc.playblast(
             format='qt',

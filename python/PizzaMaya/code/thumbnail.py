@@ -49,13 +49,14 @@ def thumbnail_control(task_dict, task_num=None, casting_info_list=None, undi_inf
         asset_thumbnail_list = []
         undi_thumbnail_list = []
         layout_asset = gazu.entity.get_entity(task_dict['entity_id'])
+        shot_list = gazu.casting.get_asset_cast_in(layout_asset)
         if layout_asset['preview_file_id']:
             preview = gazu.files.get_preview_file(layout_asset['preview_file_id'])
             png = _get_thumbnail(preview)
         else:
-            return None, asset_thumbnail_list, undi_thumbnail_list, None
-        if len(casting_info_list) == 0 and len(undi_info_list) == 0:
-            return png, asset_thumbnail_list, undi_thumbnail_list, None
+            png = None
+        if len(casting_info_list) == 0:
+            asset_thumbnail_list = None
         else:
             for info in casting_info_list:
                 # 캐스팅된 에셋들의 썸네일
@@ -71,17 +72,16 @@ def thumbnail_control(task_dict, task_num=None, casting_info_list=None, undi_inf
                 asset_thumbnail_list.append(data)
         # 언디스토션 이미지의 프리뷰. Matchmove 팀이 올린 프리뷰들 중 가장 최근 것.
         if len(undi_info_list) == 0:
-            return png, asset_thumbnail_list, undi_thumbnail_list, None
+            undi_thumbnail_list = None
         else:
             task_type = gazu.task.get_task_type_by_name('Matchmove')
-            shot_list = gazu.casting.get_asset_cast_in(layout_asset)
             for shot in shot_list:
                 task = gazu.task.get_task_by_entity(shot['shot_id'], task_type)
                 previews = gazu.files.get_all_preview_files_for_task(task)
                 if previews:
                     undi_png = _get_thumbnail(previews[0])
                     undi_thumbnail_list.append(undi_png)
-            return png, asset_thumbnail_list, undi_thumbnail_list, shot_list
+        return png, asset_thumbnail_list, undi_thumbnail_list, shot_list
 
         # 카메라는 썸네일 없음
 

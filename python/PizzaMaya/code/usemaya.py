@@ -294,6 +294,7 @@ class MayaThings:
         undi_seq_path = self.kit.get_undistortion_img(shot)
         file_list = os.listdir(os.path.dirname(undi_seq_path))
         frame_range = len(file_list)
+        print('A', frame_range)
 
         # 다른 카메라랑 이미지플레인 다 끄고, 샷에 해당하는 카메라만 켜서 플레이블라스트 프리뷰 저장
         startup_cameras = []
@@ -301,9 +302,9 @@ class MayaThings:
         for cam in all_cameras:
             if mc.camera(mc.listRelatives(cam, parent=True)[0], startupCamera=True, q=True):
                 startup_cameras.append(cam)
-        for cam in startup_cameras:
-            cam_name_parts = cam.split('|')
-            mc.setAttr("%s.visibility" % cam_name_parts[1], False)
+        # for cam in startup_cameras:
+        #     cam_name_parts = cam.split('|')
+        #     mc.setAttr("%s.visibility" % cam_name_parts[1], False)
 
         cam_name_parts = custom_camera.split('|')
         mc.setAttr("%s.visibility" % cam_name_parts[1], True)
@@ -322,9 +323,9 @@ class MayaThings:
             wh=(1920, 1080)
         )
 
-        for cam in startup_cameras:
-            cam_name_parts = cam.split('|')
-            mc.setAttr("%s.visibility" % cam_name_parts[1], True)
+        # for cam in startup_cameras:
+        #     cam_name_parts = cam.split('|')
+        #     mc.setAttr("%s.visibility" % cam_name_parts[1], True)
 
     def export_shot_scene(self, path, shot, camera):
         """

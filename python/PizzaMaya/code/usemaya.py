@@ -1,5 +1,6 @@
 #coding:utf8
 import os
+import re
 import gazu
 import pprint as pp
 import maya.cmds as mc
@@ -266,7 +267,7 @@ class MayaThings:
         # main preview file 저장
         self._make_main_preview_mov(preview_path)
         
-    def export_shot_previews(self, path, shot, camera):
+    def export_shot_previews(self, path, shot, custom_camera):
         """
         각 샷에 해당하는 preview 영상을 저장하는 매서드
 
@@ -284,29 +285,35 @@ class MayaThings:
         frame_range = len(file_list)
 
         # 다른 카메라랑 이미지플레인 다 끄고, 샷에 해당하는 카메라만 켜서 플레이블라스트 프리뷰 저장
-        shot_name = shot['name']
-        if shot_name not in camera:
-            cam_name_parts = camera.split('|')
+        startup_cameras = []
+        all_cameras = mc.ls(type='camera', l=True)
+        for cam in all_cameras:
+            if mc.camera(mc.listRelatives(cam, parent=True)[0], startupCamera=True, q=True):
+                startup_cameras.append(cam)
+        for cam in startup_cameras:
+            cam_name_parts = cam.split('|')
             mc.setAttr("%s.visibility" % cam_name_parts[1], False)
-        else:
-            cam_name_parts = camera.split('|')
+
+        cam_name_parts = custom_camera.split('|')
+        # mc.setAttr("%s.visibility" % cam_name_parts[1], True)
+        mc.lookThru(custom_camera)
+        mc.playblast(
+            format='qt',
+            filename=path,
+            sequenceTime=False,
+            clearCache=True, viewer=True,
+            showOrnaments=True,
+            percent=50,
+            compression="jpeg",
+            quality=50,
+            startTime=0,
+            endTime=frame_range,
+            wh=(1920, 1080)
+        )
+
+        for cam in startup_cameras:
+            cam_name_parts = cam.split('|')
             mc.setAttr("%s.visibility" % cam_name_parts[1], True)
-            mc.lookThru(camera)
-            mc.playblast(
-                format='qt',
-                filename=path,
-                sequenceTime=False,
-                clearCache=True, viewer=True,
-                showOrnaments=True,
-                percent=50,
-                compression="jpeg",
-                quality=50,
-                startTime=0,
-                endTime=frame_range,
-                wh=(1920, 1080)
-            )
-            mc.setAttr("%s.visibility" % cam_name_parts[1], False)
-            # 켰던 카메라 다시 꺼줌
 
     def export_shot_scene(self, path, shot, camera):
         """
@@ -358,12 +365,13 @@ class MayaThings:
         if custom_camera:
             for cam_name in custom_camera:
                 cam_name_parts1 = cam_name.split("|")
-                cam_name_parts2 = cam_name_parts1[1].split("_")
+                cam_name_parts_list = re.split(r'V(\d+)', cam_name_parts1[1])
+                cam_name_parts2 = cam_name_parts_list[0].split('_')
                 proj_name = (cam_name_parts2[0]).title()
                 proj = gazu.project.get_project_by_name(proj_name)
                 seq_name = cam_name_parts2[1]
                 seq = gazu.shot.get_sequence_by_name(proj, seq_name)
-                shot = gazu.shot.get_shot_by_name(seq, cam_name_parts2[-1])
+                shot = gazu.shot.get_shot_by_name(seq, cam_name_parts2[2])
                 shot_dict_list.append(shot)
 
         return shot_dict_list, custom_camera, all_assets

@@ -215,20 +215,20 @@ class PublishThings:
             custom_camera_list(list): 현재 작업중인 마야 씬에 존재하는 카메라의 집합
             comment(str): 퍼블리시할 때 사용할 comment
         """
-        revision = 0
+        revision = 1
         task_type = gazu.task.get_task_type_by_name('Layout')
         output_type = gazu.files.get_output_type_by_name('MayaBinary')
         for shot, cam in zip(shot_list, custom_camera_list):
-            pre_path = gazu.files.build_entity_output_file_path(shot, self._preview_type,
-                                                                task_type, revision=revision)
-            if not os.path.exists(pre_path):
-                os.makedirs(pre_path)
-            mb_path = gazu.files.build_entity_output_file_path(shot, output_type, task_type, revision=revision)
-            while os.path.exists(pre_path) is True:
-                revision += 1
+            while True:
                 pre_path = gazu.files.build_entity_output_file_path(shot, self._preview_type,
                                                                     task_type, revision=revision)
                 mb_path = gazu.files.build_entity_output_file_path(shot, output_type, task_type, revision=revision)
+                if os.path.exists(os.path.dirname(pre_path)) == False or os.path.exists(os.path.dirname(mb_path)) == False:
+                    os.makedirs(os.path.dirname(pre_path))
+                    os.makedirs(os.path.dirname(mb_path))
+                    break
+                else:
+                    revision += 1
             self.maya.export_shot_previews(pre_path, shot, cam)
             self.maya.export_shot_scene(mb_path, shot, cam)
 

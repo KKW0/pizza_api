@@ -306,13 +306,14 @@ class MainWindow(QMainWindow):
         """
         선택한 테스크에 대한 작업내용을 퍼블리시하는 버튼 클릭 시 save ui를 띄우고, my_task의 정보를 넘긴다.
         """
-        if self.my_task == None and len(self.custom_camera) == 0 and len(self.all_assets) == 0:
+        self.shot_dict_list, self.custom_camera, self.all_assets = self.ma.get_working_task()
+        if self.my_task == None or len(self.custom_camera) == 0 or len(self.all_assets) == 0:
             warning = QMessageBox()
             warning.setText("⚠ 비어있는 씬은 퍼블리시할 수 없습니다.")
             warning.setStandardButtons(QMessageBox.Ok)
             warning.setWindowTitle("Error")
             warning.exec_()
-        elif self.my_task == None and len(self.custom_camera) == 0:
+        elif len(self.custom_camera) == 0:
             warning = QMessageBox()
             warning.setText("⚠ 카메라가 존재하지 않는 씬은 퍼블리시할 수 없습니다.")
             warning.setStandardButtons(QMessageBox.Ok)
@@ -561,11 +562,12 @@ class MainWindow(QMainWindow):
             # 샷 목록 추가
             for index, _ in enumerate(self.undi_info_list):
                 if self.shot_list:
-                    if len(self.undi_thumbnail_list):
-                        data.append([self.undi_thumbnail_list[index], self.shot_list[index]['shot_name']])
-                    else:
+                    try:
+                        self.undi_thumbnail_list[index]
+                    except IndexError as exc:
                         data.append([None, self.shot_list[index]['shot_name']])
-
+                        continue
+                    data.append([self.undi_thumbnail_list[index], self.shot_list[index]['shot_name']])
                 else:
                     data.append([None, 'No Output File to Load'])
 

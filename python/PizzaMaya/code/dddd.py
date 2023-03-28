@@ -7,6 +7,7 @@ gazu.set_event_host("http://192.168.3.116")
 gazu.log_in("pipeline@rapa.org", "netflixacademy")
 
 project = gazu.project.get_project_by_name('RAPA')
+proj2 = gazu.project.get_project_by_name('Project1')
 
 asset = gazu.asset.get_asset_by_name(project, 'Village')
 asset2 = gazu.asset.get_asset_by_name(project, 'Classroom')
@@ -32,9 +33,11 @@ comment = '레이아웃 작업 완료되었습니다. 변경사항: 배치 수�
 software = gazu.files.all_softwares()[1]  # 마야
 
 seq1 = gazu.shot.get_sequence_by_name(project, 'SQ01')
+s1 = gazu.shot.get_sequence_by_name(proj2, 'seq1')
 
 shot1 = gazu.shot.get_shot_by_name(seq1, '0010')
 shot2 = gazu.shot.get_shot_by_name(seq1, '0020')
+ss1 = gazu.shot.get_shot_by_name(s1, 'sh1')
 
 output_type_mb = gazu.files.get_output_type_by_name('MayaBinary')
 output_type_ma = gazu.files.get_output_type_by_name('MayaAskii')
@@ -47,79 +50,78 @@ output_type_exr = gazu.files.get_output_type_by_name('EXR')
 output_type_jpg = gazu.files.get_output_type_by_name('JPEG')
 
 
-def make(proj, t=None, tt=None, sof=None, ot=None, rp=None):
-    for shot in gazu.shot.all_shots_for_project(proj):
-        for task in gazu.task.all_tasks_for_shot(shot):
-            path = os.path.dirname(gazu.files.build_working_file_path(task)[1:])
-            path2 = os.path.dirname(gazu.files.build_entity_output_file_path(shot, ot, tt))
+def make(proj, shot, t=None, tt=None, sof=None, ot=None, rp=None):
+    # for shot in gazu.shot.all_shots_for_project(proj):
+    #     for task in gazu.task.all_tasks_for_shot(shot):
+    #         path = os.path.dirname(gazu.files.build_working_file_path(task)[1:])
+    #         path2 = os.path.dirname(gazu.files.build_entity_output_file_path(shot, ot, tt))
+    #
+    #         try:
+    #             os.makedirs(os.sep + path)
+    #         except OSError as exc:
+    #             continue
+    #
+    #         try:
+    #             os.makedirs(os.sep + path2)
+    #         except OSError as exc:
+    #             continue
+    #
+    # for asset in gazu.asset.all_assets_for_project(proj):
+    #     for task in gazu.task.all_tasks_for_asset(asset):
+    #         path = os.path.dirname(gazu.files.build_working_file_path(task)[1:])
+    #         try:
+    #             os.makedirs(os.sep + path)
+    #         except OSError as exc:
+    #             continue
 
-            try:
-                os.makedirs(os.sep + path)
-            except OSError as exc:
-                continue
-
-            try:
-                os.makedirs(os.sep + path2)
-            except OSError as exc:
-                continue
-            
-    for asset in gazu.asset.all_assets_for_project(proj):
-        for task in gazu.task.all_tasks_for_asset(asset):
-            path = os.path.dirname(gazu.files.build_working_file_path(task)[1:])
-            try:
-                os.makedirs(os.sep + path)
-            except OSError as exc:
-                continue
-
-    gazu.task.get_task_by_entity(shot1, tt)
-    gazu.task.add_comment(t, task_status, comment)
-    w1 = gazu.files.new_working_file(t, software=sof, comment=comment)
-    gazu.files.new_entity_output_file(shot1, ot, tt,
+    w1 = gazu.files.new_working_file(t, comment=comment)
+    gazu.files.new_entity_output_file(shot, ot, tt,
                                       comment, w1, representation=rp)
 
-# task = gazu.task.get_task_by_entity(shot1, task_type_mm)
-# make(project, task, task_type_mm, ot=output_type_ujpg, rp='jpg')
+
+task = gazu.task.get_task_by_entity(shot1, task_type_mm)
+make(project, shot1, task, task_type_mm, ot=output_type_ujpg, rp='jpg')
+
+task = gazu.task.get_task_by_entity(shot1, task_type_cam)
+make(project, shot1, task, task_type_cam, ot=output_type_abc, rp='abc')
+
+task = gazu.task.get_task_by_entity(ss1, task_type_cam)
+make(proj2, ss1, task, task_type_cam, ot=output_type_abc, rp='abc')
+
+
+
+
+# mountpoint = '/mnt/Project'
+# root = 'JS'
+# tree = {
+#     "working": {
+#         "mountpoint": mountpoint,
+#         "root": root,
+#         "folder_path": {
+#             "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/working/v<Revision>",
+#             "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/working/v<Revision>",
+#             "style": "lowercase"
+#         },
+#         "file_name": {
+#             "shot": "<Project>_<Sequence>_<Shot>_<TaskType>_<Revision>",
+#             "asset": "<Project>_<AssetType>_<Asset>_<TaskType>_<Revision>",
+#             "style": "lowercase"
+#         }
+#     },
+#     "output": {
+#         "mountpoint": mountpoint,
+#         "root": root,
+#         "folder_path": {
+#             "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/output/<OutputType>/v<Revision>",
+#             "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/output/<OutputType>/v<Revision>",
+#             "style": "lowercase"
+#         },
+#         "file_name": {
+#             "shot": "<Project>_<Sequence>_<Shot>_<OutputType>_v<Revision>",
+#             "asset": "<Project>_<AssetType>_<Asset>_<OutputType>_v<Revision>",
+#             "style": "lowercase"
+#         }
+#     }
+# }
 #
-# task = gazu.task.get_task_by_entity(shot1, task_type_cam)
-# make(project, task, task_type_cam, ot=output_type_abc, rp='abc')
-#
-# task = gazu.task.get_task_by_entity(shot1, task_type_cam)
-# make(project, task, task_type_cam, ot=output_type_abc, rp='abc')
-
-
-
-
-mountpoint = '/mnt/Project'
-root = 'JS'
-tree = {
-    "working": {
-        "mountpoint": mountpoint,
-        "root": root,
-        "folder_path": {
-            "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/working/v<Revision>",
-            "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/working/v<Revision>",
-            "style": "lowercase"
-        },
-        "file_name": {
-            "shot": "<Project>_<Sequence>_<Shot>_<TaskType>_<Revision>",
-            "asset": "<Project>_<AssetType>_<Asset>_<TaskType>_<Revision>",
-            "style": "lowercase"
-        }
-    },
-    "output": {
-        "mountpoint": mountpoint,
-        "root": root,
-        "folder_path": {
-            "shot": "<Project>/shots/<Sequence>/<Shot>/<TaskType>/output/<OutputType>/v<Revision>",
-            "asset": "<Project>/assets/<AssetType>/<Asset>/<TaskType>/output/<OutputType>/v<Revision>",
-            "style": "lowercase"
-        },
-        "file_name": {
-            "shot": "<Project>_<Sequence>_<Shot>_<OutputType>_v<Revision>",
-            "asset": "<Project>_<AssetType>_<Asset>_<OutputType>_v<Revision>",
-            "style": "lowercase"
-        }
-    }
-}
-
-gazu.files.update_project_file_tree(project, tree)
+# gazu.files.update_project_file_tree(project, tree)

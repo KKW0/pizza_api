@@ -245,7 +245,8 @@ class MayaThings:
             compression='jpeg',
             quality=50,
             startTime=0,
-            endTime=300
+            endTime=300,
+            wh=(1920, 1080)
         )
         mc.delete(cam_group)
         # 메인 프리뷰용 카메라 그룹지우기
@@ -301,7 +302,8 @@ class MayaThings:
                 compression="jpeg",
                 quality=50,
                 startTime=0,
-                endTime=frame_range
+                endTime=frame_range,
+                wh=(1920, 1080)
             )
             mc.setAttr("%s.visibility" % cam_name_parts[1], False)
             # 켰던 카메라 다시 꺼줌

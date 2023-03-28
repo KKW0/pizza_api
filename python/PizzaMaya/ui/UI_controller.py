@@ -132,6 +132,10 @@ class MainWindow(QMainWindow):
             self.is_logged_in = True
 
             self.save = Save()
+            # Save 버튼, Back 버튼 연결
+            self.save.ui.Final_Save_Button.clicked.connect(self.final_save_button)
+            self.save.ui.Back_Button.clicked.connect(self.back_button)
+
             self.ft = Filter()
             self.ma = MayaThings()
             self.pub = PublishThings()
@@ -151,10 +155,6 @@ class MainWindow(QMainWindow):
         # Login 버튼, Logout 버튼 연결
         self.login_window.ui.Login_Button.clicked.connect(self.login_button)
         self.ui.Logout_Button.clicked.connect(self.logout_button)
-
-        # Save 버튼, Back 버튼 연결
-        self.save.ui.Final_Save_Button.clicked.connect(self.final_save_button)
-        self.save.ui.Back_Button.clicked.connect(self.back_button)
 
         # TableView 3개 연결
         self.table.clicked.connect(self.table_clicked)
@@ -237,6 +237,10 @@ class MainWindow(QMainWindow):
 
         if tf1 and tf2 and self.is_logged_in:
             self.save = Save()
+            # Save 버튼, Back 버튼 연결
+            self.save.ui.Final_Save_Button.clicked.connect(self.final_save_button)
+            self.save.ui.Back_Button.clicked.connect(self.back_button)
+
             self.ft = Filter()
             self.ma = MayaThings()
             self.pub = PublishThings()

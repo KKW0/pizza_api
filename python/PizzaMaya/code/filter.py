@@ -58,7 +58,7 @@ class Filter:
         task_info_list = []
         tmp_task_list = gazu.user.all_tasks_to_do()
         for index, task in enumerate(tmp_task_list):
-            if task['task_type_name'] == 'LayoutPizza':
+            if task['task_type_name'] == 'LayoutAsset':
                 proj_list.append(task['project_name'])
                 task_info = self._get_information_dict(task)
                 task_info_list.append(task_info)
@@ -191,7 +191,7 @@ class Filter:
             casting_info_list.append(casting_dict)
         for shot in shot_list:
             jpgs = gazu.files.get_output_type_by_name('UndistortionJpg')
-            abc = gazu.files.get_output_type_by_name('FBX')     ##### Alembic으로 바꿔야 함
+            abc = gazu.files.get_output_type_by_name('Alembic')     ##### Alembic으로 바꿔야 함
             if self._get_img_cam_info_dict_list(shot, jpgs, task_match):
                 undi_info_list.append(self._get_img_cam_info_dict_list(shot, jpgs, task_match, 1))
             if self._get_img_cam_info_dict_list(shot, abc, task_cam):

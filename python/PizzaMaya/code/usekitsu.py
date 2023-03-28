@@ -64,12 +64,12 @@ class KitsuThings:
         Returns:
             str: 카메라(fbx 등) 아웃풋 파일이 저장된 path
         """
-        output_type = gazu.files.get_output_type_by_name('FBX')     #### Alembic으로 바꿔야 함
+        output_type = gazu.files.get_output_type_by_name('Alembic')     #### Alembic으로 바꿔야 함
         task_type = gazu.task.get_task_type_by_name('Camera')
         camera_files = gazu.files.get_last_output_files_for_entity(shot, output_type, task_type)
         camera_path = gazu.files.build_entity_output_file_path(shot, output_type, task_type)
         # full_path = camera_path + '.' + camera_files[0]['representation']     ### output file에 안넣어줘서...
-        full_path = camera_path + '.fbx'    ### abc로 바꿔야 함
+        full_path = camera_path + '.abc'    ### abc로 바꿔야 함
 
         return full_path
 

@@ -101,8 +101,19 @@ class MayaThings:
             camera_path(str): 카메라 파일의 전체 경로
         """
         camera_name_tmp = (os.path.basename(camera_path)).split('.')[0]
-        camera_name_parts = camera_name_tmp.split('_')
-        camera_name = camera_name_tmp + '_' + camera_name_parts[-3]
+
+        startup_cameras = []
+        all_cameras = mc.ls(type='camera', l=True)
+        for camera in all_cameras:
+            if mc.camera(mc.listRelatives(camera, parent=True)[0], startupCamera=True, q=True):
+                startup_cameras.append(camera)
+        custom_camera = list(set(all_cameras) - set(startup_cameras))
+
+        for cam_name in custom_camera:
+            if camera_name_tmp in cam_name:
+                cam_name_parts1 = cam_name.split("|")
+
+        camera_name = cam_name_parts1[1]
         image_plane = mc.imagePlane(camera=camera_name)
         mc.setAttr(image_plane[0]+'.imageName', undi_path, type='string')
         mc.setAttr(image_plane[0]+'.useFrameExtension', True)
@@ -365,7 +376,7 @@ class MayaThings:
         if custom_camera:
             for cam_name in custom_camera:
                 cam_name_parts1 = cam_name.split("|")
-                cam_name_parts_list = re.split(r'V(\d+)', cam_name_parts1[1])
+                cam_name_parts_list = re.split(r'_v\d+_', cam_name_parts1[1])
                 cam_name_parts2 = cam_name_parts_list[0].split('_')
                 proj_name = (cam_name_parts2[0]).title()
                 proj = gazu.project.get_project_by_name(proj_name)

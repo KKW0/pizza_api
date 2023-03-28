@@ -180,10 +180,16 @@ color: white;</string>
     </item>
     <item row="4" column="3" colspan="2">
      <widget class="QLineEdit" name="ID_Box">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>30</height>
+       </size>
+      </property>
       <property name="maximumSize">
        <size>
         <width>300</width>
-        <height>50</height>
+        <height>30</height>
        </size>
       </property>
       <property name="font">
@@ -198,7 +204,7 @@ color: white;</string>
 color: white;</string>
       </property>
       <property name="text">
-       <string>keiel0326@gmail.com</string>
+       <string/>
       </property>
      </widget>
     </item>
@@ -258,10 +264,16 @@ color: white;</string>
     </item>
     <item row="5" column="3" colspan="2">
      <widget class="QLineEdit" name="PW_Box">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>30</height>
+       </size>
+      </property>
       <property name="maximumSize">
        <size>
         <width>300</width>
-        <height>50</height>
+        <height>30</height>
        </size>
       </property>
       <property name="font">
@@ -276,7 +288,10 @@ color: white;</string>
 color: white;</string>
       </property>
       <property name="text">
-       <string>tmvpdltm</string>
+       <string/>
+      </property>
+      <property name="echoMode">
+       <enum>QLineEdit::Password</enum>
       </property>
      </widget>
     </item>

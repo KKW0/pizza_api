@@ -383,7 +383,6 @@ class MainWindow(QMainWindow):
 
         # 현재 클릭한 인덱스 번호와 몇개를 클릭했는지 출력
         print(self.ui.Selection_Lable.text())
-        print(sel_asset_ids)
 
     def no_data_no_click(self, model):
         """

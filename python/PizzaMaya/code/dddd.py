@@ -1,5 +1,7 @@
 #coding:utf8
 import os
+import pprint as pp
+
 import gazu
 
 gazu.client.set_host("http://192.168.3.116/api")
@@ -19,7 +21,7 @@ s_asset4 = gazu.asset.get_asset_by_name(project, 'Person')
 
 task_status = gazu.task.get_task_status_by_name('Todo')
 
-task_type_layoutpizza = gazu.task.get_task_type_by_name('LayoutPizza')
+task_type_layoutpizza = gazu.task.get_task_type_by_name('LayoutAsset')
 task_type_lay = gazu.task.get_task_type_by_name('Layout')
 task_type_md = gazu.task.get_task_type_by_name('Modeling')
 task_type_mm = gazu.task.get_task_type_by_name('Matchmove')
@@ -74,19 +76,23 @@ def make(proj, shot, t=None, tt=None, sof=None, ot=None, rp=None):
     #         except OSError as exc:
     #             continue
 
-    w1 = gazu.files.new_working_file(t, comment=comment)
-    gazu.files.new_entity_output_file(shot, ot, tt,
-                                      comment, w1, representation=rp)
+    # w1 = gazu.files.new_working_file(t, comment=comment)
+    w1 = gazu.files.get_last_working_files(t)
+    print(w1['main']['revision'])
+    gazu.files.new_entity_output_file(shot, ot, tt, comment, w1['main']['id'], representation=rp)
+    pp.pprint(gazu.files.get_last_output_files_for_entity(shot, ot, tt))
 
 
-task = gazu.task.get_task_by_entity(shot1, task_type_mm)
-make(project, shot1, task, task_type_mm, ot=output_type_ujpg, rp='jpg')
-
-task = gazu.task.get_task_by_entity(shot1, task_type_cam)
-make(project, shot1, task, task_type_cam, ot=output_type_abc, rp='abc')
-
-task = gazu.task.get_task_by_entity(ss1, task_type_cam)
-make(proj2, ss1, task, task_type_cam, ot=output_type_abc, rp='abc')
+# task = gazu.task.get_task_by_entity(asset, task_type_layoutpizza)
+# casted_list = gazu.casting.get_asset_cast_in(task['entity_id'])
+# print(casted_list)
+# make(project, shot1, task, task_type_mm, ot=output_type_ujpg, rp='jpg')
+#
+# task = gazu.task.get_task_by_entity(shot1, task_type_cam)
+# make(project, shot1, task, task_type_cam, ot=output_type_abc, rp='abc')
+#
+task = gazu.task.get_task_by_entity(s_asset4, task_type_md)
+make(project, s_asset4, task, task_type_md, ot=output_type_fbx, rp='fbx')
 
 
 

@@ -40,7 +40,7 @@ class MayaThings:
         path = path + '.' + working['representation']
         mc.file(path, i=True)
 
-    def _load_output(self, path, asset=None):
+    def _load_output(self, path, undi_seq_path=None, asset=None):
         """
         마야에서 task asset에 캐스팅된 에셋들의 output file들을 레퍼런스 형태로 import하는 매서드
 
@@ -51,15 +51,35 @@ class MayaThings:
             path(str): 확장자를 포함한 아웃풋 파일의 패스
             asset(dict): 로드하고자 하는 에셋 아웃풋 파일의 nb_elements, path 정보가 담긴 딕셔너리
         """
-        # 시퀀스 길이(씬의 프레임레인지) 를 가장 길게 설정
-        if 'UndistortionImg' in path:
-            file_list = os.listdir(path)
+        if undi_seq_path:
+            # 시퀀스 길이(씬의 프레임레인지) 를 가장 길게 설정
+            file_list = os.listdir(os.path.dirname(undi_seq_path))
             frame_range = len(file_list)
             end_frame = mc.playbackOptions(query=True, max=True)
-            if end_frame < frame_range:
-                mc.playbackOptions(min=False, max=frame_range)
+            # if end_frame < frame_range:
+            mc.playbackOptions(min=1001, max=frame_range+1000)
 
-        mc.file(
+        objects_shape = mc.ls(type='mesh')
+        objects = mc.listRelatives(objects_shape, p=1)
+        object_found = None
+        new_z = 0
+        if objects:
+            for obj in objects:
+                pos = mc.xform(obj, q=True, ws=True, t=True)
+                if pos == [0.0, 0.0, 0.0]:
+                    object_found = True
+                else:
+                    object_found = False
+                    break
+                while object_found:
+                    for obj in objects:
+                        pos = mc.xform(obj, q=True, ws=True, t=True)
+                        if pos == [0.0, new_z, 0.0]:
+                            new_z += 1
+                        else:
+                            object_found = False
+
+        my_object_nodes = mc.file(
             path, r=True, ignoreVersion=True,
             # path의 아웃풋 파일을 import 하는데, 이 때 파일의 버전 번호를 무시한다.
             mergeNamespacesOnClash=False,
@@ -69,6 +89,10 @@ class MayaThings:
             returnNewNodes=True
             # 변수에 노드의 정보값을 넣으려고 쓰는 거라 없어도 될 듯
         )
+        my_object = mc.ls(my_object_nodes, type='transform')
+        if object_found != None:
+            mc.setAttr("%s.translateZ" % my_object[0], new_z)
+
         i = 0
         v = 0
         if asset and asset['nb_elements'] > 1:
@@ -77,15 +101,23 @@ class MayaThings:
                 full_filename = os.path.basename(asset['path'])
                 file_name_parts = full_filename.split('_')
                 import_name = '_'.join(file_name_parts[:-1]) \
-                              + '__1_' + str(asset['nb_elements']) + '__' + file_name_parts[2]
-                instance_geo = mc.instance(import_name)
+                              + '__1_' + str(asset['nb_elements']) + '__' + file_name_parts[2] + '_GRP'
+                try:
+                    mesh = mc.listRelatives(import_name, c=1)
+                except ValueError as exc:
+                    import_name = '_'.join(file_name_parts[:-1]) \
+                                  + '__1_' + str(asset['nb_elements']) + '__' + file_name_parts[2]
+                    mesh = mc.listRelatives(import_name, c=1)
+
+                instance_geo = mc.instance(mesh)
                 bounding_box = mc.exactWorldBoundingBox(instance_geo, ce=1)
-                if index < 10:
-                    mc.setAttr("%s.translateX" % instance_geo[0], i)
-                    i+=bounding_box[3]*2
+                if index <= 10:
+                    mc.setAttr("%s.translateX" % instance_geo[0], i + bounding_box[3]*2)
+                    i += bounding_box[3]*2
+                    mc.setAttr("%s.translateZ" % instance_geo[0], new_z-1)
                 else:
                     mc.setAttr("%s.translateZ" % instance_geo[0], bounding_box[5] * 2)
-                    mc.setAttr("%s.translateX" % instance_geo[0], v)
+                    mc.setAttr("%s.translateX" % instance_geo[0], v + bounding_box[3]*2)
                     v += bounding_box[3] * 2
 
     def _connect_image(self, undi_path, camera_path):
@@ -112,9 +144,13 @@ class MayaThings:
         for cam_name in custom_camera:
             if camera_name_tmp in cam_name:
                 cam_name_parts1 = cam_name.split("|")
+        camera_name = camera_name_tmp + '_object'
+        try:
+            image_plane = mc.imagePlane(camera=camera_name)
+        except RuntimeError as exc:
+            camera_name = camera_name_tmp + '_cam_fire_FS'
+            image_plane = mc.imagePlane(camera=camera_name)
 
-        camera_name = cam_name_parts1[1]
-        image_plane = mc.imagePlane(camera=camera_name)
         mc.setAttr(image_plane[0]+'.imageName', undi_path, type='string')
         mc.setAttr(image_plane[0]+'.useFrameExtension', True)
         mc.connectAttr('%s.visibility' % camera_name, '%s.visibility' % image_plane[0])
@@ -131,8 +167,8 @@ class MayaThings:
         shot = gazu.shot.get_shot(shot_simple['shot_id'])
         undi_seq_path = self.kit.get_undistortion_img(shot)
         camera_path = self.kit.get_camera(shot)
-        self._load_output(undi_seq_path)
-        self._load_output(camera_path)
+        # self._load_output(undi_seq_path)
+        self._load_output(camera_path, undi_seq_path)
         self._connect_image(undi_seq_path, camera_path)
 
     def import_casting_asset(self, asset, num_list=None):
@@ -163,7 +199,7 @@ class MayaThings:
             if asset_output['path'] == '':
                 print('asset에 아웃풋 파일이 존재하지 않습니다. Asset Name: {0}'.format(asset['name']))
             else:
-                self._load_output(asset_output['path'], asset_output)
+                self._load_output(asset_output['path'], asset=asset_output)
                 self.log.load_file_log(asset_output['name'])
 
     def save_scene_file(self, path, representation):
@@ -294,7 +330,6 @@ class MayaThings:
         undi_seq_path = self.kit.get_undistortion_img(shot)
         file_list = os.listdir(os.path.dirname(undi_seq_path))
         frame_range = len(file_list)
-        print('A', frame_range)
 
         # 다른 카메라랑 이미지플레인 다 끄고, 샷에 해당하는 카메라만 켜서 플레이블라스트 프리뷰 저장
         startup_cameras = []
@@ -305,6 +340,19 @@ class MayaThings:
         # for cam in startup_cameras:
         #     cam_name_parts = cam.split('|')
         #     mc.setAttr("%s.visibility" % cam_name_parts[1], False)
+
+        # startup_cameras = []
+        # all_cameras = mc.ls(type='camera', l=True)
+        # for cam in all_cameras:
+        #     if mc.camera(mc.listRelatives(cam, parent=True)[0], startupCamera=True, q=True):
+        #         startup_cameras.append(cam)
+        # print(startup_cameras)
+        # custom_camera = list(set(all_cameras) - set(startup_cameras))
+        # for cam in custom_camera:
+        #     print(cam)
+        #     transform_cam = mc.listRelatives(cam, p=1)
+        #     print(transform_cam)
+        #     mc.setAttr("%s.visibility" % transform_cam[0], False)
 
         cam_name_parts = custom_camera.split('|')
         mc.setAttr("%s.visibility" % cam_name_parts[1], True)
@@ -318,8 +366,8 @@ class MayaThings:
             percent=50,
             compression="jpeg",
             quality=50,
-            startTime=0,
-            endTime=frame_range,
+            startTime=1001,
+            endTime=frame_range+1000,
             wh=(1920, 1080)
         )
 
@@ -366,7 +414,15 @@ class MayaThings:
             if ref_nodes:
                 for node in ref_nodes:
                     if mc.objectType(node) == 'mesh':
-                        all_assets.append(node)
+                        while True:
+                            parent = mc.listRelatives(node, parent=True)
+                            if parent is None:
+                                root_node = node
+                                break
+                            else:
+                                node = parent[0]
+                        if root_node not in all_assets:
+                            all_assets.append(root_node)
 
         all_cameras = mc.ls(type='camera', l=True)
         for camera in all_cameras:

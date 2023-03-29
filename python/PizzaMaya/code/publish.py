@@ -42,11 +42,12 @@ class PublishThings:
             str(preview_path): preview file이 저장될 경로(확장자 제외)
         """
         casted_list = gazu.casting.get_asset_cast_in(task['entity_id'])
-        seq = casted_list[0]
+        shot = gazu.shot.get_shot(casted_list[0]['shot_id'])
+        seq = gazu.shot.get_sequence_from_shot(shot)
         # working file 모델 생성
         working_file_list = gazu.files.get_working_files_for_task(task['id'])
         software = gazu.files.get_software_by_name('Maya')
-        if working_file_list is []:
+        if len(working_file_list) is 0:
             # task가 주어진 에셋에 working file 모델이 없으면 새로 생성
             working_file = gazu.files.new_working_file(task['id'],
                                                        name=seq['name']+'_layout_working',
@@ -122,7 +123,7 @@ class PublishThings:
         if os.path.exists(path) is False:
             os.makedirs(path)
         else:
-            raise SystemError("폴더가 이미 존재합니다.")
+            pass
 
     def _upload_files(self, task, path, file_type=None, comment=None):
         """

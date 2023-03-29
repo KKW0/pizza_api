@@ -177,26 +177,29 @@ class MainWindow(QMainWindow):
         """
         self.shot_dict_list, self.custom_camera, self.all_assets = self.ma.get_working_task()
         if len(self.custom_camera) != 0:
-            seq = gazu.shot.get_sequence_from_shot(self.shot_dict_list[0])['name']
+            seq = gazu.shot.get_sequence_from_shot(self.shot_dict_list[0])
+            proj = gazu.project.get_project(seq['project_id'])
             for index, item in enumerate(self.task_info):
-                if seq == item['sequence_name']:
+                if seq['name'] == item['sequence_name'] and proj['name'] == item['project_name']:
                     self.my_task = self.task[index]
-                    print('{0} task가 씬에 존재하여 자동 선택되었습니다.'.format(seq))
+                    print('{0} task가 씬에 존재하여 자동 선택되었습니다.'.format(seq['name']))
                     self.table.selectRow(index)
                     self.table_clicked(None, index)
-
         if len(self.all_assets) != 0:
             old_asset_list = []
             for asset in self.all_assets:
-                asset_rn = '_'.join(asset.split('_')[:-1]) + 'RN'
+                asset_rn = '_'.join(asset.split('_')[:-2]) + 'RN'
                 asset_name = asset.split('_')[2]
-                revision = asset.split('_')[4]
+                revision = int((asset.split('_')[4]).split('v')[1])
                 proj = gazu.project.get_project_by_name(asset.split('_')[0])
                 output_type = gazu.files.get_output_type_by_name('FBX')
                 task_type = gazu.task.get_task_type_by_name('Modeling')
                 kitsu_asset = gazu.asset.get_asset_by_name(proj, asset_name.title())
                 if kitsu_asset:
-                    kitsu_revision = gazu.files.get_last_entity_output_revision(kitsu_asset, output_type, task_type)
+                    output_file = gazu.files.get_last_output_files_for_entity(kitsu_asset, output_type, task_type)
+                    kitsu_revision = output_file[0]['revision']
+                    print('A', kitsu_revision)
+                    print('B', revision)
                     if revision < kitsu_revision:
                         old_asset_list.append(asset)
                         ask = QMessageBox()
@@ -307,13 +310,13 @@ class MainWindow(QMainWindow):
         선택한 테스크에 대한 작업내용을 퍼블리시하는 버튼 클릭 시 save ui를 띄우고, my_task의 정보를 넘긴다.
         """
         self.shot_dict_list, self.custom_camera, self.all_assets = self.ma.get_working_task()
-        if self.my_task == None or len(self.custom_camera) == 0 or len(self.all_assets) == 0:
+        if len(self.custom_camera) == 0 and len(self.all_assets) == 0:
             warning = QMessageBox()
             warning.setText("⚠ 비어있는 씬은 퍼블리시할 수 없습니다.")
             warning.setStandardButtons(QMessageBox.Ok)
             warning.setWindowTitle("Error")
             warning.exec_()
-        elif len(self.custom_camera) == 0:
+        elif len(self.custom_camera) == 0 and len(self.all_assets) != 0:
             warning = QMessageBox()
             warning.setText("⚠ 카메라가 존재하지 않는 씬은 퍼블리시할 수 없습니다.")
             warning.setStandardButtons(QMessageBox.Ok)
@@ -404,7 +407,8 @@ class MainWindow(QMainWindow):
         if item == "asset":
             for index in range(len(self.casting_info_list)):
                 for asset in all_assets:
-                    if self.casting_info_list[index]['asset_name'] in asset:
+                    scene_asset_name = self.casting_info_list[index]['asset_name'].lower()
+                    if scene_asset_name in asset:
                         print('{0} 에셋은 이미 로드되어 선택할 수 없습니다.'.format(self.casting_info_list[index]['asset_name']))
                         model.asset_name = self.casting_info_list[index]['asset_name']
 

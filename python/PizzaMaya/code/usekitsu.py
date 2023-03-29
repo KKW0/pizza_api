@@ -23,10 +23,10 @@ class KitsuThings:
             str: 파일명 끝에 붙일 첫번째 패딩의 문자열
         """
         if shot['nb_frames'] and len(str(shot['nb_frames'])) > 4:
-            padding_info = len(str(shot['nb_frames'])) - 1
+            padding_info = len(str(shot['nb_frames'])) - 2
         else:
-            padding_info = 3
-        padding = '_' + ('0' * padding_info) + '1'
+            padding_info = 2
+        padding = '_1' + ('0' * padding_info) + '1'
 
         return padding
 
